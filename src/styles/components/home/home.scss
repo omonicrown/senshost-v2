@@ -1,0 +1,40 @@
+.home-container {
+    height: 100%;
+
+    @import "../shared/header.scss";
+
+    aside {
+        &.left-side-container {
+            height: calc(100% - #{$header-height});
+            width: $aside-width;
+            background-color: #3a4651;
+            display: inline-block;
+        }
+    }
+
+    main {
+        &.main-container {
+            display: inline-block;
+            height: calc(100% - #{$header-height});
+            width: calc(100% - #{$aside-width});
+            overflow-y: auto;
+
+            >.main-holder {
+                height: calc(100% - #{$footer-height});
+            }
+
+            footer {
+                &.footer-container {
+                    height: $footer-height;
+                    background: #fff;
+                    color: #444;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    border-top: 1px solid #d2d6de;
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
