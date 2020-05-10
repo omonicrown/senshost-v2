@@ -1,4 +1,8 @@
-$header-background : #d7dde4;
-$header-height : 60px;
-$footer-height : 30px;
-$aside-width : 240px;
+$header-background : #3b4655;
+$header-height : calculateRem(60);
+$footer-height : calculateRem(30);
+$aside-width : calculateRem(240);
+$transition_time: 400ms;
+$aside-background-color: #d7dde4;
+$root-font-size: 16px;
+$page-padding: 20;

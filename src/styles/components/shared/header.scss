@@ -1,8 +1,8 @@
-$header-background : #d7dde4;
-
 .header-container {
     height: $header-height;
     position: relative;
     width: 100%;
     background: $header-background;
+    padding-left: calculateRem(20);
+    padding-right: calculateRem(20);
 }

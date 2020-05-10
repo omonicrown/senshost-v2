@@ -1,38 +1,157 @@
 .home-container {
     height: 100%;
-
     @import "../shared/header.scss";
 
-    aside {
-        &.left-side-container {
-            height: calc(100% - #{$header-height});
-            width: $aside-width;
-            background-color: #3a4651;
-            display: inline-block;
+    .main-body {
+        height: 100%;
+        width: 100%;
+
+        aside {
+            &.left-side-container {
+                height: calc(100% - #{$header-height});
+                background-color: $aside-background-color;
+
+                position: relative;
+
+                transition: width $transition_time;
+
+                &:before {
+                    content: " ";
+                    background-color: $aside-background-color;
+                    position: fixed;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    z-index: -1;
+                    transition: width $transition_time;
+                }
+
+                >.hamburger-icon {
+                    position: absolute;
+                    right: calculateRem(-35);
+                    top: calculateRem(17);
+                    z-index: 10;
+                    transition: transform $transition_time;
+
+                    svg {
+                        cursor: pointer;
+                        width: calculateRem(20);
+                        height: calculateRem(22);
+                    }
+                }
+
+                &.sidemenu-opened {
+                    >.sidebar-content {
+                        width: $aside-width;
+                        opacity: 1;
+                        overflow: visible;
+                        height: 100%;
+                        @include setPagePadding(20);
+                    }
+
+                    &:before {
+                        width: $aside-width;
+                    }
+                }
+
+                &.sidemenu-closed {
+                    >.sidebar-content {
+                        padding: 0rem;
+                        width: 0rem;
+                        opacity: 0;
+                    }
+
+                    &:before {
+                        width: 0rem;
+                    }
+                }
+
+                .sidebar-content {
+                    transition: width $transition_time, padding $transition_time, opacity $transition_time;
+                    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
+                    color: $header-background;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        main {
+            &.main-container {
+                height: calc(100% - #{$header-height});
+                width: 100%;
+
+                &.sidemenu-opened {
+                    width: calc(100% - #{$aside-width});
+                }
+
+                overflow-y: auto;
+
+                >.main-holder {
+                    height: calc(100% - #{$footer-height});
+                    @include setPagePadding(20);
+                }
+
+                footer {
+                    &.footer-container {
+                        height: $footer-height;
+                        background: #fff;
+                        color: #444;
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        justify-content: center;
+                        border-top: 1px solid #d2d6de;
+                        width: 100%;
+
+                        @include setPagePadding(20);
+                    }
+                }
+            }
         }
     }
+}
 
-    main {
-        &.main-container {
-            display: inline-block;
-            height: calc(100% - #{$header-height});
-            width: calc(100% - #{$aside-width});
-            overflow-y: auto;
-
-            >.main-holder {
-                height: calc(100% - #{$footer-height});
+/* Mobile */
+@media only screen and (max-width: 767px) {
+    .home-container {
+    
+        .main-body {
+            main {
+                &.main-container {
+                    &.sidemenu-opened {
+                        width: 100%;
+                    }
+                }
             }
+            aside {
+                &.left-side-container {
+                    &.sidemenu-opened {
+                        width: 100%;
 
-            footer {
-                &.footer-container {
-                    height: $footer-height;
-                    background: #fff;
-                    color: #444;
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    border-top: 1px solid #d2d6de;
-                    width: 100%;
+                        >.sidebar-content {
+                            width: 100%;
+                        }
+
+                        &:before {
+                            width: 100%
+                        }
+
+                        >.hamburger-icon {
+                            transform: translateX(calculateRem(-60))
+                        }
+
+                        & + * {
+                            width: 0;
+                            height: 0;
+                            opacity: 0;
+                            overflow: hidden;
+                            transition: all $transition_time;
+                        }
+                    }
+                    &.sidemenu-closed {
+                        width: 0;
+                    }
                 }
             }
         }

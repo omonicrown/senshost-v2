@@ -1,4 +1,5 @@
 @import "~@sebgroup/bootstrap/scss/bootstrap";
+@import "./components/shared/mixins.scss";
 @import "./components/shared/variables.scss";
 
 body {
@@ -6,9 +7,9 @@ body {
         margin: 0;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         box-sizing: border-box;
-        font-size: 14px;
-      }
-      
+        @include fontSize(16);
+    }
+
     .main-app-container {
         position: absolute;
         top: 0;
@@ -16,6 +17,12 @@ body {
         left: 0;
         right: 0;
         overflow: hidden;
+
+        .container-fluid {
+            padding-right: 0rem;
+            padding-left: 0rem;
+        }
+
         @import "./components/home/home.scss";
     }
 }
