@@ -143,6 +143,8 @@ export class AnalogTank {
   private topSupportLabel: any;
 
   private topMarkerLabel: any;
+  private topMarker: any;
+  private bottomMarker: any;
   private bottomMarkerLabel: any;
   private markerBarGroup: any;
   private markerLabelWidth: any;
@@ -283,14 +285,14 @@ export class AnalogTank {
   private viewPortHeight: any;
   private bisector: any;
 
-  constructor(element: HTMLDivElement, config: Config) {
+  constructor(element: HTMLDivElement, config?: Config) {
     let defaults: Config = {
       tankType: "tower", // available types: 'tower', 'round'
       tankWidth: null, // outside width.
       tankHeight: null, // outside height.
       fillPadding: null, // gap between perimeter and inside tank area that displays water.
       borderWidth: 2, // perimeter width.
-      borderColor: "#333", // outside border color. usually the perimeter of the tank
+      borderColor: "transparent", // #333 // outside border color. usually the perimeter of the tank
       defaultFillColor: "#3fabd4", // default water color. this is assigned to fillColor if water level does not pass any thresholds.
       fillColor: null, // used later to set water color. it could be different color depending on situations.
       backFillColor: "#fafafa", // background color inside the tank where there is no water.
@@ -399,8 +401,6 @@ export class AnalogTank {
     Object.assign(this, defaults);
     this.url = window.location.href;
 
-    console.log("The attributes ate ", this.thresholds);
-
     this.init();
   }
 
@@ -409,7 +409,12 @@ export class AnalogTank {
     this.setInitialValues();
     this.drawSvgContainer();
 
-    this.initTower();
+    if ( this.tankType === "tower" ) {
+      this.initTower();
+    } else if ( this.tankType === "round" ) {
+      this.initRound();
+    }
+
     this.setMarkerAttributes();
     this.calculateDimensions();
     this.setGaugeScale();
@@ -456,8 +461,6 @@ export class AnalogTank {
         -(this.innerHeight + this.amplitude) / 2,
       ])
       .clamp(true);
-
-    console.log("Is it a number ", this.innerHeight);
   }
 
   getNewHeight() {
@@ -467,7 +470,6 @@ export class AnalogTank {
 
   initTower() {
     let uniqId = this.uniqId();
-    // this.tankGroup = this.bodyGroup.append('g').attr('id', 'tank-group');
     this.waveClip = this.bodyGroup
       .append("defs")
       .append("clipPath")
@@ -537,6 +539,55 @@ export class AnalogTank {
       .attr("id", "marker-bar-group");
     // for debug purpose
     // this.bodyGroup.append('path').attr('d', 'M-${this.height/2} 0 L ${this.height} 0').attr('stroke-width', 1).attr('stroke', 'red');
+  }
+
+  initRound () {
+    let that = this;
+    let uniqId = this.uniqId();
+    this.tankGroup = this.bodyGroup.append('g').attr('id', 'tank-group');
+    this.waveClip = this.bodyGroup.append('defs').append('clipPath').attr('id', uniqId);
+    this.waveHorizontal = this.waveClip.append('path');
+
+    this.backFill = this.tankGroup.append('ellipse').attr('id', 'back-fill');
+    this.border = this.tankGroup.append('ellipse').attr('id', 'border');
+    this.neckBackFill = this.tankGroup.append('path').attr('id', 'neck-back-fill');
+    this.behindText = this.tankGroup.append('text').attr('id', 'behind-text');
+    this.behindArrow = this.tankGroup.append('text').attr('id', 'behind-arrow');
+
+    if (this.lookupTableValueEnabled) {
+      this.lookupTableValueBehindText = this.tankGroup.append('text').attr('id', 'lookup-value-behind-text');
+    }
+
+    if (this.changeRateValueEnabled) {
+      this.changeRateValueBehindText = this.tankGroup.append('text').attr('id', 'lookup-value-rate-behind-text');
+    }
+
+    this.waveGroup = this.tankGroup.append('g').attr('clip-path', this.getUniqUrl(uniqId));
+    this.neckFill = this.waveGroup.append('path').attr('id', 'neck-fill');
+    this.waterFill = this.waveGroup.append('ellipse').attr('id', 'water-fill');
+    this.neckBorder = this.tankGroup.append('path').attr('id', 'neck-border');
+
+    this.overlayText = this.waveGroup.append('text').attr('id', 'overlay-text');
+    this.overlayArrow = this.waveGroup.append('text').attr('id', 'overlay-arrow');
+
+    if (this.lookupTableValueEnabled) {
+      this.lookupTableValueOverlayText = this.waveGroup.append('text').attr('id', 'lookup-value-overlay-text');
+    }
+
+    if (this.changeRateValueEnabled) {
+      this.changeRateValueOverlayText = this.waveGroup.append('text').attr('id', 'lookup-value-rate-overlay-text');
+    }
+
+    this.supportLabelGroup = this.bodyGroup.append('g').attr('id', 'support-label-group');
+    this.supportLabelBg = this.supportLabelGroup.append('rect').attr('id', 'support-label-bg');
+    this.supportLabel = this.supportLabelGroup.append('text').attr('id', 'overlay-support-label');
+    this.topSupportLabel = this.supportLabelGroup.append('text').attr('id', 'top-overlay-support-label');
+
+    this.topMarker = this.tankGroup.append('line').attr('id', 'top-marker');
+    this.bottomMarker = this.tankGroup.append('line').attr('id', 'bottom-marker');
+    this.topMarkerLabel = this.tankGroup.append('text').attr('id', 'top-marker-label');
+    this.bottomMarkerLabel = this.tankGroup.append('text').attr('id', 'bottom-marker-label');
+    this.markerBarGroup = this.tankGroup.append('g').attr('id', 'marker-bar-group');
   }
 
   // sets the inital text and color to display based on fillValue

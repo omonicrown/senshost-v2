@@ -90,6 +90,12 @@
                 >.main-holder {
                     height: calc(100% - #{$footer-height});
                     @include setPagePadding(20);
+                    padding-top: calculateRem(50);
+
+                    >.container {
+                        height: 100%;
+                        @import "../dashboard/dashboard.scss";
+                    }
                 }
 
                 footer {
@@ -115,7 +121,7 @@
 /* Mobile */
 @media only screen and (max-width: 767px) {
     .home-container {
-    
+
         .main-body {
             main {
                 &.main-container {
@@ -124,6 +130,7 @@
                     }
                 }
             }
+
             aside {
                 &.left-side-container {
                     &.sidemenu-opened {
@@ -141,7 +148,7 @@
                             transform: translateX(calculateRem(-60))
                         }
 
-                        & + * {
+                        &+* {
                             width: 0;
                             height: 0;
                             opacity: 0;
@@ -149,6 +156,7 @@
                             transition: all $transition_time;
                         }
                     }
+
                     &.sidemenu-closed {
                         width: 0;
                     }

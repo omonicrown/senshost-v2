@@ -1,6 +1,8 @@
 import React from "react";
 import { RouteComponentProps } from "react-router";
 
+import Gauge from "../gauge";
+
 export default class Dashboard extends React.PureComponent<
   RouteComponentProps
   > {
@@ -9,8 +11,19 @@ export default class Dashboard extends React.PureComponent<
   }
 
   render() {
-    return (<div className="dashboard-container">
+    return (
+      <div className="dashboard-container">
 
-    </div>);
+        <div className="row">
+          <div className="col-md-4 col-12 gadgetPanel">
+            <Gauge type="tower" />
+          </div>
+
+          <div className="col-md-4 col-12 gadgetPanel">
+            <Gauge type="round" />
+          </div>
+        </div>
+      </div>
+    );
   }
 }

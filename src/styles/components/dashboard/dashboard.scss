@@ -1,0 +1,14 @@
+.dashboard-container{
+    position: relative;
+    height: 100%;
+    width: 100%;
+    .row {
+        .gadgetPanel {
+            margin: calculateRem(10);
+            min-height: calculateRem(350);
+            border-radius: calculateRem(5);
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+    }
+}

@@ -15,7 +15,6 @@ export default class App extends React.PureComponent<{}, {}> {
   }
 
   render() {
-    console.log("Oga ", this.props);
     return (
       <div className="main-app-container">
         <React.Suspense fallback={<Loader toggle={true} />}>
