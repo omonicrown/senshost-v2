@@ -83,14 +83,16 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
   }, []);
 
   const style: React.CSSProperties = {
-
     height: "200px",
-    width: "auto",
+    width: "200px",
     position: "relative",
-    background: "#3b4655"
   };
   return (
-    <div className="gauge-container">
+    <div className="gauge-container d-flex align-items-center justify-content-center" style={{
+      height: "70%",
+      background: "#3b4655",
+      marginTop: "1rem"
+    }}>
       <div className="wrapper" ref={wrapperDiv} style={style} id="wrapper"></div>
     </div>
   );

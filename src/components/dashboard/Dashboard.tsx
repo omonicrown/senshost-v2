@@ -15,11 +15,11 @@ export default class Dashboard extends React.PureComponent<
       <div className="dashboard-container">
 
         <div className="row">
-          <div className="col-md-4 col-12 gadgetPanel">
+          <div className="col-md-3 col-12 gadgetPanel">
             <Gauge type="tower" />
           </div>
 
-          <div className="col-md-4 col-12 gadgetPanel">
+          <div className="col-md-3 col-12 gadgetPanel">
             <Gauge type="round" />
           </div>
         </div>

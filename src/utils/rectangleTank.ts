@@ -292,7 +292,7 @@ export class AnalogTank {
       tankHeight: null, // outside height.
       fillPadding: null, // gap between perimeter and inside tank area that displays water.
       borderWidth: 2, // perimeter width.
-      borderColor: "transparent", // #333 // outside border color. usually the perimeter of the tank
+      borderColor: "#333", // #333 // outside border color. usually the perimeter of the tank
       defaultFillColor: "#3fabd4", // default water color. this is assigned to fillColor if water level does not pass any thresholds.
       fillColor: null, // used later to set water color. it could be different color depending on situations.
       backFillColor: "#fafafa", // background color inside the tank where there is no water.

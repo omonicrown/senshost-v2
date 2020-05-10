@@ -1,5 +1,4 @@
 import * as React from "react";
-import logo from "./logo.svg";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
 import { AppRoute } from "../utils/functions";
 import { Redirect, Switch, RouteComponentProps } from "react-router";
