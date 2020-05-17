@@ -85,12 +85,13 @@
                     width: calc(100% - #{$aside-width});
                 }
 
-                overflow-y: auto;
+                overflow-y: hidden;
 
                 >.main-holder {
                     height: calc(100% - #{$footer-height});
                     @include setPagePadding(20);
                     padding-top: calculateRem(50);
+                    overflow-y: auto;
 
                     >.container {
                         height: 100%;

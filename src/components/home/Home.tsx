@@ -30,7 +30,6 @@ export default class Home extends React.PureComponent<HomeProps, HomeStates> {
   }
 
   onToggle = (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => {
-    console.log("Does ir call on toggle")
     this.setState({ toggle: value || !this.state.toggle });
   }
 

@@ -1,100 +1,108 @@
 import * as React from "react";
 
-import { AnalogTank } from "../utils/rectangleTank";
+import 'echarts/lib/chart/gauge';
+import { EChartOption } from "echarts";
 
+import "echarts-liquidfill";
+import ReactEcharts from 'echarts-for-react';
 
 interface GaugeProps {
-  type: "round" | "tower";
+  type: "rectangle" | "tears" | "circle";
+  data: Array<number>;
+}
+
+interface ChartOption {
+  name: string;
+  color?: string;
+  properties: Option
+}
+type Option = {
+  [k: string]: any;
 }
 
 const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
-  const ref: React.RefObject<SVGSVGElement> = React.createRef<SVGSVGElement>();
-  const wrapperDiv: React.RefObject<HTMLDivElement> = React.createRef<
-    HTMLDivElement
-  >();
-  // let gauge: Gauge;
-  let analogueTank: AnalogTank;
+
+  const [selectedOption, setSelectedOption] = React.useState<Option>({});
+  const [options, setOptions] = React.useState<Array<ChartOption>>([{
+    name: "rectangle",
+    properties: {
+      series: [{
+        type: 'liquidFill',
+        data: [0.6],
+        radius: '70%',
+        backgroundStyle: {
+          borderWidth: 2,
+          borderColor: '#156ACF'
+        },
+        outline: {
+          show: false
+        },
+        shape: 'rect'
+      }]
+    }
+  },
+  {
+    name: "circle",
+    properties: {
+      series: [{
+        type: 'liquidFill',
+        data: [0.6],
+        radius: '70%',
+        outline: {
+          show: false
+        },
+      }]
+    }
+  },
+  {
+    name: "tears", properties: {
+      series: [{
+        type: 'liquidFill',
+        data: [0.6],
+        radius: '90%',
+        itemStyle: {
+          shadowBlur: 0
+        },
+        backgroundStyle: {
+          borderWidth: 2,
+          borderColor: '#156ACF'
+        },
+        outline: {
+          show: false
+        },
+        label: {
+          shadowBlur: 0,
+          fontSize: 30,
+          position: ['50%', '45%']
+        },
+        shape: 'pin',
+        center: ['50%', '40%']
+      }]
+    }
+  }]);
 
   React.useEffect(() => {
-    // gauge = new Gauge(ref?.current);
+    const option = options.find((option: ChartOption) => option.name === props.type);
 
-    let thresholds = [
-      {
-        name: "Alarm High",
-        value: 90,
-        type: "High",
-        alarm: true,
-      },
-      {
-        name: "Pump On",
-        value: 55,
-        type: "High",
-        alarm: false,
-      },
-      {
-        name: "Pump On",
-        value: 40,
-        type: "Low",
-        alarm: false,
-      },
-      {
-        name: "Alarm Low",
-        value: 10,
-        type: "Low",
-        alarm: true,
-      },
-    ];
-    // let options: Config = {
-    //   tankType: "tower",
-    //   fillValue: 55,
-    //   fillUnit: "ft",
-    //   supportLabelPadding: 5,
-    //   frontFontColor: "#003B42",
-    //   thresholds: thresholds,
-    //   lookupTableValue: 1700,
-    //   lookupTableValueUnit: "gal",
-    //   lookupTableValueDecimal: 1,
-    //   changeRateValueDecimal: 3,
-    //   changeRateValueArrowEnabled: true,
-    //   changeRateValue: "0.3",
-    //   changeRateValueUnit: "gal/min",
-    // };
-
-    let options = {
-      tankType: props.type,
-      fillValue: 55,
-      fillUnit: "ft",
-      supportLabelPadding: 5,
-      frontFontColor: "#003B42",
-      thresholds: thresholds,
-      lookupTableValue: 1700,
-      lookupTableValueUnit: 'gal',
-      lookupTableValueDecimal: 1,
-      changeRateValueDecimal: 3,
-      changeRateValueArrowEnabled: true,
-      changeRateValue: 0.3,
-      changeRateValueUnit: 'gal/min'
+    if (option) {
+      setSelectedOption(option?.properties)
     }
+  }, [options]);
 
-    analogueTank = new AnalogTank(
-      wrapperDiv?.current as HTMLDivElement,
-      options as any
-    );
-  }, []);
+  React.useEffect(() => {
+    const updatedOptions: Array<ChartOption> = options.map((option: ChartOption) => {
+      if (option.name === props.type) {
+        return { ...option, properties: { ...option.properties, series: { ...option.properties.series, data: props.data } } };
+      }
 
-  const style: React.CSSProperties = {
-    height: "200px",
-    width: "200px",
-    position: "relative",
-  };
+      return option;
+    });
+    setOptions(updatedOptions);
+  }, [props.type, props.data])
+
   return (
-    <div className="gauge-container d-flex align-items-center justify-content-center" style={{
-      height: "70%",
-      background: "#3b4655",
-      marginTop: "1rem"
-    }}>
-      <div className="wrapper" ref={wrapperDiv} style={style} id="wrapper"></div>
-    </div>
+    <ReactEcharts className="chart" option={selectedOption} />
+
   );
 }
 
