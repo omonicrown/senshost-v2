@@ -41,7 +41,8 @@ export default class Home extends React.PureComponent<HomeProps, HomeStates> {
         </div>
         <div className="row no-gutters main-body">
           <SidebarComponent onToggle={this.onToggle} toggle={this.state.toggle} />
-          <main className={"main-container" + (this.state.toggle ? " sidemenu-opened" : " sidemenu-closed")} role="main">
+          <main className={"main-container col" + (this.state.toggle ? " sidemenu-opened" : " sidemenu-closed")} role="main">
+            <div className="inner-bar"></div>
             <div className="main-holder">
               <div className="container">
                 <Switch>
@@ -58,11 +59,11 @@ export default class Home extends React.PureComponent<HomeProps, HomeStates> {
                   />
                 </Switch>
               </div>
-            </div>
 
-            <footer className="footer-container">
-              Copyright © 2019 Senshost. All rights reserved.
+              <footer className="footer-container">
+                Copyright © 2019 Senshost. All rights reserved.
             </footer>
+            </div>
           </main>
         </div>
       </div>

@@ -80,38 +80,40 @@
             &.main-container {
                 height: calc(100% - #{$header-height});
                 width: 100%;
+                overflow-y: hidden;
 
                 &.sidemenu-opened {
                     width: calc(100% - #{$aside-width});
                 }
 
-                overflow-y: hidden;
-
+                >.inner-bar {
+                    height: calculateRem(60);
+                    width: 100%;
+                    background: red;
+                }
                 >.main-holder {
-                    height: calc(100% - #{$footer-height});
-                    @include setPagePadding(20);
-                    padding-top: calculateRem(50);
                     overflow-y: auto;
+                    height: calc(100% - #{calculateRem(60)});
 
                     >.container {
-                        height: 100%;
+                        width: 100%;
                         @import "../dashboard/dashboard.scss";
                     }
-                }
 
-                footer {
-                    &.footer-container {
-                        height: $footer-height;
-                        background: #fff;
-                        color: #444;
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        justify-content: center;
-                        border-top: 1px solid #d2d6de;
-                        width: 100%;
+                    footer {
+                        &.footer-container {
+                            height: $footer-height;
+                            background: #fff;
+                            color: #444;
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            justify-content: center;
+                            border-top: 1px solid #d2d6de;
+                            width: 100%;
 
-                        @include setPagePadding(20);
+                            @include setPagePadding(20);
+                        }
                     }
                 }
             }
