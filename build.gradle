@@ -1,0 +1,100 @@
+apply plugin: 'eclipse-wtp'
+apply plugin: 'idea'
+buildscript {
+	ext {
+		swagger_version = '2.2.2'
+		openApiGeneratorVersion = '4.2.3'
+	}
+	repositories {
+        mavenLocal()
+        maven { url "https://repo1.maven.org/maven2" }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url "https://oss.sonatype.org/content/repositories/releases/"
+        }
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        // Updated version can be passed via command line arg as -PopenApiGeneratorVersion=VERSION
+        classpath "org.openapitools:openapi-generator-gradle-plugin:$openApiGeneratorVersion"
+    }
+}
+repositories {
+	maven {
+			url "https://repo1.maven.org/maven2"
+	}
+}
+configurations {
+    swaggerCompile
+}
+dependencies {
+	swaggerCompile group:'io.swagger', name: 'swagger-codegen-cli', version: swagger_version
+}
+apply plugin: 'org.openapi.generator'
+
+// Install all dependecies
+task npm_install (type:Exec) {
+	workingDir "${rootDir}"
+	if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+		commandLine 'cmd', '/c', 'npm', 'install'
+	} else {
+		commandLine 'npm', 'install'
+	}
+}
+
+// Build project for production
+task npm_build (type:Exec) {
+	workingDir "${rootDir}"
+	if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+		commandLine 'cmd', '/c', 'npm', 'run', 'build'
+	} else {
+		commandLine 'npm', 'run', 'build'
+	}
+}
+
+// Execute build commands and move files around as needed
+task build () {
+	//outputs.upToDateWhen { false } 
+	dependsOn 'npm_install'
+    dependsOn 'npm_build'
+    tasks.findByName('npm_build').mustRunAfter 'npm_install'
+}
+
+
+// CLEAN--------------------------------------------------------------------------------
+// Clean senhost
+task swagger_clean_api {
+	doLast {
+		new File("${projectDir}/src/apis/generated").deleteDir()
+		new File("${projectDir}/generated").deleteDir()
+		new File("${projectDir}/src/apis/generated").mkdirs()
+	}
+}
+
+// GENERATE----------------------------------------------------------------------------
+// Generate Apis
+task swagger_generate_api(type:JavaExec, dependsOn: ['swagger_clean_api']){
+	main = 'io.swagger.codegen.SwaggerCodegen'
+	classpath = configurations.swaggerCompile
+	args "generate", 
+	"-o", "${projectDir}/generated",
+	"-t", "${projectDir}/template/TypescriptNode", 
+	"-l", "typescript-node", 
+	"-i", "http://senshost.com:8000/swagger/v1/swagger.json"
+	// "-Dio.swagger.parser.util.RemoteUrl.trustAll=true"
+}
+
+// EXECUTE----------------------------------------------------------------------------
+// Execute
+task swagger_api(dependsOn: ['swagger_generate_api']) {
+	doLast {
+		ant.copy(todir:"${projectDir}/src/apis/generated" ) {
+			fileset( file:"${projectDir}/generated/api.ts" )
+		}
+		new File("${projectDir}/generated").deleteDir()
+	}
+}

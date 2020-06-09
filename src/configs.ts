@@ -23,6 +23,7 @@ const configs = {
     socket: SOCKET_URL,
     type: TYPE_REST,
     context: SOCKET_URL,
+    history: createHashHistory(),
     requestTimeOut: 30000,
 }
 export default configs;

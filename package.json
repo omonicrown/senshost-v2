@@ -18,6 +18,7 @@
     "@vx/mock-data": "0.0.195",
     "@vx/scale": "0.0.195",
     "@vx/shape": "0.0.195",
+    "axios": "^0.19.2",
     "echarts": "^4.7.0",
     "echarts-for-react": "^2.0.15-beta.1",
     "echarts-liquidfill": "^2.0.5",
@@ -42,7 +43,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "api": "gradle swagger_api"
   },
   "eslintConfig": {
     "extends": "react-app"

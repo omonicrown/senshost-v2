@@ -6,11 +6,17 @@ import { History } from "history";
 
 import SidebarComponent from "../shared/Sidebar";
 import HeaderComponent from "../shared/Header";
+import { AuthState } from "../../interfaces/states";
+import { actionTypes } from "../../types";
+
+import RequireLoginComponent from "../shared/requireLogin";
 
 const Dashboard: any = React.lazy(() => import("../dashboard/Dashboard"));
 
 export interface SharedProps {
   history?: History;
+  authState?: AuthState;
+  actions?: actionTypes;
 }
 
 interface HomeProps extends RouteComponentProps {
@@ -21,7 +27,6 @@ interface HomeStates {
 }
 
 export default class Home extends React.PureComponent<HomeProps, HomeStates> {
-
   constructor(props: HomeProps) {
     super(props);
     this.state = {
@@ -54,7 +59,7 @@ export default class Home extends React.PureComponent<HomeProps, HomeStates> {
                   <AppRoute
                     exact
                     path={HomeRoutes.Dashboard.toString()}
-                    component={Dashboard}
+                    component={RequireLoginComponent(Dashboard)}
                     props={this.props}
                   />
                 </Switch>
@@ -62,7 +67,7 @@ export default class Home extends React.PureComponent<HomeProps, HomeStates> {
 
               <footer className="footer-container">
                 Copyright © 2019 Senshost. All rights reserved.
-            </footer>
+              </footer>
             </div>
           </main>
         </div>
