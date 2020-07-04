@@ -1,5 +1,4 @@
-import { Account } from "../apis/generated/api";
-import { AuthModel } from "./models";
+import { AuthResponseModel, Account } from "./models";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 
 export interface ErrorModel {
@@ -21,12 +20,14 @@ export interface NotificationState {
     notification: NotificationProps;
 }
 
-export interface AuthState extends IReducer, AuthModel {
+export interface AuthState extends IReducer {
     isAuthenticated: boolean;
+    auth: AuthResponseModel;
 }
 
 
 export interface States {
     account: AccountState;
     auth: AuthState;
+    notification: NotificationState;
 }

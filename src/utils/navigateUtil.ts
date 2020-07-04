@@ -17,7 +17,7 @@ export function navigate( url: string, replace?: boolean, newPage?: boolean, goB
     } else if (newPage) {
         window.open(url, "_blank");
     } else {
-        if (location.hash.substr(1) !== url) {
+        if (configs.history?.location?.pathname?.substr(1) !== url) {
             if (replace) {
                 configs.history.replace(url);
             } else {

@@ -96,7 +96,7 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
       }
 
       return option;
-    });
+    }, [props.type]);
     setOptions(updatedOptions);
   }, [props.type, props.data])
 

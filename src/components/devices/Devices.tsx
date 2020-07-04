@@ -3,12 +3,9 @@ import { RouteComponentProps } from "react-router";
 
 import Gauge from "../gauge";
 
-export default class Dashboard extends React.PureComponent<
+export default class Devices extends React.PureComponent<
   RouteComponentProps
   > {
-  componentDidMount() {
-    console.log("Coming back to call us ", this.props);
-  }
 
   render() {
     return (

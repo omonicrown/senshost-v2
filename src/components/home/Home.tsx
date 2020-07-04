@@ -9,9 +9,9 @@ import HeaderComponent from "../shared/Header";
 import { AuthState } from "../../interfaces/states";
 import { actionTypes } from "../../types";
 
-import RequireLoginComponent from "../shared/requireLogin";
+import RequireLoginComponent from "../shared/RequireLogin";
 
-const Dashboard: any = React.lazy(() => import("../dashboard/Dashboard"));
+const Dashboard: any = React.lazy(() => import("../devices/Devices"));
 
 export interface SharedProps {
   history?: History;
@@ -57,7 +57,6 @@ export default class Home extends React.PureComponent<HomeProps, HomeStates> {
                     to={HomeRoutes.Dashboard.toString()}
                   />
                   <AppRoute
-                    exact
                     path={HomeRoutes.Dashboard.toString()}
                     component={RequireLoginComponent(Dashboard)}
                     props={this.props}

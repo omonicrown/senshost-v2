@@ -2,11 +2,12 @@ import Axios, { AxiosInstance, AxiosError, AxiosResponse } from "axios";
 import configs from '../../configs';
 import { History } from 'history';
 import { navigate } from '../../utils/navigateUtil';
-import { NotificationProps } from "@sebgroup/react-components/dist/Notification/Notification";
 import { AppRoutes } from '../../enums/routes';
 
 import { store } from "../../store/configureStore";
-import { toggleNotification, signoutUser, signoutUserIfNeeded } from '../../actions';
+import { toggleNotification, signoutUser } from '../../actions';
+import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
+import { AuthState } from "../../interfaces/states";
 
 
 export class AxiosGlobal {
@@ -35,15 +36,14 @@ export class AxiosGlobal {
     }
 
     constructor() {
-        const tokenObj: any = store.getState().account;
+        const tokenObj: AuthState = store.getState().auth;
         this.history = configs.history;
         let headers = {
-            'Content-Type': 'application/json',
-            'authorization': ""
+            'Content-Type': 'application/json'
         };
 
-        if (tokenObj && tokenObj.token) {
-            headers = { ...headers, 'authorization': `JWT ${tokenObj.token}` }
+        if (tokenObj?.auth?.identityToken) {
+            headers['Authorization'] = `JWT ${tokenObj?.auth?.identityToken}`;
         }
 
         this.axios = Axios.create({
@@ -82,9 +82,9 @@ export class AxiosGlobal {
                     notification.message = error.response.data.message;
                 }
                 store.dispatch(toggleNotification(notification));
-                store.dispatch<any>(signoutUserIfNeeded());
+                store.dispatch(signoutUser());
 
-                navigate(AppRoutes.Login, true);
+                navigate(AppRoutes.Account, true);
                 return Promise.reject({ ...error });
             } else if (error && error.response && error.response.status === 403) {
                 const notification: NotificationProps = {
@@ -92,17 +92,12 @@ export class AxiosGlobal {
                     title: "Unauthorized",
                     message: `You dont have permisiion to access this action`,
                     toggle: true,
-                    onDismiss: () => {}
+                    onDismiss: () => { }
                 };
                 if (error && error.response && error.response.data && error.response.data.message) {
                     notification.message = error.response.data.message;
                 }
                 store.dispatch(toggleNotification(notification));
-                // if (error && error.response && error.response.data && String(error.response.data.message).toLocaleLowerCase().indexOf("activate") > -1) {
-                //     navigate(AppRoutes.AccountActivation, true);
-                // } else {
-                //     navigate(AppRoutes.NotFound, true);
-                // }
                 return Promise.reject({ ...error });
             } else if (error && error.response && error.response.status === 400) {
                 const notification: NotificationProps = {
@@ -110,7 +105,7 @@ export class AxiosGlobal {
                     title: "Validation Error",
                     message: `One of the field validations failed!`,
                     toggle: true,
-                     onDismiss: () => { }
+                    onDismiss: () => { }
                 };
 
                 if (error && Array.isArray(error.response.data)) {
@@ -118,7 +113,11 @@ export class AxiosGlobal {
                     notification.message = arrayOfErrors.join(", ");
                 } else if (error && error.response && error.response.data && error.response.data.message) {
                     notification.message = error.response.data.message;
+                } else if (error && error.response.data) {
+                    notification.message = error.response.data;
                 }
+
+                console.log("I can btreahe ", store)
                 store.dispatch(toggleNotification(notification));
 
                 return Promise.reject({ ...error });
@@ -128,7 +127,7 @@ export class AxiosGlobal {
                     title: "Record not found",
                     message: `Record not found!`,
                     toggle: true,
-                    onDismiss: () => {}
+                    onDismiss: () => { }
                 };
 
                 if (error && Array.isArray(error.response.data)) {

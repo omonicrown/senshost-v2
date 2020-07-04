@@ -1,6 +1,6 @@
 import * as React from "react";
 import { navigate } from '../../utils/navigateUtil';
-import * as actions from "../../actions/AuthActions";
+import * as actions from "../../actions";
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { SharedProps } from "../home/Home";
@@ -20,34 +20,34 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
             super(props);
         }
 
-        // componentDidMount() {
-        //     console.log("Destroy his opponent ", this.props);
-        //     if (this.props.authState && (!this.props.authState.isAuthenticated || !this.props.authState?.account || !this.props.authState?.account)) {
-        //         const notification: NotificationProps = {
-        //             theme: "danger",
-        //             title: "Unauthenticated user",
-        //             message: `Please login to proceed`,
-        //             onDismiss: () => { },
-        //             toggle: true
-        //         };
-        //         this.props.actions && this.props.actions.toggleNotification(notification);
-        //         navigate(AppRoutes.Login, true);
-        //     }
-        // };
+        componentDidMount() {
+            console.log("Destroy his opponent ", this.props);
+            if (this.props.authState && (!this.props.authState.isAuthenticated || !this.props.authState?.auth?.account)) {
+                const notification: NotificationProps = {
+                    theme: "danger",
+                    title: "Unauthenticated user",
+                    message: `Please login to proceed`,
+                    onDismiss: () => { },
+                    toggle: true
+                };
+                this.props.actions && this.props.actions.toggleNotification(notification);
+                navigate(AppRoutes.Account, true);
+            }
+        };
 
-        // componentDidUpdate(prevProps: RequireLoginComponentProps) {
-        //     if (this.props.authState && (!this.props.authState.isAuthenticated || !this.props.authState?.account || !this.props.authState?.account)) {
-        //         const notification: NotificationProps = {
-        //             theme: "danger",
-        //             title: "Unauthenticated user",
-        //             message: `Please login to proceed`,
-        //             onDismiss: () => { },
-        //             toggle: true
-        //         };
-        //         this.props.actions && this.props.actions.toggleNotification(notification);
-        //         navigate(AppRoutes.Login, true);
-        //     }
-        // }
+        componentDidUpdate(prevProps: RequireLoginComponentProps) {
+            if (this.props.authState && (!this.props.authState.isAuthenticated || !this.props.authState?.auth?.account)) {
+                const notification: NotificationProps = {
+                    theme: "danger",
+                    title: "Unauthenticated user",
+                    message: `Please login to proceed`,
+                    onDismiss: () => { },
+                    toggle: true
+                };
+                this.props.actions && this.props.actions.toggleNotification(notification);
+                navigate(AppRoutes.Account, true);
+            }
+        }
 
         render() {
             return <ComposedComponent {...this.props} />;
@@ -66,5 +66,5 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
         }
     };
 
-   return connect(mapStateToProps, null)(RequireLoginComponent);
+   return connect(mapStateToProps, mapDispatchToProps)(RequireLoginComponent);
 }

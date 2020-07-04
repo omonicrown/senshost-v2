@@ -1,17 +1,15 @@
+import { AuthState } from "../interfaces/states";
+import { AuthResponseModel } from "../interfaces/models";
 import { authActions } from "../actions";
-import {
-    RECEIVE_AUTH_USER,
-    REQUEST_AUTH_USER,
-    SIGNOUT_USER,
-    LOG_AUTH_ERROR,
-} from "../constants";
-import { AuthState } from '../interfaces/states';
+import { RECEIVE_AUTH_USER, LOG_AUTH_ERROR, REQUEST_AUTH_USER, SIGNOUT_USER } from "../constants";
+
+
 
 const initialState: AuthState = {
     isFetching: false,
-    auth: null,
-    error: null,
-    isAuthenticated: false
+    isAuthenticated: false,
+    auth: {} as AuthResponseModel,
+    error: null
 };
 
 export default (state: AuthState = initialState, action: authActions) => {
@@ -19,8 +17,9 @@ export default (state: AuthState = initialState, action: authActions) => {
         case RECEIVE_AUTH_USER: {
             return {
                 ...state,
-                auth: action.auth,
                 error: null,
+                auth: action.auth,
+                rememberMe: true,
                 isAuthenticated: true,
                 isFetching: false
 
@@ -36,7 +35,7 @@ export default (state: AuthState = initialState, action: authActions) => {
             return {
                 ...state,
                 isAuthenticated: false,
-                token: null,
+                auth: null,
                 isFetching: false,
                 user: false
             };

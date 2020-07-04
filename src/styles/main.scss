@@ -1,4 +1,6 @@
 @import "~@sebgroup/bootstrap/scss/bootstrap";
+@import "~@sebgroup/bootstrap/scss/_variables";
+
 @import "./components/shared/mixins.scss";
 @import "./components/shared/variables.scss";
 @import "./components/shared/chart.scss";
@@ -25,5 +27,6 @@ body {
         }
 
         @import "./components/home/home.scss";
+        @import "./components/account/account.scss";
     }
 }

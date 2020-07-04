@@ -3,8 +3,7 @@
 
 export enum AppRoutes {
     Home = "/home",
-    Login = "/login",
-    Register = "/register"
+    Account = "/"
 }
 
 export enum HomeRoutes {

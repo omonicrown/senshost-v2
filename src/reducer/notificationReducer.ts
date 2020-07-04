@@ -1,17 +1,15 @@
-import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
-
 import {
     TOGGLE_NOTIFICATION
 } from "../constants";
 import { NotificationState } from '../interfaces/states';
 import { notificationActions } from "../actions/notificationActions";
+import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 
 const initialState: NotificationState = {
     notification: {} as NotificationProps
 };
 
 export default (state = initialState, action: notificationActions) => {
-    console.log("Help me ", action)
     switch (action.type) {
         case TOGGLE_NOTIFICATION: {
             return { ...state, notification: action.notification };
