@@ -18,28 +18,22 @@ export interface SharedProps extends RouteComponentProps {
   actions: actionTypes;
 }
 
-class App extends React.PureComponent<{}, {}> {
-  constructor(props: SharedProps) {
-    super(props);
-  }
+const App: React.FunctionComponent<SharedProps> = React.memo((props: SharedProps): React.ReactElement<void> => {
+  return (
+    <div className="main-app-container">
+      <NotificationHook />
+      <React.Suspense fallback={<Loader toggle={true} />}>
+        <Switch>
+          <AppRoute exact path="/" component={Account} props={props} />
+          <AppRoute path={AppRoutes.Home} component={RequireLogin(Home)} props={props} />
+          <AppRoute path={AppRoutes.Account} component={(Account)} props={props} />
+          <AppRoute path="*" component={NotFound} props={props} />
+        </Switch>
+      </React.Suspense>
+    </div>
+  );
 
-  render() {
-    console.log("The main props ar e ", this.props);
-    return (
-      <div className="main-app-container">
-        <NotificationHook />
-        <React.Suspense fallback={<Loader toggle={true} />}>
-          <Switch>
-            <AppRoute exact path="/" component={Account} props={this.props} />
-            <AppRoute path={AppRoutes.Home} component={RequireLogin(Home)} props={this.props} />
-            <AppRoute path={AppRoutes.Account} component={(Account)} props={this.props} />
-            <AppRoute path="*" component={NotFound} props={this.props} />
-          </Switch>
-        </React.Suspense>
-      </div>
-    );
-  }
-}
+});
 
 
 export default withRouter<any, any>(App);

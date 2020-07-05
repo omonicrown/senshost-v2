@@ -10,8 +10,11 @@ import { AuthState } from "../../interfaces/states";
 import { actionTypes } from "../../types";
 
 import RequireLoginComponent from "../shared/RequireLogin";
+import { Button } from "@sebgroup/react-components/dist/Button";
 
-const Dashboard: any = React.lazy(() => import("../devices/Devices"));
+const Devices: any = React.lazy(() => import("../devices/Devices"));
+const NotFound: React.LazyExoticComponent<React.FunctionComponent<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
+
 
 export interface SharedProps {
   history?: History;
@@ -22,45 +25,65 @@ export interface SharedProps {
 interface HomeProps extends RouteComponentProps {
 
 }
+
 interface HomeStates {
   toggle: boolean;
+  onToggleAdd?: (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => void;
 }
 
-export default class Home extends React.PureComponent<HomeProps, HomeStates> {
-  constructor(props: HomeProps) {
-    super(props);
-    this.state = {
-      toggle: false
-    }
-  }
+export interface AddModalToggleProps {
+  toggle: boolean;
+  setToggle: (value?: boolean) => void;
+}
+export const toggleAddModalContext = React.createContext<AddModalToggleProps>({
+  toggle: false,
+  setToggle: () => { }
+})
 
-  onToggle = (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => {
-    this.setState({ toggle: value || !this.state.toggle });
-  }
+const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps): React.ReactElement<void> => {
+  const [toggleMenu, setMenuToggle] = React.useState<boolean>(false);
+  const [toggleAddModal, setToggleAddModal] = React.useState<boolean>(false);
 
-  render() {
-    return (
+
+  const onToggle = React.useCallback((e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => {
+    setMenuToggle(!toggleMenu)
+  }, [toggleMenu]);
+
+  const setToggle = React.useCallback((value?: boolean) => {
+    console.log("Its setting toggle here ", value)
+    setToggleAddModal(value || !toggleAddModal)
+  }, [toggleAddModal]);
+
+  React.useEffect(() => {
+    console.log("Tring time ", props)
+  }, []);
+
+  return (
+    <toggleAddModalContext.Provider value={{ toggle: toggleAddModal, setToggle }}>
       <div className="home-container container-fluid">
         <div className="row no-gutters">
           <HeaderComponent />
         </div>
         <div className="row no-gutters main-body">
-          <SidebarComponent onToggle={this.onToggle} toggle={this.state.toggle} />
-          <main className={"main-container col" + (this.state.toggle ? " sidemenu-opened" : " sidemenu-closed")} role="main">
-            <div className="inner-bar"></div>
+          <SidebarComponent onToggle={onToggle} toggle={toggleMenu} />
+          <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
+            <div className="inner-bar d-flex">
+              <Button label="Add" id="addBtn" onClick={() => setToggle()} theme="outline-primary" />
+            </div>
             <div className="main-holder">
               <div className="container">
                 <Switch>
                   <Redirect
                     exact
                     from="/home"
-                    to={HomeRoutes.Dashboard.toString()}
+                    to={HomeRoutes.Devices.toString()}
                   />
                   <AppRoute
-                    path={HomeRoutes.Dashboard.toString()}
-                    component={RequireLoginComponent(Dashboard)}
-                    props={this.props}
+                    path={HomeRoutes.Devices.toString()}
+                    component={RequireLoginComponent(Devices)}
                   />
+                  <AppRoute path="*" component={NotFound} props={props} />
+
                 </Switch>
               </div>
 
@@ -71,6 +94,10 @@ export default class Home extends React.PureComponent<HomeProps, HomeStates> {
           </main>
         </div>
       </div>
-    );
-  }
-}
+    </toggleAddModalContext.Provider>
+  );
+
+});
+
+export default Home;
+

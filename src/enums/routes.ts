@@ -7,5 +7,5 @@ export enum AppRoutes {
 }
 
 export enum HomeRoutes {
-    Dashboard = AppRoutes.Home + "/dashboard",
+    Devices = AppRoutes.Home + "/devices",
 }

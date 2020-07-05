@@ -16,6 +16,9 @@ import SignupForm from "./signupForm/SignupForm";
 
 
 import PortalComponent from "../shared/Portal";
+import { navigate } from "../../utils/navigateUtil";
+import { AppRoutes } from "../../enums/routes";
+import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 
 export type AccountMode = "signup" | "signin";
 interface UserAccountStates {
@@ -65,6 +68,20 @@ class UserAccount extends React.PureComponent<SharedProps, UserAccountStates> {
 
   onSwictchToSignin = () => {
     this.setState({ accountMode: "signin" });
+  }
+
+  componentDidMount() {
+    if (this.props.authState && (!this.props.authState.isAuthenticated || this.props.authState?.auth?.account)) {
+      const notification: NotificationProps = {
+        theme: "warning",
+        title: "Aauthenticated user",
+        message: `You are already loggedIn`,
+        onDismiss: () => { },
+        toggle: true
+      };
+      this.props.actions && this.props.actions.toggleNotification(notification);
+      this.props.history?.replace(AppRoutes.Home);
+    }
   }
 
   componentWillUnmount() {
@@ -143,7 +160,7 @@ class UserAccount extends React.PureComponent<SharedProps, UserAccountStates> {
 
 const mapStateToProps = (states: States) => {
   return {
-    auth: states.auth
+    authState: states.auth
   }
 };
 

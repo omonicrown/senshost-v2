@@ -12,7 +12,7 @@ interface RequireLoginComponentProps extends SharedProps {
 
 }
 
-export default function (ComposedComponent: typeof React.Component | React.LazyExoticComponent<any>) {
+export default function (ComposedComponent: typeof React.Component | React.LazyExoticComponent<any>, props?: any) {
 
     class RequireLoginComponent extends React.PureComponent<RequireLoginComponentProps, {}> {
 
@@ -21,7 +21,7 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
         }
 
         componentDidMount() {
-            console.log("Destroy his opponent ", this.props);
+            console.log("The props are ", this.props)
             if (this.props.authState && (!this.props.authState.isAuthenticated || !this.props.authState?.auth?.account)) {
                 const notification: NotificationProps = {
                     theme: "danger",
@@ -31,7 +31,7 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
                     toggle: true
                 };
                 this.props.actions && this.props.actions.toggleNotification(notification);
-                navigate(AppRoutes.Account, true);
+                this.props.history.push(AppRoutes.Account);
             }
         };
 
@@ -45,7 +45,7 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
                     toggle: true
                 };
                 this.props.actions && this.props.actions.toggleNotification(notification);
-                navigate(AppRoutes.Account, true);
+                this.props.history.push(AppRoutes.Account);
             }
         }
 
