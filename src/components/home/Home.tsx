@@ -11,9 +11,21 @@ import { actionTypes } from "../../types";
 
 import RequireLoginComponent from "../shared/RequireLogin";
 import { Button } from "@sebgroup/react-components/dist/Button";
+import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 
 const Devices: any = React.lazy(() => import("../devices/Devices"));
 const NotFound: React.LazyExoticComponent<React.FunctionComponent<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
+
+
+const initialState: ModalProps = {
+  toggle: false,
+  fullscreen: false,
+  position: null,
+  centered: false,
+  size: "modal-lg",
+  disableBackdropDismiss: true,
+  onDismiss: null,
+};
 
 
 export interface SharedProps {
@@ -31,35 +43,29 @@ interface HomeStates {
   onToggleAdd?: (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => void;
 }
 
-export interface AddModalToggleProps {
-  toggle: boolean;
+export interface AddModalToggleProps extends ModalProps {
   setToggle: (value?: boolean) => void;
 }
+
 export const toggleAddModalContext = React.createContext<AddModalToggleProps>({
-  toggle: false,
+  ...initialState,
   setToggle: () => { }
 })
 
 const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps): React.ReactElement<void> => {
   const [toggleMenu, setMenuToggle] = React.useState<boolean>(false);
-  const [toggleAddModal, setToggleAddModal] = React.useState<boolean>(false);
-
+  const [toggleAddModal, setToggleAddModal] = React.useState<ModalProps>({ ...initialState });
 
   const onToggle = React.useCallback((e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => {
     setMenuToggle(!toggleMenu)
   }, [toggleMenu]);
 
   const setToggle = React.useCallback((value?: boolean) => {
-    console.log("Its setting toggle here ", value)
-    setToggleAddModal(value || !toggleAddModal)
+    setToggleAddModal({ ...toggleAddModal, toggle: value })
   }, [toggleAddModal]);
 
-  React.useEffect(() => {
-    console.log("Tring time ", props)
-  }, []);
-
   return (
-    <toggleAddModalContext.Provider value={{ toggle: toggleAddModal, setToggle }}>
+    <toggleAddModalContext.Provider value={{ ...toggleAddModal, setToggle: setToggle }}>
       <div className="home-container container-fluid">
         <div className="row no-gutters">
           <HeaderComponent />
@@ -68,7 +74,7 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
           <SidebarComponent onToggle={onToggle} toggle={toggleMenu} />
           <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
             <div className="inner-bar d-flex">
-              <Button label="Add" id="addBtn" onClick={() => setToggle()} theme="outline-primary" />
+              <Button label="Add" id="addBtn" onClick={() => setToggle(!toggleAddModal.toggle)} theme="outline-primary" />
             </div>
             <div className="main-holder">
               <div className="container">

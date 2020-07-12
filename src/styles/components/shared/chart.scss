@@ -1,5 +1,7 @@
-.chart {
-    width: 100%;
-    height: 70%;
-    float: left;
+.echarts-for-react {
+    &.chart {
+        width: 100%;
+        height: 50% !important;
+        float: left;
+    }
 }

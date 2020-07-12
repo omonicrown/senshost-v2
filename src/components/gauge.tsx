@@ -102,7 +102,6 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
 
   return (
     <ReactEcharts className="chart" option={selectedOption} />
-
   );
 }
 

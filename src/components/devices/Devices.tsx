@@ -6,6 +6,9 @@ import Gauge from "../gauge";
 import PortalComponent from "../shared/Portal";
 
 import { toggleAddModalContext, AddModalToggleProps } from "../home/Home";
+import { Modal } from "@sebgroup/react-components/dist/Modal/Modal";
+import { Button } from "@sebgroup/react-components/dist/Button";
+import AddAndEditDevice from "./add-edit-device/AddAndEditDevice";
 
 interface DevicesProps {
 }
@@ -13,8 +16,10 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
   const toggleAddModal: AddModalToggleProps = React.useContext(toggleAddModalContext);
 
-  console.log("This context ")
-  const handleSave = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => toggleAddModal.setToggle(false), [toggleAddModal])
+  const handleSave = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    toggleAddModal.setToggle(false);
+  }, [toggleAddModal]);
+
   return (
     <div className="dashboard-container">
 
@@ -35,19 +40,18 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
         </div>
       </div>
       <toggleAddModalContext.Consumer>
-        {({ toggle, setToggle }) => (
+        {(modalProps) => (
           <PortalComponent>
-            <Dialogue
-              header="Are you sure?"
-              desc="Lorem ipsum dolor sit amet, ius quis veniam ad, mea id nemore probatus sensibus. Sed  lorem everti menandri cu, habeo."
-              toggle={toggle}
-              primaryBtn="Yes, delete it!"
-              secondaryBtn="Cancel"
-              secondaryAction={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => setToggle(false)}
-              primaryAction={handleSave}
-              enableCloseButton
-              enableBackdropDismiss
-              onDismiss={(e: React.MouseEvent<any, MouseEvent>) => setToggle(false)}
+            <Modal
+              {...modalProps}
+              onDismiss={() => modalProps.setToggle(false)}
+              header={<h3>Create Device</h3>}
+              body={
+                <AddAndEditDevice />
+              }
+            
+              ariaLabel="My Label"
+              ariaDescribedby="My Description"
             />
           </PortalComponent>
         )}

@@ -1,0 +1,40 @@
+.modal-content {
+    .modal-body {
+        overflow: visible;
+
+        .add-and-edit-device {
+            .add-and-edit-form {
+                padding-top: 1rem;
+            }
+
+            .custom-step-tracker {
+                &.horizontal {
+                    padding: 0 30px;
+                }
+
+                .step-wrapper {
+                    .line {
+                        z-index: 0;
+                    }
+                }
+            }
+
+            .controls-holder {
+                margin-top: 2rem;
+
+                .next-and-previous{
+                    button{
+                        &:first-child{
+                            margin-right: 1rem;
+                        }
+
+                        svg {
+                            fill: currentColor;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}
