@@ -30,11 +30,11 @@ export interface SensorModel {
     creationDate: Date;
 }
 
-interface ActuatorModel {
+export interface ActuatorModel {
     deviceId: string;
     name: string;
     type: number
-    propertise: string;
+    propertise: { ON: "", OFF: ""};
     id: string;
     creationDate: Date;
 }
@@ -46,7 +46,7 @@ export interface DeviceModel {
     accountId: string;
     fields: Array<SensorModel>;
     groupId: string;
-    actuator: ActuatorModel;
+    widget: ActuatorModel;
     id: string;
     creationDate: Date;
 }

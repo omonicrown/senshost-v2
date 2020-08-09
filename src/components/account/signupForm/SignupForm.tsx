@@ -14,7 +14,6 @@ import { NotificationProps } from "@sebgroup/react-components/dist/notification/
 import { bindActionCreators, Dispatch } from "redux";
 import { connect } from "react-redux";
 import { States } from "../../../interfaces/states";
-import { AppRoutes } from "../../../enums/routes";
 
 
 const userIcon: JSX.Element = (

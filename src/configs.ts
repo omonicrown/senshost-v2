@@ -14,6 +14,7 @@ const SECONDARY = '/something';
 export enum APILIST {
     AUTH = "Auth",
     ACCOUNT = 'Account',
+    DEVICE = 'Device',
 }
 
 //CONFIG DATA (Please change here only)

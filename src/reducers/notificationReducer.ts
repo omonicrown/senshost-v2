@@ -11,7 +11,6 @@ const initialState: NotificationState = {
 };
 
 export default (state = initialState, action: notificationActions) => {
-    console.log("Help me ", action)
     switch (action.type) {
         case TOGGLE_NOTIFICATION: {
             return { ...state, notification: action.notification };

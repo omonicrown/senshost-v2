@@ -21,7 +21,7 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
         }
 
         componentDidMount() {
-            console.log("The props are ", this.props)
+            console.log("The props are ", this.props.history.location)
             if (this.props.authState && (!this.props.authState.isAuthenticated || !this.props.authState?.auth?.account)) {
                 const notification: NotificationProps = {
                     theme: "danger",
@@ -31,7 +31,7 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
                     toggle: true
                 };
                 this.props.actions && this.props.actions.toggleNotification(notification);
-                this.props.history.push(AppRoutes.Account);
+                this.props.history.replace(AppRoutes.Account);
             }
         };
 
@@ -45,7 +45,7 @@ export default function (ComposedComponent: typeof React.Component | React.LazyE
                     toggle: true
                 };
                 this.props.actions && this.props.actions.toggleNotification(notification);
-                this.props.history.push(AppRoutes.Account);
+                this.props.history.replace(AppRoutes.Account);
             }
         }
 

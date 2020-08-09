@@ -1,16 +1,12 @@
 import React from "react";
-import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
-import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import { DeviceModel } from "../../../../interfaces/models";
-
-interface DeviceFormProps {
-    selectedType: DropdownItem;
-    handleDeviceTypeChange: (value: DropdownItem) => void;
+import { TextLabel } from "@sebgroup/react-components/dist/TextLabel"
+import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
+interface SummaryFormProps {
     device: DeviceModel;
-    handleDeviceNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const DeviceForm: React.FunctionComponent<DeviceFormProps> = (props: DeviceFormProps) => {
+const SummaryForm: React.FunctionComponent<SummaryFormProps> = (props: SummaryFormProps) => {
     const deviceTypes = React.useMemo(() => [{
         label: "Temperature Sensor",
         value: 0
@@ -62,28 +58,27 @@ const DeviceForm: React.FunctionComponent<DeviceFormProps> = (props: DeviceFormP
         value: 15
     }], []);
 
+    const selectedDeviceType: DropdownItem = React.useMemo(() => {
+        return deviceTypes?.find((item: DropdownItem) => item.value === props?.device?.type);
+    }, [props?.device?.type, deviceTypes]);
+
     return (
-        <div className="row">
-            <div className="col-sm-6 col-12">
-                <Dropdown
-                    label="Device type"
-                    list={deviceTypes}
-                    selectedValue={props.selectedType}
-                    onChange={props.handleDeviceTypeChange}
-                />
+        <React.Fragment>
+            <div className="row title-holder">
+                <div className="col">
+                    Device
+                </div>
             </div>
-            <div className="col-sm-6 col-12">
-                <TextBoxGroup
-                    name="name"
-                    label="Device name"
-                    placeholder="Name"
-                    value={props.device?.name}
-                    onChange={props.handleDeviceNameChange}
-                />
+            <div className="row">
+                <div className="col">
+                    <TextLabel label="Device name" value={props?.device?.name} />
+                </div>
+                <div className="col-sm-6 col-12">
+                    <TextLabel label="Device type" value={selectedDeviceType?.label} />
+                </div>
             </div>
-        </div>
-    )
+        </React.Fragment>
+    );
+};
 
-}
-
-export default DeviceForm;
+export default SummaryForm;

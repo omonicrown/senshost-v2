@@ -14,9 +14,7 @@ const NotificationHook: React.FunctionComponent = (): React.ReactElement<void> =
         dispatch({ type: TOGGLE_NOTIFICATION, notification: {...notificationState?.notification, toggle: false} });
     }
 
-    console.log("Prove to your dad ", notificationState.notification)
     return (
-
         <PortalComponent>
             <Notification
                 toggle={notificationState?.notification?.toggle}

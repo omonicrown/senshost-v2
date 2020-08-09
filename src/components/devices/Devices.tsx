@@ -7,7 +7,6 @@ import PortalComponent from "../shared/Portal";
 
 import { toggleAddModalContext, AddModalToggleProps } from "../home/Home";
 import { Modal } from "@sebgroup/react-components/dist/Modal/Modal";
-import { Button } from "@sebgroup/react-components/dist/Button";
 import AddAndEditDevice from "./add-edit-device/AddAndEditDevice";
 
 interface DevicesProps {

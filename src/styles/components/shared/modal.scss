@@ -1,3 +1,5 @@
+@import "~@sebgroup/bootstrap/scss/_variables";
+
 .modal-content {
     .modal-body {
         overflow: visible;
@@ -15,6 +17,21 @@
                 .step-wrapper {
                     .line {
                         z-index: 0;
+                    }
+                }
+            }
+            .title-holder{
+                margin-bottom: 1rem;
+                border-bottom: 1px solid $gray-300;
+            }
+            table {
+                tbody {
+                    tr {
+                        td {
+                            .action-column {
+                                justify-content: flex-end;
+                            }
+                        }
                     }
                 }
             }

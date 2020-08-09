@@ -39,7 +39,8 @@ export class AxiosGlobal {
         const tokenObj: AuthState = store.getState().auth;
         this.history = configs.history;
         let headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            callerType: 'web'
         };
 
         if (tokenObj?.auth?.identityToken) {
@@ -117,7 +118,6 @@ export class AxiosGlobal {
                     notification.message = error.response.data;
                 }
 
-                console.log("I can btreahe ", store)
                 store.dispatch(toggleNotification(notification));
 
                 return Promise.reject({ ...error });

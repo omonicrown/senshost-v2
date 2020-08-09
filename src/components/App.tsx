@@ -24,9 +24,9 @@ const App: React.FunctionComponent<SharedProps> = React.memo((props: SharedProps
       <NotificationHook />
       <React.Suspense fallback={<Loader toggle={true} />}>
         <Switch>
-          <AppRoute exact path="/" component={Account} props={props} />
-          <AppRoute path={AppRoutes.Home} component={RequireLogin(Home)} props={props} />
+          <Redirect exact from="/" to={AppRoutes.Account} />
           <AppRoute path={AppRoutes.Account} component={(Account)} props={props} />
+          <AppRoute path={AppRoutes.Home} component={RequireLogin(Home)} props={props} />
           <AppRoute path="*" component={NotFound} props={props} />
         </Switch>
       </React.Suspense>

@@ -72,6 +72,31 @@
                     color: $header-background;
                     overflow: hidden;
                     white-space: nowrap;
+
+                    .row {
+                        .sidebar-sticky {
+                            ul {
+                                li {
+                                    padding: .8rem 0px;
+
+                                    &.active {
+                                        color: $blue-darker;
+                                        svg {
+                                            fill: $blue-darker;
+                                        }
+                                    }
+
+                                    .title-holder {
+                                        align-items: center;
+
+                                        .icon-holder {
+                                            margin-right: 0.5rem;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 import React from "react";
 import { RouteComponentProps, Switch, Redirect } from "react-router";
 import { AppRoute } from "../../utils/functions";
-import { HomeRoutes } from "../../enums/routes";
+import { HomeRoutes, AppRoutes } from "../../enums/routes";
 import { History } from "history";
 
 import SidebarComponent from "../shared/Sidebar";
@@ -20,7 +20,6 @@ const NotFound: React.LazyExoticComponent<React.FunctionComponent<RouteComponent
 const initialState: ModalProps = {
   toggle: false,
   fullscreen: false,
-  position: null,
   centered: false,
   size: "modal-lg",
   disableBackdropDismiss: true,
@@ -71,7 +70,7 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
           <HeaderComponent />
         </div>
         <div className="row no-gutters main-body">
-          <SidebarComponent onToggle={onToggle} toggle={toggleMenu} />
+          <SidebarComponent onToggle={onToggle} toggle={toggleMenu} activeTab="devices" />
           <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
             <div className="inner-bar d-flex">
               <Button label="Add" id="addBtn" onClick={() => setToggle(!toggleAddModal.toggle)} theme="outline-primary" />
@@ -81,7 +80,7 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                 <Switch>
                   <Redirect
                     exact
-                    from="/home"
+                    from={AppRoutes.Home}
                     to={HomeRoutes.Devices.toString()}
                   />
                   <AppRoute

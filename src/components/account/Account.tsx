@@ -71,7 +71,8 @@ class UserAccount extends React.PureComponent<SharedProps, UserAccountStates> {
   }
 
   componentDidMount() {
-    if (this.props.authState && (!this.props.authState.isAuthenticated || this.props.authState?.auth?.account)) {
+    console.log("My sister ? if not would you like a magerino ? ", this.props.authState)
+    if (this.props.authState && (this.props.authState.isAuthenticated || this.props.authState?.auth?.account)) {
       const notification: NotificationProps = {
         theme: "warning",
         title: "Aauthenticated user",
