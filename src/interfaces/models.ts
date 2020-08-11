@@ -32,9 +32,10 @@ export interface SensorModel {
 
 export interface ActuatorModel {
     deviceId: string;
+    accountId?: string;
     name: string;
     type: number
-    propertise: { ON: "", OFF: ""};
+    propertise: { ON: "", OFF: "" };
     id: string;
     creationDate: Date;
 }

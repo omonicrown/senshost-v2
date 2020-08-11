@@ -18,6 +18,8 @@ import ActuatorForm from "./sections/ActuatorForm";
 import SummaryForm from "./sections/SummaryForm";
 
 import { AxiosResponse, AxiosError } from "axios";
+import { useSelector } from "react-redux";
+import { States } from "../../../interfaces/states";
 
 interface AddAndEditDeviceProps {
 
@@ -26,6 +28,9 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
     const [stepTracker, setStepTracker] = React.useState<number>(0);
     const stepList: Array<string> = React.useMemo(() => ["Device", "Sensor", "Actuator", "Summary"], []);
     const modalContext: AddModalToggleProps = useContext<AddModalToggleProps>(toggleAddModalContext);
+
+    // account or profile ----------------------------
+    const authState = useSelector((states: States) => states.auth);
 
     const [device, setDevice] = React.useState<DeviceModel>({
         name: "",
@@ -78,8 +83,8 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
     }, [device, setDevice]);
 
     const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        const createDeviceModel: any = { ...device, accountId: "559d898b-0320-4648-a7c7-02e571484505", widget: { ...device.widget, propertise: JSON.stringify(device?.widget?.propertise) } }
-        console.log("Man is ", createDeviceModel);
+        const createDeviceModel: any = { ...device, accountId: authState.auth?.account.id, widget: { ...device.widget, propertise: JSON.stringify(device?.widget?.propertise) } }
+        console.log("Man is ", authState);
         DeviceApis.createDevice(createDeviceModel).then((response: AxiosResponse<PositiveResponse>) => {
             console.log("Ojenmab shutup ", response);
         }).catch((err: AxiosError) => {
