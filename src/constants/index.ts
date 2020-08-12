@@ -12,20 +12,6 @@ export const TOGGLE_NOTIFICATION = "TOGGLE_NOTIFICATION";
 export type TOGGLE_NOTIFICATION = typeof TOGGLE_NOTIFICATION;
 
 
-export const j = [{
-    label: "decimal",
-    value: 0
-},
-{
-    label: "String",
-    value: 1
-}, {
-    label: "int",
-    value: 2
-}, {
-    label: "double",
-    value: 3
-}];
 
 export const SENSORSTYPESCOLUMN = [{
     label: "Type",
@@ -33,6 +19,17 @@ export const SENSORSTYPESCOLUMN = [{
 }, {
     label: "Name",
     accessor: "name",
+}];
+
+export const ACTUATORS = [{
+    label: "Digital",
+    value: 0,
+}, {
+    label: "Analog",
+    value: 1
+}, {
+    label: "Message",
+    value: 2
 }];
 
 export const SENSORSTYPES = [{

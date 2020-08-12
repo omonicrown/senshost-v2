@@ -6,7 +6,7 @@ import { DeviceModel, SensorModel } from "../../../../interfaces/models";
 import { DropdownItem, Dropdown } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { TableHeader, DataItem, PrimaryActionButton, TableRow } from "@sebgroup/react-components/dist/Table/Table";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { error } from "console";
+import { SENSORSTYPES, SENSORSTYPESCOLUMN } from "../../../../constants";
 
 interface SensorsFormProps {
     handleSensorSubmitChange: (sensors: Array<SensorModel>) => void;
@@ -18,20 +18,7 @@ const SensorsForm: React.FunctionComponent<SensorsFormProps> = (props: SensorsFo
 
     const [sensors, setSensors] = React.useState<Array<SensorModel>>([]);
     const [sensorData, setSensorData] = React.useState<Array<DataItem<SensorModel>>>([]);
-    const sensorTypes = React.useMemo(() => [{
-        label: "decimal",
-        value: 0
-    },
-    {
-        label: "String",
-        value: 1
-    }, {
-        label: "int",
-        value: 2
-    }, {
-        label: "double",
-        value: 3
-    }], []);
+    const sensorTypes = React.useMemo(() => SENSORSTYPES, []);
 
 
     const primaryButton: PrimaryActionButton = React.useMemo(() => ({
@@ -54,13 +41,7 @@ const SensorsForm: React.FunctionComponent<SensorsFormProps> = (props: SensorsFo
         },
     }), [sensors, sensorData, setSensorData, setSensors]);
 
-    const sensorColumns: Array<TableHeader> = React.useMemo(() => [{
-        label: "Type",
-        accessor: "dataType",
-    }, {
-        label: "Name",
-        accessor: "name",
-    }], []);
+    const sensorColumns: Array<TableHeader> = React.useMemo(() => SENSORSTYPESCOLUMN, []);
 
     const handleSensorNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSensor({ ...sensor, name: e.target.value });

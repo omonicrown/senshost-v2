@@ -4,7 +4,7 @@ import { TextLabel } from "@sebgroup/react-components/dist/TextLabel"
 import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { Table } from "@sebgroup/react-components/dist/Table";
 import { TableHeader } from "@sebgroup/react-components/dist/Table/Table";
-import { DEVICETYPES, SENSORSTYPESCOLUMN, SENSORSTYPES } from "../../../../constants";
+import { DEVICETYPES, SENSORSTYPESCOLUMN, ACTUATORS } from "../../../../constants";
 
 interface SummaryFormProps {
     device: DeviceModel;
@@ -12,20 +12,16 @@ interface SummaryFormProps {
 
 const SummaryForm: React.FunctionComponent<SummaryFormProps> = (props: SummaryFormProps) => {
     const deviceTypes = React.useMemo(() => DEVICETYPES, []);
-    const sensorTypes = React.useMemo(() => SENSORSTYPES, []);
+    const actuatorTypes = React.useMemo(() => ACTUATORS, []);
     const sensorColumns: Array<TableHeader> = React.useMemo(() => SENSORSTYPESCOLUMN, []);
 
     const selectedDeviceType: DropdownItem = React.useMemo(() => {
         return deviceTypes?.find((item: DropdownItem) => item.value === props?.device?.type);
     }, [props?.device?.type, deviceTypes]);
 
-    const selectedSensor: DropdownItem = React.useMemo(() => {
-        return sensorTypes?.find((item: DropdownItem) => item.value === props?.device?.widget?.type);
-    }, [props?.device?.type, sensorTypes]);
-
     const selectedActuatorType: DropdownItem = React.useMemo(() => {
-        return deviceTypes?.find((item: DropdownItem) => item.value === props?.device?.type);
-    }, [props?.device?.type, deviceTypes]);
+        return actuatorTypes?.find((item: DropdownItem) => item.value === props?.device?.widget?.type);
+    }, [props?.device?.type, actuatorTypes]);
 
     return (
         <React.Fragment>
@@ -76,18 +72,37 @@ const SummaryForm: React.FunctionComponent<SummaryFormProps> = (props: SummaryFo
                     <TextLabel label="Actuator name" value={props?.device?.widget?.name} />
                 </div>
                 <div className="col-sm-6 col-12">
-                    <TextLabel label="Actuator type" value={selectedDeviceType?.label} />
+                    <TextLabel label="Actuator type" value={selectedActuatorType?.label} />
                 </div>
             </div>
 
-            <div className="row">
-                <div className="col-sm-6 col-12">
-                    <TextLabel label="On value" value={props?.device?.widget?.propertise.ON} />
+            {(props?.device?.widget?.propertise.ON || props?.device?.widget?.propertise.OFF) &&
+                <div className="row">
+                    <div className="col-sm-6 col-12">
+                        <TextLabel label="On value" value={props?.device?.widget?.propertise.ON} />
+                    </div>
+                    <div className="col-sm-6 col-12">
+                        <TextLabel label="Off value" value={props?.device?.widget?.propertise.OFF} />
+                    </div>
                 </div>
-                <div className="col-sm-6 col-12">
-                    <TextLabel label="Off value" value={props?.device?.widget?.propertise.OFF} />
-                </div>
-            </div>
+            }
+            {(props?.device?.widget?.propertise.message || props?.device?.widget?.propertise.value) &&
+                <React.Fragment>
+                    <div className="row">
+                        {props?.device?.widget?.propertise.message &&
+                            <div className="col-sm-6 col-12">
+                                <TextLabel label="Message" value={props?.device?.widget?.propertise.message} />
+                            </div>
+                        }
+                        {props?.device?.widget?.propertise.value &&
+                            <div className="col-sm-6 col-12">
+                                <TextLabel label="Analog Value" value={props?.device?.widget?.propertise.value} />
+                            </div>
+                        }
+                    </div>
+                </React.Fragment>
+            }
+
         </React.Fragment>
     );
 };

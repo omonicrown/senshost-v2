@@ -35,7 +35,7 @@ export interface ActuatorModel {
     accountId?: string;
     name: string;
     type: number
-    propertise: { ON: "", OFF: "" };
+    propertise: { ON: "", OFF: "", message: "", value: "" };
     id: string;
     creationDate: Date;
 }

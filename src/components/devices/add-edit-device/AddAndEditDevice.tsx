@@ -20,6 +20,7 @@ import SummaryForm from "./sections/SummaryForm";
 import { AxiosResponse, AxiosError } from "axios";
 import { useSelector } from "react-redux";
 import { States } from "../../../interfaces/states";
+import { ACTUATORS } from "../../../constants";
 
 interface AddAndEditDeviceProps {
 
@@ -34,21 +35,18 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
 
     const [device, setDevice] = React.useState<DeviceModel>({
         name: "",
-        widget: { name: "", type: 0, propertise: { ON: "", OFF: "", } } as ActuatorModel,
+        widget: { name: "", type: 0, propertise: { ON: "", OFF: "", message: "", value: "" } } as ActuatorModel,
         accountId: null,
         groupId: null,
         fields: []
     } as DeviceModel);
 
     // actuator props---------------------------------------------------
-    const [selectedActuatorType, setSelectedActuatorType] = React.useState<DropdownItem>({
-        label: "Default",
-        value: 0,
-    } as DropdownItem);
+    const [selectedActuatorType, setSelectedActuatorType] = React.useState<DropdownItem>(ACTUATORS[0]);
 
     const handleActuatorTypeChange = React.useCallback((e: DropdownItem) => {
         setSelectedActuatorType(e);
-        setDevice({ ...device, widget: { ...device?.widget, type: e.value } });
+        setDevice({ ...device, widget: { ...device?.widget, type: e.value, propertise: { ON: "", OFF: "", message: "", value: "" } } });
     }, [device, selectedActuatorType, setDevice]);
 
     const handleActuatorPropertyChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +82,7 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
 
     const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
         const createDeviceModel: any = { ...device, accountId: authState.auth?.account.id, widget: { ...device.widget, propertise: JSON.stringify(device?.widget?.propertise) } }
-        console.log("Man is ", authState);
+
         DeviceApis.createDevice(createDeviceModel).then((response: AxiosResponse<PositiveResponse>) => {
             console.log("Ojenmab shutup ", response);
         }).catch((err: AxiosError) => {
