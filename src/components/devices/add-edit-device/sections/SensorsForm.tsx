@@ -39,7 +39,7 @@ const SensorsForm: React.FunctionComponent<SensorsFormProps> = (props: SensorsFo
             setSensors(updatedSensors);
             props?.handleSensorSubmitChange(updatedSensors);
         },
-    }), [sensors, sensorData, setSensorData, setSensors]);
+    }), [sensors, sensorData, setSensorData, setSensors,  props]);
 
     const sensorColumns: Array<TableHeader> = React.useMemo(() => SENSORSTYPESCOLUMN, []);
 
@@ -64,7 +64,7 @@ const SensorsForm: React.FunctionComponent<SensorsFormProps> = (props: SensorsFo
         }
         setSensorError(error);
         e.preventDefault();
-    }, [setSensors, sensors, sensor]);
+    }, [setSensors, sensors, sensor, props]);
 
     const handleDeviceTypeChange = React.useCallback((e: DropdownItem) => {
         setSensor({ ...sensor, selectedSensor: e });

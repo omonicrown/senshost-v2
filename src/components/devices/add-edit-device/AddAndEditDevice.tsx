@@ -47,7 +47,7 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
     const handleActuatorTypeChange = React.useCallback((e: DropdownItem) => {
         setSelectedActuatorType(e);
         setDevice({ ...device, widget: { ...device?.widget, type: e.value, propertise: { ON: "", OFF: "", message: "", value: "" } } });
-    }, [device, selectedActuatorType, setDevice]);
+    }, [device, setDevice]);
 
     const handleActuatorPropertyChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setDevice({
@@ -78,7 +78,7 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
     const onCancel = React.useCallback((e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setDevice({ name: "" } as DeviceModel);
         modalContext.setToggle(false);
-    }, [device, setDevice]);
+    }, [setDevice, modalContext]);
 
     const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
         const createDeviceModel: any = { ...device, accountId: authState.auth?.account.id, widget: { ...device.widget, propertise: JSON.stringify(device?.widget?.propertise) } }
@@ -90,7 +90,7 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
         })
 
         e.preventDefault();
-    }, [device]);
+    }, [device, authState.auth]);
 
     const handleSensorSubmitChange = React.useCallback((values: Array<SensorModel>) => {
         setDevice({ ...device, fields: values });
@@ -99,7 +99,7 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
 
     React.useEffect(() => {
         setDevice({ ...device, type: selectedDeviceType?.value });
-    }, [selectedDeviceType]);
+    }, [selectedDeviceType, device]);
 
     return (
         <div className="add-and-edit-device">
