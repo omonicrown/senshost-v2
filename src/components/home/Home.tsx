@@ -6,15 +6,28 @@ import { History } from "history";
 
 import SidebarComponent from "../shared/Sidebar";
 import HeaderComponent from "../shared/Header";
-import { AuthState } from "../../interfaces/states";
+import { AuthState, States } from "../../interfaces/states";
 import { actionTypes } from "../../types";
 
 import RequireLoginComponent from "../shared/RequireLogin";
+import { DashboardProps } from "../dashboard/Dashboard";
+import { DevicesProps } from "../devices/Devices";
+
 import { Button } from "@sebgroup/react-components/dist/Button";
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
+import { GroupsProps } from "../groups/Groups";
+import { GroupApis } from "../../apis/groupApis";
+import { useSelector, useDispatch } from "react-redux";
+import { GroupModel } from "../../interfaces/models";
+import { AxiosResponse, AxiosError } from "axios";
+import { getGroupsByAccount } from "../../actions/groupActions";
 
-const Devices: any = React.lazy(() => import("../devices/Devices"));
-const NotFound: React.LazyExoticComponent<React.FunctionComponent<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
+const Devices: React.LazyExoticComponent<React.FC<DevicesProps>> = React.lazy(() => import("../devices/Devices"));
+const Dashbaord: React.LazyExoticComponent<React.FC<DashboardProps>> = React.lazy(() => import("../dashboard/Dashboard"));
+const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
+const Users: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../users/Users"));
+
+const NotFound: React.LazyExoticComponent<React.FC<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
 
 
 const initialState: ModalProps = {
@@ -42,38 +55,31 @@ interface HomeStates {
   onToggleAdd?: (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => void;
 }
 
-export interface AddModalToggleProps extends ModalProps {
-  setToggle: (value?: boolean) => void;
-}
-
-export const toggleAddModalContext = React.createContext<AddModalToggleProps>({
-  ...initialState,
-  setToggle: () => { }
-})
 
 const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps): React.ReactElement<void> => {
   const [toggleMenu, setMenuToggle] = React.useState<boolean>(false);
-  const [toggleAddModal, setToggleAddModal] = React.useState<ModalProps>({ ...initialState });
+  const authState = useSelector((states: States) => states.auth);
+  const dispatch = useDispatch();
 
   const onToggle = React.useCallback((e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => {
-    setMenuToggle(!toggleMenu)
-  }, [toggleMenu]);
+    setMenuToggle(!toggleMenu);
 
-  const setToggle = React.useCallback((value?: boolean) => {
-    setToggleAddModal({ ...toggleAddModal, toggle: value })
-  }, [toggleAddModal]);
+    e.preventDefault();
+  }, [toggleMenu, setMenuToggle]);
+
+  React.useEffect(() => {
+    dispatch(getGroupsByAccount(authState?.auth?.account?.id))
+}, []);
 
   return (
-    <toggleAddModalContext.Provider value={{ ...toggleAddModal, setToggle: setToggle }}>
       <div className="home-container container-fluid">
         <div className="row no-gutters">
           <HeaderComponent />
         </div>
         <div className="row no-gutters main-body">
-          <SidebarComponent onToggle={onToggle} toggle={toggleMenu} activeTab="devices" />
+          <SidebarComponent onToggle={onToggle} toggle={toggleMenu} />
           <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
             <div className="inner-bar d-flex">
-              <Button label="Add" id="addBtn" onClick={() => setToggle(!toggleAddModal.toggle)} theme="outline-primary" />
             </div>
             <div className="main-holder">
               <div className="container">
@@ -81,12 +87,26 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                   <Redirect
                     exact
                     from={AppRoutes.Home}
-                    to={HomeRoutes.Devices.toString()}
+                    to={HomeRoutes.Dashboard.toString()}
+                  />
+                  <AppRoute
+                    path={HomeRoutes.Dashboard.toString()}
+                    component={RequireLoginComponent(Dashbaord)}
                   />
                   <AppRoute
                     path={HomeRoutes.Devices.toString()}
                     component={RequireLoginComponent(Devices)}
                   />
+                  <AppRoute
+                    path={HomeRoutes.Groups.toString()}
+                    component={RequireLoginComponent(Groups)}
+                  />
+
+                  <AppRoute
+                    path={HomeRoutes.Users.toString()}
+                    component={RequireLoginComponent(Users)}
+                  />
+
                   <AppRoute path="*" component={NotFound} props={props} />
 
                 </Switch>
@@ -99,7 +119,6 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
           </main>
         </div>
       </div>
-    </toggleAddModalContext.Provider>
   );
 
 });

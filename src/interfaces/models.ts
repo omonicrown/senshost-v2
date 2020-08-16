@@ -1,3 +1,4 @@
+import { Status } from "../enums/status"
 
 export interface AuthResponseModel {
     identityToken: string;
@@ -38,6 +39,25 @@ export interface ActuatorModel {
     propertise: { ON: "", OFF: "", message: "", value: "" };
     id: string;
     creationDate: Date;
+}
+
+export interface GroupModel {
+    accountId: string;
+    name: string;
+    status: Status;
+    id?: string;
+    creationDate?: string;
+}
+
+export interface UserModel {
+    accountId: string;
+    groupId: string;
+    name: string;
+    email: string;
+    password: string;
+    id: string;
+    creationDate: string;
+
 }
 
 export interface DeviceModel {

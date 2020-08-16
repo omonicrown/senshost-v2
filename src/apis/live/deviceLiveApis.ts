@@ -5,7 +5,11 @@ import configs from "../../configs";
 
 
 export class DeviceLiveApis extends AxiosGlobal {
-    createDevice(device: DeviceModel): AxiosPromise<PositiveResponse> {
+    createDevice(device: DeviceModel): AxiosPromise<DeviceModel> {
         return this.axios.post(`${configs.context}/${configs.apiList.DEVICE}`, device);
+    }
+
+    getDevicesByAccount(account: string): AxiosPromise<Array<DeviceModel>> {
+        return this.axios.get(`${configs.context}/${configs.apiList.DEVICE}/account/${account}`);
     }
 } 

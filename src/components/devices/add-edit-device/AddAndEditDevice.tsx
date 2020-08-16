@@ -9,7 +9,6 @@ import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown"
 
 import { DeviceModel, SensorModel, ActuatorModel, PositiveResponse } from "../../../interfaces/models";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { toggleAddModalContext, AddModalToggleProps } from "../../home/Home";
 import { Icon } from "@sebgroup/react-components/dist/Icon";
 import { SvgElement, icontypesEnum } from "../../../utils/svgElement";
 import DeviceForm from "./sections/DeviceForm";
@@ -18,17 +17,24 @@ import ActuatorForm from "./sections/ActuatorForm";
 import SummaryForm from "./sections/SummaryForm";
 
 import { AxiosResponse, AxiosError } from "axios";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { States } from "../../../interfaces/states";
 import { ACTUATORS } from "../../../constants";
+import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
+import { toggleNotification } from "../../../actions";
 
 interface AddAndEditDeviceProps {
-
+    onSave: (e: React.FormEvent<HTMLFormElement>, device: DeviceModel) => void;
+    onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    toggle: boolean;
 }
-const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps) => {
+
+const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props: AddAndEditDeviceProps) => {
     const [stepTracker, setStepTracker] = React.useState<number>(0);
     const stepList: Array<string> = React.useMemo(() => ["Device", "Sensor", "Actuator", "Summary"], []);
-    const modalContext: AddModalToggleProps = useContext<AddModalToggleProps>(toggleAddModalContext);
+
+    // actions
+    const dispatch = useDispatch();
 
     // account or profile ----------------------------
     const authState = useSelector((states: States) => states.auth);
@@ -77,17 +83,11 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
 
     const onCancel = React.useCallback((e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setDevice({ name: "" } as DeviceModel);
-        modalContext.setToggle(false);
+        props.onCancel(e);
     }, [device, setDevice]);
 
     const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        const createDeviceModel: any = { ...device, accountId: authState.auth?.account.id, widget: { ...device.widget, propertise: JSON.stringify(device?.widget?.propertise) } }
-
-        DeviceApis.createDevice(createDeviceModel).then((response: AxiosResponse<PositiveResponse>) => {
-            console.log("Ojenmab shutup ", response);
-        }).catch((err: AxiosError) => {
-            console.log("There are error in create ", err);
-        })
+        props?.onSave(e, device);
 
         e.preventDefault();
     }, [device]);
@@ -100,6 +100,16 @@ const AddAndEditDevice: React.FunctionComponent = (props: AddAndEditDeviceProps)
     React.useEffect(() => {
         setDevice({ ...device, type: selectedDeviceType?.value });
     }, [selectedDeviceType]);
+
+    React.useEffect(() => {
+        setDevice({
+            name: "",
+            widget: { name: "", type: 0, propertise: { ON: "", OFF: "", message: "", value: "" } } as ActuatorModel,
+            accountId: null,
+            groupId: null,
+            fields: []
+        } as DeviceModel);
+    }, [props?.toggle])
 
     return (
         <div className="add-and-edit-device">

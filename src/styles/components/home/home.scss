@@ -81,6 +81,7 @@
 
                                     &.active {
                                         color: $blue-darker;
+
                                         svg {
                                             fill: $blue-darker;
                                         }
@@ -123,13 +124,12 @@
                 >.main-holder {
                     overflow-y: auto;
                     height: calc(100% - #{calculateRem(60)});
-                    // display: flex;
-                    // flex-direction: column;
-                    // justify-content: flex-end;
 
                     >.container {
                         width: 100%;
+                        min-height: 100%;
                         @import "../dashboard/dashboard.scss";
+                        @import "../device/device.scss";
                     }
 
                     footer {

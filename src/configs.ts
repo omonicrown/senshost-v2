@@ -15,6 +15,8 @@ export enum APILIST {
     AUTH = "Auth",
     ACCOUNT = 'Account',
     DEVICE = 'Device',
+    Group = 'Group',
+    User = 'User',
 }
 
 //CONFIG DATA (Please change here only)
@@ -28,6 +30,7 @@ const configs = {
     context: SOCKET_URL,
     history: createBrowserHistory(),
     requestTimeOut: 30000,
-    apiList: APILIST
+    apiList: APILIST,
+    tablePageSize: 10
 }
 export default configs;

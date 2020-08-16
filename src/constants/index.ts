@@ -1,3 +1,5 @@
+import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
+
 export const RECEIVE_AUTH_USER = "RECEIVE_AUTH_USER";
 export type RECEIVE_AUTH_USER = typeof RECEIVE_AUTH_USER;
 export const LOG_AUTH_ERROR = "LOG_AUTH_ERROR";
@@ -11,6 +13,10 @@ export type SIGNOUT_USER = typeof SIGNOUT_USER;
 export const TOGGLE_NOTIFICATION = "TOGGLE_NOTIFICATION";
 export type TOGGLE_NOTIFICATION = typeof TOGGLE_NOTIFICATION;
 
+
+
+export const RECEIVE_GROUPS = "RECEIVE_GROUPS";
+export const LOG_GROUP_ERROR = "LOG_GROUP_ERROR";
 
 
 export const SENSORSTYPESCOLUMN = [{
@@ -97,3 +103,14 @@ export const DEVICETYPES = [{
     label: "I R Sensor",
     value: 15
 }];
+
+
+
+export const initialState: ModalProps = {
+    toggle: false,
+    fullscreen: false,
+    centered: false,
+    size: "modal-lg",
+    disableBackdropDismiss: true,
+    onDismiss: null,
+};

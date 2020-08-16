@@ -1,7 +1,8 @@
 import { ErrorModel } from "./states";
-import { AuthResponseModel } from "./models";
+import { AuthResponseModel, GroupModel } from "./models";
 
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
+import { AxiosError } from "axios";
 
 
 export interface AccountActions {
@@ -19,4 +20,11 @@ export interface AuthActions {
 export interface NotificationActions {
     type: string;
     notification: NotificationProps
+}
+
+export interface GroupActions {
+    type: string;
+    groups?: Array<GroupModel>;
+    error?: AxiosError;
+
 }
