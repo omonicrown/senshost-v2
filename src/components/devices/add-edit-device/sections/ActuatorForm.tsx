@@ -1,6 +1,6 @@
 import React from "react";
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
-import { DeviceModel, SensorModel } from "../../../../interfaces/models";
+import { DeviceModel } from "../../../../interfaces/models";
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { ACTUATORS } from "../../../../constants";
 

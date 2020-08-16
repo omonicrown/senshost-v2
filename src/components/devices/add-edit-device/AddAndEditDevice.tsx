@@ -53,7 +53,7 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
     const handleActuatorTypeChange = React.useCallback((e: DropdownItem) => {
         setSelectedActuatorType(e);
         setDevice({ ...device, widget: { ...device?.widget, type: e.value, propertise: { ON: "", OFF: "", message: "", value: "" } } });
-    }, [device, selectedActuatorType, setDevice]);
+    }, [device, setDevice]);
 
     const handleActuatorPropertyChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setDevice({
@@ -90,7 +90,7 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
         props?.onSave(e, device);
 
         e.preventDefault();
-    }, [device]);
+    }, [device, authState.auth]);
 
     const handleSensorSubmitChange = React.useCallback((values: Array<SensorModel>) => {
         setDevice({ ...device, fields: values });
@@ -99,7 +99,7 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
 
     React.useEffect(() => {
         setDevice({ ...device, type: selectedDeviceType?.value });
-    }, [selectedDeviceType]);
+    }, [selectedDeviceType, device]);
 
     React.useEffect(() => {
         setDevice({
