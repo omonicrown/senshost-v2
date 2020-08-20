@@ -98,8 +98,8 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
 
 
     React.useEffect(() => {
-        setDevice({ ...device, type: selectedDeviceType?.value });
-    }, [selectedDeviceType, device]);
+       setDevice({ ...device, type: selectedDeviceType?.value });
+    }, [selectedDeviceType]);
 
     React.useEffect(() => {
         setDevice({

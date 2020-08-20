@@ -79,11 +79,14 @@
                                 li {
                                     padding: .8rem 0px;
 
-                                    &.active {
-                                        color: $blue-darker;
+                                    a {
+                                        &:not(.active) {
+                                            color: inherit;
+                                        }
+
 
                                         svg {
-                                            fill: $blue-darker;
+                                            fill: currentcolor;
                                         }
                                     }
 

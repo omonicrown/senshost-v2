@@ -26,7 +26,7 @@ const App: React.FunctionComponent<SharedProps> = React.memo((props: SharedProps
         <Switch>
           <Redirect exact from="/" to={AppRoutes.Account} />
           <AppRoute path={AppRoutes.Account} component={(Account)} props={props} />
-          <AppRoute path={AppRoutes.Home} component={RequireLogin(Home)} props={props} />
+          <AppRoute path={AppRoutes.Home} component={(Home)} props={props} />
           <AppRoute path="*" component={NotFound} props={props} />
         </Switch>
       </React.Suspense>

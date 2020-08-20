@@ -88,7 +88,6 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
         setDevices([...devices, device]);
 
         setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
-
       }
     }).catch((err: AxiosError) => {
       console.log(err);
