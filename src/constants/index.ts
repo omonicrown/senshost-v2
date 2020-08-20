@@ -27,6 +27,33 @@ export const SENSORSTYPESCOLUMN = [{
     accessor: "name",
 }];
 
+export const ACTUATORCOLUMNS = [
+    {
+        label: "Name",
+        accessor: "name",
+    },
+    {
+        label: "Type",
+        accessor: "type"
+    },
+    {
+        label: "ON",
+        accessor: "ON"
+    },
+    {
+        label: "OFF",
+        accessor: "OFF"
+    },
+    {
+        label: "Value",
+        accessor: "value"
+    },
+    {
+        label: "Message",
+        accessor: "message"
+    }
+];
+
 export const ACTUATORS = [{
     label: "Digital",
     value: 0,

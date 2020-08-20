@@ -67,7 +67,7 @@ export interface DeviceModel {
     accountId: string;
     fields: Array<SensorModel>;
     groupId: string;
-    widget: ActuatorModel;
+    actuators: Array<ActuatorModel>;
     id: string;
     creationDate: Date;
 }

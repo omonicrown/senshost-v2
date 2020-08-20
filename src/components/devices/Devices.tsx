@@ -2,7 +2,6 @@ import React from "react";
 
 import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 
-import Gauge from "../gauge";
 import PortalComponent from "../shared/Portal";
 
 import { SharedProps } from "../home/Home";
@@ -12,7 +11,7 @@ import { DeviceApis } from "../../apis/deviceApis";
 import { States } from "../../interfaces/states";
 import { useSelector, useDispatch } from "react-redux";
 import { AxiosResponse, AxiosError } from "axios";
-import { DeviceModel } from "../../interfaces/models";
+import { DeviceModel, ActuatorModel } from "../../interfaces/models";
 import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, FilterProps, FilterItem } from "@sebgroup/react-components/dist/Table/Table";
 import { DEVICETYPES, initialState } from "../../constants";
 import { DropdownItem, Dropdown } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
@@ -71,7 +70,13 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
   const [filters, setFilters] = React.useState<Array<FilterItem>>(columns.map((column: Column) => ({ accessor: column.accessor, filters: [] })));
 
   const onSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, device: DeviceModel) => {
-    const createDeviceModel: any = { ...device, accountId: authState.auth?.account.id, widget: { ...device.widget, propertise: JSON.stringify(device?.widget?.propertise) } }
+    const createDeviceModel: DeviceModel = {
+      ...device,
+      accountId: authState.auth?.account.id,
+      actuators: device?.actuators?.map((actuator: ActuatorModel) => {
+        return { ...actuator, propertise: JSON.stringify(actuator?.propertise) as any }
+      })
+    };
 
     DeviceApis.createDevice(createDeviceModel).then((response: AxiosResponse<DeviceModel>) => {
       if (response?.data) {

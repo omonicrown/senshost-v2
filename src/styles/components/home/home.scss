@@ -127,6 +127,7 @@
                 >.main-holder {
                     overflow-y: auto;
                     height: calc(100% - #{calculateRem(60)});
+                    background-color: $gray-200;
 
                     >.container {
                         width: 100%;
