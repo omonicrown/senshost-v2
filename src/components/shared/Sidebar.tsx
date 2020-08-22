@@ -40,11 +40,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
             title: "Devices"        
         },
         {
-            name: "actuators",
-            iconType: icontypesEnum.ACTUATORS,
-            title: "Actuators",
-        },
-        {
             name: "groups",
             iconType: icontypesEnum.GROUPS,
             title: "Groups"

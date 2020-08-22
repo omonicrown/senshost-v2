@@ -36,7 +36,7 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
 
     const [selectedStatus, setSelectedStatus] = React.useState<DropdownItem>(null);
     const statuses: Array<DropdownItem> = React.useMemo(() => [
-        { label: "Active", value: 0 }, { label: "inActive", value: 1 }
+        { label: "Select", value: null }, { label: "Active", value: 0 }, { label: "inActive", value: 1 }
     ], []);
 
     const [modalProps, setModalProps] = React.useState<ModalProps>({ ...initialState });
@@ -109,13 +109,14 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
 
     React.useEffect(() => {
         const updatedFilterItems: Array<FilterItem> = filters?.map((filterItem: FilterItem) => {
-            if (filterItem.accessor === "type" && selectedStatus?.value) {
+            if (filterItem.accessor === "status") {
                 return { ...filterItem, filters: [selectedStatus?.value] };
             }
             return filterItem;
         });
+
         setFilters(updatedFilterItems);
-    }, [selectedStatus]);
+    }, [selectedStatus, setFilters]);
 
 
     React.useEffect(() => {

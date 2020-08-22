@@ -13,7 +13,7 @@ interface ActuatorFormProps {
     handleActuatorSubmitChange: (actuators: Array<ActuatorModel>) => void;
 }
 
-interface ActuatorTableData {
+export interface ActuatorTableData {
     name: string;
     value: string;
     message: string;
