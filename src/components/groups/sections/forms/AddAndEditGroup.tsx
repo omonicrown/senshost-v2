@@ -1,6 +1,6 @@
 import React from "react";
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
-import { GroupModel } from "../../../interfaces/models";
+import { GroupModel } from "../../../../interfaces/models";
 import { Button } from "@sebgroup/react-components/dist/Button";
 
 interface AddAndEditGroupProps {

@@ -1,7 +1,7 @@
 import React from "react";
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { UserModel, GroupModel } from "../../../interfaces/models";
+import { UserModel, GroupModel } from "../../../../interfaces/models";
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 
 interface AddAndEditUserProps {

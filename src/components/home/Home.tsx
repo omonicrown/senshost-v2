@@ -15,7 +15,7 @@ import { DevicesProps } from "../devices/Devices";
 
 import { Button } from "@sebgroup/react-components/dist/Button";
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
-import { GroupsProps } from "../groups/Groups";
+import { GroupProps } from "../groups/Groups";
 import { GroupApis } from "../../apis/groupApis";
 import { useSelector, useDispatch } from "react-redux";
 import { GroupModel } from "../../interfaces/models";
@@ -24,8 +24,7 @@ import { getGroupsByAccount } from "../../actions/groupActions";
 
 const Devices: React.LazyExoticComponent<React.FC<DevicesProps>> = React.lazy(() => import("../devices/Devices"));
 const Dashbaord: React.LazyExoticComponent<React.FC<DashboardProps>> = React.lazy(() => import("../dashboard/Dashboard"));
-const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
-const Users: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../users/Users"));
+const Groups: React.LazyExoticComponent<React.FC<GroupProps>> = React.lazy(() => import("../groups/Groups"));
 
 const NotFound: React.LazyExoticComponent<React.FC<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
 
@@ -100,11 +99,6 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                   <AppRoute
                     path={HomeRoutes.Groups.toString()}
                     component={RequireLoginComponent(Groups)}
-                  />
-
-                  <AppRoute
-                    path={HomeRoutes.Users.toString()}
-                    component={RequireLoginComponent(Users)}
                   />
 
                   <AppRoute path="*" component={NotFound} props={props} />

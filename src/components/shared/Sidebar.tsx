@@ -44,11 +44,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
             iconType: icontypesEnum.GROUPS,
             title: "Groups"
         },
-        {
-            name: "users",
-            iconType: icontypesEnum.USER,
-            title: "Users"
-        },
     ];
 
     return (
