@@ -1,6 +1,19 @@
 .header-container {
     height: $header-height;
-    position: relative;
+    align-items: center;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .3);
+
+    >.icon-holder {
+        margin-right: 1rem;
+        width: 1.2rem;
+
+        svg {
+            fill: $white;
+        }
+
+        cursor: pointer;
+    }
+
     width: 100%;
     background: $header-background;
     padding-left: calculateRem(20);

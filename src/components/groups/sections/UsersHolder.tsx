@@ -57,10 +57,12 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
 
     // filter and show only used groups from the group list
     const groupOptions: Array<DropdownItem> = React.useMemo(() => {
-        return groupState?.groups?.filter((group: GroupModel) => users?.some((user: UserModel) => user?.groupId === group.id))
-            .map((group: GroupModel): DropdownItem => {
-                return { label: group.name, value: group.id }
-            })
+        const groups: Array<DropdownItem> = groupState?.groups?.filter((group: GroupModel) => users?.some((user: UserModel) => user?.groupId === group.id))
+            .map((newGroup: GroupModel): DropdownItem => {
+                return { label: newGroup.name, value: newGroup.name }
+            }) || [];
+
+        return [{ label: "All", value: null }, ...groups];
     }, [users, groupState?.groups]);
 
     const columns: Array<Column> = React.useMemo((): Array<Column> => [
@@ -71,6 +73,7 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
         {
             label: "Group",
             accessor: "groupName",
+            isHidden: true
         }
     ], []);
 
@@ -110,13 +113,13 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
 
     React.useEffect(() => {
         const updatedFilterItems: Array<FilterItem> = filters?.map((filterItem: FilterItem) => {
-            if (filterItem.accessor === "name") {
+            if (filterItem.accessor === "groupName" && selectedGroup?.value) {
                 return { ...filterItem, filters: [selectedGroup?.value] };
             }
-            return filterItem;
+      
+            return { ...filterItem, filters: [] };
         });
 
-        console.log("Tabbatar maka ", updatedFilterItems);
         setFilters(updatedFilterItems);
     }, [selectedGroup, setFilters]);
 

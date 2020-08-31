@@ -15,7 +15,7 @@ const initialState: GroupState = {
 export default (state = initialState, action: groupActions): GroupState => {
     switch (action.type) {
         case RECEIVE_GROUPS: {
-            return { ...state, groups: [...state.groups, ...action?.groups] };
+            return { ...state, groups: [...state?.groups, ...action?.groups] };
         }
         default: {
             return state;

@@ -8,7 +8,7 @@ import { SharedProps } from "../home/Home";
 import { Modal, ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import AddAndEditDevice from "./add-edit-device/AddAndEditDevice";
 import { DeviceApis } from "../../apis/deviceApis";
-import { States } from "../../interfaces/states";
+import { States, AuthState } from "../../interfaces/states";
 import { useSelector, useDispatch } from "react-redux";
 import { AxiosResponse, AxiosError } from "axios";
 import { DeviceModel, ActuatorModel } from "../../interfaces/models";
@@ -22,13 +22,16 @@ import { SvgElement, icontypesEnum } from "../../utils/svgElement";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 import { toggleNotification } from "../../actions";
 import { dispatch } from "d3";
+import { Dispatch } from "redux";
+import { useHistory } from "react-router";
+import { History } from "history";
+import { AppRoutes } from "../../enums/routes";
 
 export interface DevicesProps extends SharedProps {
   onToggle: (value: boolean) => void;
 }
 
 const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): React.ReactElement<void> => {
-  const authState = useSelector((states: States) => states.auth);
   const [paginationValue, setPagination] = React.useState<number>(1);
   const [searchValue, setSearchValue] = React.useState<string>("");
   const [devices, setDevices] = React.useState<Array<DeviceModel>>(null);
@@ -43,7 +46,25 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
   }), []);
 
   // actions
-  const dispatch = useDispatch();
+  const authState: AuthState = useSelector((states: States) => states?.auth);
+  const dispatch: Dispatch = useDispatch();
+
+  const history: History = useHistory();
+
+  React.useEffect(() => {
+    if (!authState?.auth?.identityToken) {
+      const notification: NotificationProps = {
+        theme: "danger",
+        title: "Unauthenticated user",
+        message: `Please login to proceed`,
+        onDismiss: () => { },
+        toggle: true
+      };
+
+      dispatch(toggleNotification(notification));
+      history.replace(AppRoutes.Account);
+    }
+  }, [authState]);
 
   // memos
   const data: Array<DataItem> = React.useMemo(() => devices?.map((device: DeviceModel) => {

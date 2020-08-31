@@ -3,7 +3,6 @@ import { Loader } from "@sebgroup/react-components/dist/Loader";
 import { AppRoute } from "../utils/functions";
 import { Redirect, Switch, RouteComponentProps, withRouter } from "react-router";
 
-import RequireLogin from "./shared/RequireLogin";
 import { actionTypes } from "../types";
 import NotificationHook from "./shared/NotificationHook";
 import { AppRoutes } from "../enums/routes";

@@ -9,7 +9,6 @@ import HeaderComponent from "../shared/Header";
 import { AuthState, States } from "../../interfaces/states";
 import { actionTypes } from "../../types";
 
-import RequireLoginComponent from "../shared/RequireLogin";
 import { DashboardProps } from "../dashboard/Dashboard";
 import { DevicesProps } from "../devices/Devices";
 
@@ -73,13 +72,11 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
   return (
       <div className="home-container container-fluid">
         <div className="row no-gutters">
-          <HeaderComponent />
+          <HeaderComponent onToggle={onToggle} toggle={toggleMenu} />
         </div>
         <div className="row no-gutters main-body">
-          <SidebarComponent onToggle={onToggle} toggle={toggleMenu} />
+          <SidebarComponent toggle={toggleMenu} />
           <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
-            <div className="inner-bar d-flex">
-            </div>
             <div className="main-holder">
               <div className="container">
                 <Switch>
@@ -90,15 +87,15 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                   />
                   <AppRoute
                     path={HomeRoutes.Dashboard.toString()}
-                    component={RequireLoginComponent(Dashbaord)}
+                    component={Dashbaord}
                   />
                   <AppRoute
                     path={HomeRoutes.Devices.toString()}
-                    component={RequireLoginComponent(Devices)}
+                    component={Devices}
                   />
                   <AppRoute
                     path={HomeRoutes.Groups.toString()}
-                    component={RequireLoginComponent(Groups)}
+                    component={Groups}
                   />
 
                   <AppRoute path="*" component={NotFound} props={props} />

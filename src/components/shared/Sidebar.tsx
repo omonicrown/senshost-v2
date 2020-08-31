@@ -7,7 +7,6 @@ import { HomeRoutes } from "../../enums/routes";
 import { Link } from "react-router-dom";
 
 interface SidebarProps {
-    onToggle: (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => void;
     toggle: boolean;
 }
 
@@ -37,7 +36,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
         {
             name: "devices",
             iconType: icontypesEnum.DEVICES,
-            title: "Devices"        
+            title: "Devices"
         },
         {
             name: "groups",
@@ -48,16 +47,13 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
 
     return (
         <aside className={"left-side-container " + (props.toggle ? "sidemenu-opened" : "sidemenu-closed")}>
-            <div className="hamburger-icon">
-                <Icon src={<SvgElement type={icontypesEnum.BARS} onClick={props.onToggle} />} />
-            </div>
             <div className="sidebar-content">
                 <div className="row">
                     <div className="sidebar-sticky col">
                         <ul className="nav d-flex flex-column">
                             {menuItems?.map((menu: MenuItem) =>
                                 <li className={"nav-item"} key={menu.name}>
-                                    <Link className={"title-holder d-flex " + (activeTab === menu.name ? " active" : "")}  to={`/home/${menu.name}`}>
+                                    <Link className={"title-holder d-flex " + (activeTab === menu.name ? " active" : "")} to={`/home/${menu.name}`}>
                                         <Icon src={<SvgElement type={menu.iconType} />} />
                                         <span className="title">{menu.title}</span>
                                     </Link>
