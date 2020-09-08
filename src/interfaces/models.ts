@@ -11,6 +11,7 @@ export interface Account {
     password: string;
     id: string;
     creationDate: Date;
+    name?: string;
 }
 
 export interface HttpBasicAuth {

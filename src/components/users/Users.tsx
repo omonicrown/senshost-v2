@@ -3,38 +3,38 @@ import React from "react";
 import { Dialogue } from "@sebgroup/react-components/dist/Dialogue";
 import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 
-import Gauge from "../../gauge";
-import PortalComponent from "../../shared/Portal";
+import Gauge from "../gauge";
+import PortalComponent from "../shared/Portal";
 
-import { SharedProps } from "../../home/Home";
+import { SharedProps } from "../home/Home";
 import { Modal, ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
-import { GroupApis } from "../../../apis/groupApis";
-import { States } from "../../../interfaces/states";
+import { GroupApis } from "../../apis/groupApis";
+import { States } from "../../interfaces/states";
 import { useSelector, useDispatch } from "react-redux";
 import { AxiosResponse, AxiosError } from "axios";
-import { GroupModel, UserModel } from "../../../interfaces/models";
-import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, FilterProps, FilterItem } from "@sebgroup/react-components/dist/Table/Table";
+import { GroupModel, UserModel } from "../../interfaces/models";
+import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, FilterProps, FilterItem, ActionLinkItem } from "@sebgroup/react-components/dist/Table/Table";
 import { DropdownItem, Dropdown } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
-import configs from "../../../configs";
+import configs from "../../configs";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { icontypesEnum, SvgElement } from "../../../utils/svgElement";
+import { icontypesEnum, SvgElement } from "../../utils/svgElement";
 import { Icon } from "@sebgroup/react-components/dist/Icon";
 
 
 import AddAndEditUser from "./forms/AddAndEditUser";
-import { initialState } from "../../../constants";
-import { UserApis } from "../../../apis/userApis";
+import { initialState } from "../../constants";
+import { UserApis } from "../../apis/userApis";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
-import { toggleNotification } from "../../../actions";
+import { toggleNotification } from "../../actions";
 
-export interface GroupsProps extends SharedProps {
+export interface UsersProps extends SharedProps {
 }
 
-const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React.ReactElement<void> => {
+const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.ReactElement<void> => {
     const authState = useSelector((states: States) => states.auth);
     const [paginationValue, setPagination] = React.useState<number>(1);
     const [users, setUsers] = React.useState<Array<UserModel>>(null);
-
+    const [user, setUser] = React.useState<UserModel>({} as UserModel);
     // actions
     const dispatch = useDispatch();
 
@@ -49,9 +49,26 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
         onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, selectedRow: TableRow) => { },
     }), []);
 
+    const actionLinks: Array<ActionLinkItem> = React.useMemo(() => [
+        {
+            label: "Edit", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
+                setUser({
+                    name: selectedRow["name"],
+                    email: selectedRow["email"],
+                    password: selectedRow["password"],
+                    groupId: selectedRow["groupId"],
+                    id: selectedRow["id"],
+                } as UserModel);
+                setModalProps({ ...modalProps, toggle: true });
+            }
+        },
+        { label: "Delete", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => { } },
+    ], []);
+
     // memos
     const data: Array<DataItem> = React.useMemo(() => users?.map((user: UserModel) => {
         const group: string = groupState?.groups?.find((item: GroupModel) => item?.id === user.groupId)?.name;
+
         return ({ ...user, groupName: group });
     }), [users, groupState]);
 
@@ -62,6 +79,7 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
                 return { label: newGroup.name, value: newGroup.name }
             }) || [];
 
+        console.log("Iyamura ", groups);
         return [{ label: "All", value: null }, ...groups];
     }, [users, groupState?.groups]);
 
@@ -72,34 +90,78 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
         },
         {
             label: "Group",
-            accessor: "groupName",
+            accessor: "groupName"
+        },
+        {
+            label: "Email",
+            accessor: "email"
+        },
+        {
+            label: "GroupID",
+            accessor: "groupId",
+            isHidden: true
+        },
+        {
+            label: "id",
+            accessor: "id",
             isHidden: true
         }
     ], []);
 
     const [filters, setFilters] = React.useState<Array<FilterItem>>(columns.map((column: Column) => ({ accessor: column.accessor, filters: [] })));
 
-    const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, user: UserModel) => {
-        UserApis.createUser({ ...user, accountId: authState?.auth?.account?.id })
-            .then((response: AxiosResponse<UserModel>) => {
+    const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, newUser: UserModel) => {
+        if (newUser?.id) {
+            UserApis?.updateUser(newUser)
+                .then((response: AxiosResponse<UserModel>) => {
+                    if (response.data) {
+                        const notification: NotificationProps = {
+                            theme: "success",
+                            title: "Group added",
+                            message: `Group updated successfully`,
+                            toggle: true,
+                            onDismiss: () => { }
+                        };
 
+                        dispatch(toggleNotification(notification));
 
-                if (response.data) {
-                    const notification: NotificationProps = {
-                        theme: "success",
-                        title: "Group added",
-                        message: `Group added successfully`,
-                        toggle: true,
-                        onDismiss: () => { }
-                    };
+                        const updatedusers: Array<UserModel> = users?.map((item: UserModel) => {
+                            if (item?.id === newUser.id) {
+                                return newUser;
+                            }
 
-                    dispatch(toggleNotification(notification));
+                            return item;
+                        });
 
-                    setUsers([response.data, ...users]);
+                        setUsers(updatedusers);
+                    }
+                })
+                .finally(() => {
                     setModalProps({ ...modalProps, toggle: false });
-                }
-            });
-        setModalProps({ ...modalProps, toggle: false });
+                    setUser({} as UserModel);
+                });
+
+        } else {
+            UserApis.createUser({ ...newUser, accountId: authState?.auth?.account?.id })
+                .then((response: AxiosResponse<UserModel>) => {
+                    if (response.data) {
+                        const notification: NotificationProps = {
+                            theme: "success",
+                            title: "Group added",
+                            message: `Group added successfully`,
+                            toggle: true,
+                            onDismiss: () => { }
+                        };
+
+                        dispatch(toggleNotification(notification));
+
+                        setUsers([response.data, ...users]);
+                    }
+                })
+                .finally(() => {
+                    setModalProps({ ...modalProps, toggle: false });
+                });
+        }
     }, [modalProps]);
 
     const onCancel = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -116,16 +178,15 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
             if (filterItem.accessor === "groupName" && selectedGroup?.value) {
                 return { ...filterItem, filters: [selectedGroup?.value] };
             }
-      
+
             return { ...filterItem, filters: [] };
         });
 
         setFilters(updatedFilterItems);
     }, [selectedGroup, setFilters]);
 
-
     React.useEffect(() => {
-        UserApis.getUsersByGroup(authState?.auth?.account?.id)
+        UserApis.getUsersByAccountId(authState?.auth?.account?.id)
             .then((response: AxiosResponse<Array<UserModel>>) => {
                 setUsers(response?.data || []);
                 // setGroups here 
@@ -139,7 +200,10 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
         <div className="users-container">
             <div className="row control-holder">
                 <div className="col-12 text-right">
-                    <Button label="" size="sm" theme="outline-primary" title="Add" onClick={() => setModalProps({ ...modalProps, toggle: true })}>
+                    <Button label="" size="sm" theme="outline-primary" title="Add" onClick={() => {
+                        setUser({} as UserModel);
+                        setModalProps({ ...modalProps, toggle: true });
+                    }}>
                         <Icon src={<SvgElement type={icontypesEnum.ADD} />} /> Add
                     </Button>
                 </div>
@@ -164,6 +228,7 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
                         <Table
                             columns={columns}
                             data={data}
+                            actionLinks={actionLinks}
                             offset={configs.tablePageSize}
                             currentpage={paginationValue}
                             primaryActionButton={primaryButton}
@@ -183,7 +248,7 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
                     onDismiss={() => setModalProps({ ...modalProps, toggle: false })}
                     header={<h3>Create User</h3>}
                     body={
-                        <AddAndEditUser onSave={handleSave} onCancel={onCancel} groups={groupState?.groups} />
+                        <AddAndEditUser user={user} onSave={handleSave} onCancel={onCancel} groups={groupState?.groups} />
                     }
                     ariaLabel="My Label"
                     ariaDescribedby="My Description"
@@ -194,4 +259,4 @@ const Groups: React.FunctionComponent<GroupsProps> = (props: GroupsProps): React
 
 };
 
-export default Groups;
+export default Users;

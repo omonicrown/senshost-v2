@@ -5,8 +5,16 @@ import configs from "../../configs";
 
 
 export class GroupLiveApis extends AxiosGlobal {
-    createGroup(device: GroupModel): AxiosPromise<GroupModel> {
-        return this.axios.post(`${configs.context}/${configs.apiList.Group}`, device);
+    getGroupById(groupId: string): AxiosPromise<GroupModel> {
+        return this.axios.get(`${configs.context}/${configs.apiList.Group}/${groupId}`);
+    }
+
+    updateGroup(group: GroupModel): AxiosPromise<GroupModel> {
+        return this.axios.put(`${configs.context}/${configs.apiList.Group}/${group?.id}`, group);
+    }
+
+    deleteGroup(groupId?: string): AxiosPromise {
+        return this.axios.delete(`${configs.context}/${configs.apiList.Group}/${groupId}`);
     }
 
     getGroupByAccount(account: string): AxiosPromise<Array<GroupModel>> {

@@ -11,15 +11,31 @@ export class GroupApis {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
-            return this.groupApis.createGroup(group);
+            return this.groupApis.getGroupById({} as string);
         }
     }
 
-    static updateDevice(group: GroupModel): AxiosPromise<GroupModel> {
+    static updateGroup(group: GroupModel): AxiosPromise<GroupModel> {
+        if (configs?.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.groupApis.updateGroup(group);
+        }
+    }
+
+    static deleteGroup(groupId?: string): AxiosPromise {
+        if (configs?.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.groupApis.deleteGroup(groupId);
+        }
+    }
+
+    static getGroupById(groupId: string): AxiosPromise<GroupModel> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
-            return this.groupApis.createGroup(group);
+            return this.groupApis.getGroupById(groupId);
         }
     }
 

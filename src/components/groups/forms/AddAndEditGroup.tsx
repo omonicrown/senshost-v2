@@ -1,11 +1,12 @@
 import React from "react";
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
-import { GroupModel } from "../../../../interfaces/models";
+import { GroupModel } from "../../../interfaces/models";
 import { Button } from "@sebgroup/react-components/dist/Button";
 
 interface AddAndEditGroupProps {
     onSave: (e: React.FormEvent<HTMLFormElement>, group: GroupModel) => void;
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    group: GroupModel;
 }
 const AddAndEditGroup: React.FunctionComponent<AddAndEditGroupProps> = (props: AddAndEditGroupProps): React.ReactElement<void> => {
     const [group, setGroup] = React.useState<GroupModel>({ name: "" } as GroupModel);
@@ -22,14 +23,19 @@ const AddAndEditGroup: React.FunctionComponent<AddAndEditGroupProps> = (props: A
 
 
     const onSave = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        if(!group?.name){
-            setGroupError({...groupError, name: "Group name is required"} as GroupModel);
+        if (!group?.name) {
+            setGroupError({ ...groupError, name: "Group name is required" } as GroupModel);
         } else {
-            props?.onSave(e,  group);
+            props?.onSave(e, group);
         }
 
         e.preventDefault();
     }, [group]);
+
+    React.useEffect(() => {
+        console.log("Try to sleep ", props.group)
+        setGroup(props?.group);
+    }, [])
 
     return (
         <form className="add-and-edit-group" onSubmit={onSave}>

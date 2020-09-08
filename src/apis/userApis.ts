@@ -19,11 +19,27 @@ export class UserApis {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
-            return this.userApis.createUser(user);
+            return this.userApis.updateUser(user);
         }
     }
 
-    static getUsersByGroup(account: string): AxiosPromise<Array<UserModel>> {
+    static deleteUser(userId: string): AxiosPromise {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.userApis.deleteUser(userId);
+        }
+    }
+    
+    static getUsersByGroupId(groupId: string): AxiosPromise<UserModel[]> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.userApis.getUsersByGroupId(groupId);
+        }
+    }
+
+    static getUsersByAccountId(account: string): AxiosPromise<Array<UserModel>> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {

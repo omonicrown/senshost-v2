@@ -1,17 +1,18 @@
 import React from "react";
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { UserModel, GroupModel } from "../../../../interfaces/models";
+import { UserModel, GroupModel } from "../../../interfaces/models";
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 
 interface AddAndEditUserProps {
     groups: Array<GroupModel>;
+    user: UserModel;
     onSave: (e: React.FormEvent<HTMLFormElement>, group: UserModel) => void;
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: AddAndEditUserProps): React.ReactElement<void> => {
-    const [user, setUser] = React.useState<UserModel>({ name: "", email:"", password: "" } as UserModel);
-    const [userError, setUserError] = React.useState<UserModel>({ name: "", email:"", password: "" } as UserModel);
+    const [user, setUser] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
+    const [userError, setUserError] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
 
     const [selectedGroup, setSelectedGroup] = React.useState<DropdownItem>({} as DropdownItem);
 
@@ -40,6 +41,10 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
     React.useEffect(() => {
         setUser({ ...user, groupId: selectedGroup?.value });
     }, [selectedGroup, setUser]);
+
+    React.useEffect(() => {
+        setUser(props?.user);
+    }, [props?.user]);
 
     return (
         <form className="add-and-edit-group" onSubmit={onSave}>

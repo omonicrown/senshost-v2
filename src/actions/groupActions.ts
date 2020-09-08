@@ -20,10 +20,14 @@ export function logGroupsError(error: AxiosError): GroupActions {
     }
 }
 
-export const getGroupsByAccount = (account: string)  => {
+export const getGroupsByAccount = (account: string) => {
     return (dispatch: Dispatch<GroupActions | any>) => {
         return GroupApis.getGroupsByAccount(account)
-            .then((json: AxiosResponse) => dispatch(receiveGroups(json.data)))
+            .then((json: AxiosResponse<Array<GroupModel>>) => {
+                if (json?.data) {
+                    dispatch(receiveGroups(json.data));
+                }
+            })
             .catch((err: AxiosError) => dispatch(logGroupsError(err)));
     };
 }
