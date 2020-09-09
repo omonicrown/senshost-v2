@@ -136,8 +136,10 @@ export const DEVICETYPES = [{
 export const initialState: ModalProps = {
     toggle: false,
     fullscreen: false,
-    centered: false,
-    size: "modal-lg",
+    position: null,
+    centered: true,
+    size: null,
     disableBackdropDismiss: true,
     onDismiss: null,
+    trapFocus: false
 };

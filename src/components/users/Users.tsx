@@ -200,7 +200,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
         <div className="users-container">
             <div className="row control-holder">
                 <div className="col-12 text-right">
-                    <Button label="" size="sm" theme="outline-primary" title="Add" onClick={() => {
+                    <Button label="" theme="outline-primary" title="Add" onClick={() => {
                         setUser({} as UserModel);
                         setModalProps({ ...modalProps, toggle: true });
                     }}>
@@ -209,34 +209,35 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 </div>
             </div>
             <div className="group-holder">
-                <div className="row table-filter-holder">
-                    <div className="col">
-                        <div className="d-flex">
-                            <div className="col-12 col-sm-6">
-                                <Dropdown
-                                    label=""
-                                    list={groupOptions}
-                                    selectedValue={selectedGroup}
-                                    onChange={(value: DropdownItem) => setSelectedGroup(value)}
-                                />
-                            </div>
-                        </div>
+                <div className="table-filter-holder">
+                    <div className="d-flex">
+                        <Dropdown
+                            label=""
+                            list={groupOptions}
+                            selectedValue={selectedGroup}
+                            onChange={(value: DropdownItem) => setSelectedGroup(value)}
+                        />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        <Table
-                            columns={columns}
-                            data={data}
-                            actionLinks={actionLinks}
-                            offset={configs.tablePageSize}
-                            currentpage={paginationValue}
-                            primaryActionButton={primaryButton}
-                            filterProps={filterProps}
-                            footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
-                            sortProps={{
-                                onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
-                            }} />
+                        <div className="card-container">
+                            <div className="card">
+                                <Table
+                                    columns={columns}
+                                    data={data}
+                                    actionLinks={actionLinks}
+                                    offset={configs.tablePageSize}
+                                    currentpage={paginationValue}
+                                    primaryActionButton={primaryButton}
+                                    filterProps={filterProps}
+                                    footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
+                                    sortProps={{
+                                        onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
+                                    }}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
