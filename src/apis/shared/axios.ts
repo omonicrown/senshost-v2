@@ -150,9 +150,9 @@ export class AxiosGlobal {
                 };
                 store.dispatch(toggleNotification(notification));
 
-                return Promise.reject({ ...error });
+                return Promise.reject(error);
             } else {
-                return Promise.reject({ ...error });
+                return Promise.reject(error);
             }
         });
     }

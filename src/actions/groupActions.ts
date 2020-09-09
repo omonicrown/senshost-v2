@@ -15,7 +15,7 @@ export function receiveGroups(groups: Array<GroupModel>): GroupActions {
 
 export function logGroupsError(error: AxiosError): GroupActions {
     return {
-        type: constants.RECEIVE_GROUPS,
+        type: constants.LOG_GROUP_ERROR,
         error,
     }
 }
@@ -25,6 +25,7 @@ export const getGroupsByAccount = (account: string) => {
         return GroupApis.getGroupsByAccount(account)
             .then((json: AxiosResponse<Array<GroupModel>>) => {
                 if (json?.data) {
+                    console.log("Herer")
                     dispatch(receiveGroups(json.data));
                 }
             })
