@@ -3,15 +3,17 @@ import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import { Button } from "@sebgroup/react-components/dist/Button";
 import { UserModel, GroupModel } from "../../../interfaces/models";
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
+import { Loader } from "@sebgroup/react-components/dist/Loader";
 
 interface AddAndEditUserProps {
     groups: Array<GroupModel>;
     user: UserModel;
+    loading: boolean;
     onSave: (e: React.FormEvent<HTMLFormElement>, group: UserModel) => void;
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: AddAndEditUserProps): React.ReactElement<void> => {
-    const [user, setUser] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
+    const [user, setUser] = React.useState<UserModel>({ name: "", email: "", password: "", } as UserModel);
     const [userError, setUserError] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
 
     const [selectedGroup, setSelectedGroup] = React.useState<DropdownItem>({} as DropdownItem);
@@ -27,13 +29,33 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
         props.onCancel(e);
     }, [user]);
 
+    const handleDropdownChange = React.useCallback((value: DropdownItem) => {
+        setSelectedGroup(value);
+    }, [setSelectedGroup]);
 
     const onSave = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+        let errors: UserModel = null
         if (!user?.name) {
-            setUserError({ ...userError, name: "Username name is required" } as UserModel);
-        } else {
+            errors = { ...errors, name: "Name is required" };
+        }
+
+        if (!user?.email) {
+            errors = { ...errors, email: "Email is required" };
+        }
+
+        if (!user?.password) {
+            errors = { ...errors, password: "Password is required" };
+        }
+
+        if (!user?.groupId) {
+            errors = { ...errors, groupId: "Select group" };
+        }
+
+        if (!errors) {
             props?.onSave(e, user);
         }
+
+        setUserError(errors);
 
         e.preventDefault();
     }, [user]);
@@ -46,15 +68,25 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
         setUser(props?.user);
     }, [props?.user]);
 
+    React.useEffect(() => { setUser({ ...user, groupId: selectedGroup?.value }) }, [selectedGroup]);
+
+    React.useEffect(() => {
+        const selectedGroup: DropdownItem = groupOptions?.find((item: DropdownItem) => item?.value === props.user?.groupId);
+        setSelectedGroup(selectedGroup)
+    }, [props?.user, groupOptions]);
+
     return (
         <form className="add-and-edit-group" onSubmit={onSave}>
             <div className="row">
                 <div className="col-12 col-sm-6">
                     <Dropdown
                         label="Group"
+                        searchable={true}
                         list={groupOptions}
+                        disabled={props?.loading}
                         selectedValue={selectedGroup}
-                        onChange={(value: DropdownItem) => setSelectedGroup(value)}
+                        error={userError?.groupId}
+                        onChange={handleDropdownChange}
                     />
                 </div>
                 <div className="col-12 col-sm-6">
@@ -62,6 +94,7 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
                         name="email"
                         label="Email"
                         type="email"
+                        disabled={props?.loading}
                         placeholder="Email"
                         value={user?.email}
                         error={userError?.email}
@@ -73,8 +106,9 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
                 <div className="col-12 col-sm-6">
                     <TextBoxGroup
                         name="name"
-                        label="username"
+                        label="Username"
                         placeholder="username"
+                        disabled={props?.loading}
                         value={user?.name}
                         error={userError?.name}
                         onChange={handleChange}
@@ -84,7 +118,8 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
                     <TextBoxGroup
                         name="password"
                         label="Password"
-                        type="password"
+                        type="text"
+                        disabled={props?.loading}
                         placeholder="Password"
                         value={user?.password}
                         error={userError?.password}
@@ -92,13 +127,11 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
                     />
                 </div>
             </div>
-            <div className="row controls-holder">
-                <div className="col-12 col-sm-6">
-                    <Button label="Cancel" size="sm" theme="outline-primary" onClick={onCancel} />
-                </div>
-                <div className="col-12 col-sm-6 text-right">
-                    <Button label="Save" type="submit" size="sm" theme="primary" title="Save" onClick={null} />
-                </div>
+            <div className="d-flex flex-sm-row flex-column controls-holder">
+                <Button label="Cancel" size="sm" theme="outline-primary" onClick={onCancel} />
+                <Button label="Save" type="submit" size="sm" theme="primary" title="Save" onClick={null}>
+                    <Loader toggle={props.loading} />
+                </Button>
             </div>
 
         </form>

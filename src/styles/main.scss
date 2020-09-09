@@ -1,16 +1,16 @@
+@import "~@sebgroup/bootstrap/scss/core";
 @import "~@sebgroup/bootstrap/scss/bootstrap";
 @import "~@sebgroup/bootstrap/scss/_variables";
-
 @import "./components/shared/mixins.scss";
 @import "./components/shared/variables.scss";
 
 body {
     * {
         margin: 0;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         box-sizing: border-box;
-        @include fontSize(16);
     }
+
+    @include fontSize(16);
 
     .main-app-container {
         position: absolute;
@@ -20,6 +20,7 @@ body {
         right: 0;
         overflow: hidden;
         background-color: $white;
+
         .container-fluid {
             padding-right: 0rem;
             padding-left: 0rem;
@@ -27,5 +28,24 @@ body {
 
         @import "./components/home/home.scss";
         @import "./components/account/account.scss";
+    }
+}
+
+/**  modal*/
+.modal-body {
+    /**  Reset modal body overflow*/
+    overflow: unset;
+    >form {
+        .controls-holder {
+            margin-top: 2rem;
+            justify-content: space-between;
+        }
+    }
+}
+.modal-footer{
+    >.controls-holder {
+        width: 100%;
+        margin-top: 2rem;
+        justify-content: space-between;
     }
 }

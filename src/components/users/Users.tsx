@@ -1,24 +1,19 @@
 import React from "react";
 
-import { Dialogue } from "@sebgroup/react-components/dist/Dialogue";
 import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 
-import Gauge from "../gauge";
 import PortalComponent from "../shared/Portal";
 
 import { SharedProps } from "../home/Home";
 import { Modal, ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
-import { GroupApis } from "../../apis/groupApis";
 import { States } from "../../interfaces/states";
 import { useSelector, useDispatch } from "react-redux";
 import { AxiosResponse, AxiosError } from "axios";
 import { GroupModel, UserModel } from "../../interfaces/models";
-import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, FilterProps, FilterItem, ActionLinkItem } from "@sebgroup/react-components/dist/Table/Table";
+import { Column, Table, DataItem, TableRow, TableHeader, FilterProps, FilterItem, ActionLinkItem } from "@sebgroup/react-components/dist/Table/Table";
 import { DropdownItem, Dropdown } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import configs from "../../configs";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { icontypesEnum, SvgElement } from "../../utils/svgElement";
-import { Icon } from "@sebgroup/react-components/dist/Icon";
 
 
 import AddAndEditUser from "./forms/AddAndEditUser";
@@ -26,6 +21,7 @@ import { initialState } from "../../constants";
 import { UserApis } from "../../apis/userApis";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 import { toggleNotification } from "../../actions";
+import { Loader } from "@sebgroup/react-components/dist/Loader";
 
 export interface UsersProps extends SharedProps {
 }
@@ -35,6 +31,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
     const [paginationValue, setPagination] = React.useState<number>(1);
     const [users, setUsers] = React.useState<Array<UserModel>>(null);
     const [user, setUser] = React.useState<UserModel>({} as UserModel);
+    const [loading, setLoading] = React.useState<boolean>(false);
     // actions
     const dispatch = useDispatch();
 
@@ -43,11 +40,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
     const [selectedGroup, setSelectedGroup] = React.useState<DropdownItem>(null);
 
     const [modalProps, setModalProps] = React.useState<ModalProps>({ ...initialState });
-
-    const primaryButton: PrimaryActionButton = React.useMemo(() => ({
-        label: "Manage",
-        onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, selectedRow: TableRow) => { },
-    }), []);
+    const [modalDeleteUserProps, setModalDeleteUserProps] = React.useState<ModalProps>({ ...initialState });
 
     const actionLinks: Array<ActionLinkItem> = React.useMemo(() => [
         {
@@ -62,7 +55,18 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 setModalProps({ ...modalProps, toggle: true });
             }
         },
-        { label: "Delete", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => { } },
+        {
+            label: "Delete", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
+                setUser({
+                    name: selectedRow["name"],
+                    email: selectedRow["email"],
+                    password: selectedRow["password"],
+                    groupId: selectedRow["groupId"],
+                    id: selectedRow["id"],
+                } as UserModel);
+                setModalDeleteUserProps({ ...modalDeleteUserProps, toggle: true });
+            }
+        },
     ], []);
 
     // memos
@@ -79,8 +83,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 return { label: newGroup.name, value: newGroup.name }
             }) || [];
 
-        console.log("Iyamura ", groups);
-        return [{ label: "All", value: null }, ...groups];
+        return [{ label: "All Groups", value: null }, ...groups];
     }, [users, groupState?.groups]);
 
     const columns: Array<Column> = React.useMemo((): Array<Column> => [
@@ -111,14 +114,15 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
     const [filters, setFilters] = React.useState<Array<FilterItem>>(columns.map((column: Column) => ({ accessor: column.accessor, filters: [] })));
 
     const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, newUser: UserModel) => {
+        setLoading(true);
         if (newUser?.id) {
             UserApis?.updateUser(newUser)
                 .then((response: AxiosResponse<UserModel>) => {
                     if (response.data) {
                         const notification: NotificationProps = {
                             theme: "success",
-                            title: "Group added",
-                            message: `Group updated successfully`,
+                            title: "User added",
+                            message: `User updated successfully`,
                             toggle: true,
                             onDismiss: () => { }
                         };
@@ -139,6 +143,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 .finally(() => {
                     setModalProps({ ...modalProps, toggle: false });
                     setUser({} as UserModel);
+                    setLoading(false);
                 });
 
         } else {
@@ -147,8 +152,8 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                     if (response.data) {
                         const notification: NotificationProps = {
                             theme: "success",
-                            title: "Group added",
-                            message: `Group added successfully`,
+                            title: "User added",
+                            message: `User added successfully`,
                             toggle: true,
                             onDismiss: () => { }
                         };
@@ -160,13 +165,52 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 })
                 .finally(() => {
                     setModalProps({ ...modalProps, toggle: false });
+                    setLoading(false);
                 });
         }
-    }, [modalProps]);
+    }, [modalProps, setModalProps, setLoading, setUsers]);
+
+    const handleDeleteUser = React.useCallback(() => {
+        setLoading(true);
+        UserApis.deleteUser(user?.id)
+            .then((response: AxiosResponse) => {
+                const notification: NotificationProps = {
+                    theme: "success",
+                    title: "User deleted",
+                    message: `User delete successfully`,
+                    toggle: true,
+                    onDismiss: () => { }
+                };
+
+                const indexOfUserToBeDeleted: number = users?.findIndex((newUser: UserModel) => newUser.id === user.id);
+                const updatedUsers: Array<UserModel> = [
+                    ...users?.slice(0, indexOfUserToBeDeleted),
+                    ...users?.slice(indexOfUserToBeDeleted + 1)
+                ];
+
+                dispatch(toggleNotification(notification));
+                setUsers(updatedUsers);
+            })
+            .finally(() => {
+                setModalDeleteUserProps({ ...modalDeleteUserProps, toggle: false });
+                setLoading(false);
+            });
+
+    }, [setLoading, setModalDeleteUserProps, user, setUsers])
 
     const onCancel = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setModalProps({ ...modalProps, toggle: false });
     }, [modalProps]);
+
+    const onDismissDelete = React.useCallback(() => {
+        setUser({ name: "", email: "", groupId: null, password: "" } as UserModel);
+        setModalDeleteUserProps({ ...modalDeleteUserProps, toggle: false });
+    }, [setModalDeleteUserProps, setUser])
+
+    const onAdduser = React.useCallback(() => {
+        setUser({ name: "", email: "", groupId: null, password: "" } as UserModel);
+        setModalProps({ ...modalProps, toggle: true });
+    }, [setUser, setModalProps])
 
     const filterProps: FilterProps = React.useMemo(() => ({
         onAfterFilter: (rows: Array<TableRow>) => { },
@@ -189,7 +233,6 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
         UserApis.getUsersByAccountId(authState?.auth?.account?.id)
             .then((response: AxiosResponse<Array<UserModel>>) => {
                 setUsers(response?.data || []);
-                // setGroups here 
             }).catch((error: AxiosError) => {
                 console.log("error getting users", error);
                 setUsers([]);
@@ -198,26 +241,17 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
 
     return (
         <div className="users-container">
-            <div className="row control-holder">
-                <div className="col-12 text-right">
-                    <Button label="" theme="outline-primary" title="Add" onClick={() => {
-                        setUser({} as UserModel);
-                        setModalProps({ ...modalProps, toggle: true });
-                    }}>
-                        <Icon src={<SvgElement type={icontypesEnum.ADD} />} /> Add
-                    </Button>
-                </div>
-            </div>
-            <div className="group-holder">
-                <div className="table-filter-holder">
-                    <div className="d-flex">
-                        <Dropdown
-                            label=""
-                            list={groupOptions}
-                            selectedValue={selectedGroup}
-                            onChange={(value: DropdownItem) => setSelectedGroup(value)}
-                        />
-                    </div>
+            <div className="users-holder">
+                <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
+                    <Dropdown
+                        label=""
+                        list={groupOptions}
+                        selectedValue={selectedGroup}
+                        onChange={(value: DropdownItem) => setSelectedGroup(value)}
+                    />
+
+                    <Button label="Add" id="addBtn" theme="outline-primary" title="Add" onClick={onAdduser} />
+
                 </div>
                 <div className="row">
                     <div className="col">
@@ -229,7 +263,6 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                                     actionLinks={actionLinks}
                                     offset={configs.tablePageSize}
                                     currentpage={paginationValue}
-                                    primaryActionButton={primaryButton}
                                     filterProps={filterProps}
                                     footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
                                     sortProps={{
@@ -247,12 +280,31 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 <Modal
                     {...modalProps}
                     onDismiss={() => setModalProps({ ...modalProps, toggle: false })}
-                    header={<h3>Create User</h3>}
+                    header={<h4>{user?.name ? 'Edit user' : 'Create user'}</h4>}
                     body={
-                        <AddAndEditUser user={user} onSave={handleSave} onCancel={onCancel} groups={groupState?.groups} />
+                        <AddAndEditUser loading={loading} user={user} onSave={handleSave} onCancel={onCancel} groups={groupState?.groups} />
                     }
                     ariaLabel="My Label"
                     ariaDescribedby="My Description"
+                />
+
+                <Modal
+                    {...modalDeleteUserProps}
+                    onDismiss={onDismissDelete}
+                    header={<h4>Delete {user?.name} ?</h4>}
+                    body={
+                        <p>Are you sure you want to delete this ?</p>
+                    }
+                    ariaLabel="My Label"
+                    ariaDescribedby="My Description"
+                    footer={
+                        <div className="controls-holder d-flex flex-sm-row flex-column">
+                            <Button label="Cancel" theme="outline-primary" onClick={onDismissDelete} />
+                            <Button label="Delete" theme="danger" onClick={handleDeleteUser}>
+                                {<Loader toggle={loading} size='sm' />}
+                            </Button>
+                        </div>
+                    }
                 />
             </PortalComponent>
         </div>

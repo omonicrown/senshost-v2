@@ -1,0 +1,19 @@
+.users-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+
+    .users-holder {
+        .table-filter-and-control-holder {
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 1rem 0;
+            border-bottom: 1px solid $blue;
+
+            .dropdown {
+                min-width: calculateRem(200);
+            }
+        }
+    }
+}

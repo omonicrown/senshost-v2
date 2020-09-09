@@ -25,7 +25,6 @@ export const getGroupsByAccount = (account: string) => {
         return GroupApis.getGroupsByAccount(account)
             .then((json: AxiosResponse<Array<GroupModel>>) => {
                 if (json?.data) {
-                    console.log("Herer")
                     dispatch(receiveGroups(json.data));
                 }
             })
