@@ -13,6 +13,10 @@ export class GroupLiveApis extends AxiosGlobal {
         return this.axios.put(`${configs.context}/${configs.apiList.Group}/${group?.id}`, group);
     }
 
+    createGroup(group: GroupModel): AxiosPromise<GroupModel> {
+        return this.axios.post(`${configs.context}/${configs.apiList.Group}`, group);
+    }
+
     deleteGroup(groupId?: string): AxiosPromise {
         return this.axios.delete(`${configs.context}/${configs.apiList.Group}/${groupId}`);
     }

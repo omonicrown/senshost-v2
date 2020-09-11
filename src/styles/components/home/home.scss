@@ -112,6 +112,19 @@
                         width: 100%;
                         min-height: 100%;
                         margin: 1.25rem auto;
+
+                        .table-filter-and-control-holder {
+                            justify-content: space-between;
+                            align-items: center;
+                            margin: 1rem 0;
+                            padding: 1rem 0;
+                            border-bottom: 1px solid $blue;
+                
+                            .dropdown {
+                                min-width: calculateRem(200);
+                            }
+                        }
+                        
                         @import "../dashboard/dashboard.scss";
                         @import "../device/device.scss";
                         @import "../users/users.scss";

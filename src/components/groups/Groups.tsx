@@ -6,7 +6,6 @@ import PortalComponent from "../shared/Portal";
 
 import { SharedProps } from "../home/Home";
 import { Modal, ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
-import { Dialogue } from "@sebgroup/react-components/dist/Dialogue";
 
 import { GroupApis } from "../../apis/groupApis";
 import { States, AuthState } from "../../interfaces/states";
@@ -17,8 +16,6 @@ import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, Fi
 import { DropdownItem, Dropdown } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import configs from "../../configs";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { icontypesEnum, SvgElement } from "../../utils/svgElement";
-import { Icon } from "@sebgroup/react-components/dist/Icon";
 
 
 import AddAndEditGroup from "./forms/AddAndEditGroup";
@@ -31,6 +28,7 @@ import { useHistory } from "react-router";
 import { Dispatch } from "redux";
 import { History } from "history";
 import { AppRoutes } from "../../enums/routes";
+import { Loader } from "@sebgroup/react-components/dist/Loader";
 
 export interface GroupsProps extends SharedProps {
 }
@@ -45,9 +43,8 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
 
   const [paginationValue, setPagination] = React.useState<number>(1);
   const [groups, setGroups] = React.useState<Array<GroupModel>>(null);
-  const [selectedGroupForView, setSelectedGroupForView] = React.useState<GroupModel>({} as GroupModel);
-  const [selectedGroupForEdit, setSelectedGroupForEdit] = React.useState<GroupModel>({} as GroupModel);
-  const [selectedGroupForDelete, setSelectedGroupForDelete] = React.useState<GroupModel>({} as GroupModel);
+  const [group, setGroup] = React.useState<GroupModel>({} as GroupModel);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const [selectedStatus, setSelectedStatus] = React.useState<DropdownItem>(null);
   const statuses: Array<DropdownItem> = React.useMemo(() => [
@@ -57,50 +54,55 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
   const [modalProps, setModalProps] = React.useState<ModalProps>({ ...initialState });
 
   const [groupDetailsModalProps, setGroupDetailsModalProps] = React.useState<ModalProps>({ ...initialState });
-  const [groupDeleteModalProps, setGroupDeleteModalProps] = React.useState<boolean>(false);
+  const [groupDeleteModalProps, setGroupDeleteModalProps] = React.useState<ModalProps>({ ...initialState });
 
   const primaryButton: PrimaryActionButton = React.useMemo(() => ({
     label: "View",
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, selectedRow: TableRow) => {
-      setSelectedGroupForView({
+      setGroup({
         accountId: selectedRow['accountId'],
         name: selectedRow["name"],
         status: selectedRow["status"],
         id: selectedRow["id"],
         creationDate: selectedRow["creationDate"]
       });
+
+      setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: true })
     },
-  }), []);
+  }), [setGroup, setGroupDetailsModalProps]);
 
 
   const actionLinks: Array<ActionLinkItem> = React.useMemo(() => [
     {
       label: "Edit", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
-        setSelectedGroupForEdit({
+        setGroup({
           accountId: selectedRow['accountId'],
           name: selectedRow["name"],
           status: selectedRow["status"],
           id: selectedRow["id"],
           creationDate: selectedRow["creationDate"]
         });
+
+        setModalProps({ ...modalProps, toggle: true });
       }
     },
     {
       label: "Delete", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
-        setSelectedGroupForDelete({
+        setGroup({
           accountId: selectedRow['accountId'],
           name: selectedRow["name"],
           status: selectedRow["status"],
           id: selectedRow["id"],
           creationDate: selectedRow["creationDate"]
         });
+
+        setGroupDeleteModalProps({ ...groupDeleteModalProps, toggle: true })
       }
     },
-  ], []);
+  ], [setGroup, setModalProps, setGroupDeleteModalProps]);
 
   // memos
   const data: Array<DataItem> = React.useMemo(() => groups?.map((group: GroupModel) => {
-    console.log("Hankalinsa ", group)
     const newGroup: string = statuses?.find((item: DropdownItem) => item?.value === group.status)?.label;
     return ({ ...group, statusType: newGroup, account: authState?.auth?.account?.name });
   }), [groups, statuses]);
@@ -133,9 +135,10 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
 
   const [filters, setFilters] = React.useState<Array<FilterItem>>(columns.map((column: Column) => ({ accessor: column.accessor, filters: [] })));
 
-  const handleDelete = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("The selected group is ", selectedGroupForDelete)
-    GroupApis.deleteGroup(selectedGroupForDelete?.id)
+  const handleDeleteGroup = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    setLoading(true);
+
+    GroupApis.deleteGroup(group?.id)
       .then((response: AxiosResponse) => {
         const notification: NotificationProps = {
           theme: "success",
@@ -144,7 +147,7 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
           toggle: true,
           onDismiss: () => { }
         };
-        const indexOfGroupTobeDeleted: number = groups?.findIndex((group: GroupModel) => group?.id === selectedGroupForDelete?.id);
+        const indexOfGroupTobeDeleted: number = groups?.findIndex((newGroup: GroupModel) => newGroup?.id === group?.id);
         const updatedGroups = [
           ...groups?.slice(0, indexOfGroupTobeDeleted),
           ...groups?.slice(indexOfGroupTobeDeleted + 1)
@@ -153,16 +156,25 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
         dispatch(toggleNotification(notification));
 
         setGroups(updatedGroups);
-        setSelectedGroupForDelete({} as GroupModel);
-
-        setGroupDeleteModalProps(false);
+        setGroup({ name: "", id: null } as GroupModel);
+      })
+      .finally(() => {
+        setGroupDeleteModalProps({ ...groupDeleteModalProps, toggle: false });
+        setLoading(false);
       });
-  }, [selectedGroupForDelete, setSelectedGroupForDelete, setGroupDeleteModalProps]);
+  }, [setGroup, group, setGroupDeleteModalProps]);
 
-  const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, group: GroupModel) => {
-    if (group?.id) {
 
-      GroupApis.updateGroup(group)
+  const onDismissDeleteGroup = React.useCallback(() => {
+    setGroup({ name: "", id: null } as GroupModel);
+    setGroupDeleteModalProps({ ...groupDeleteModalProps, toggle: false });
+  }, [setGroupDeleteModalProps, setGroup])
+
+
+  const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, newGroup: GroupModel) => {
+    setLoading(true);
+    if (newGroup?.id) {
+      GroupApis.updateGroup(newGroup)
         .then((response: AxiosResponse<GroupModel>) => {
           if (response.data) {
             const notification: NotificationProps = {
@@ -175,20 +187,22 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
 
             dispatch(toggleNotification(notification));
             const updatedGroups: Array<GroupModel> = groups?.map((newGroup: GroupModel) => {
-              if (newGroup?.id === group?.id) {
+              if (newGroup?.id === newGroup?.id) {
                 return response?.data;
               }
 
               return newGroup;
             })
             setGroups(updatedGroups);
-            setModalProps({ ...modalProps, toggle: false });
-            setSelectedGroupForEdit({} as GroupModel);
           }
+        })
+        .finally(() => {
+          setGroup({ name: "", id: null } as GroupModel);
+          setModalProps({ ...modalProps, toggle: false });
+          setLoading(false);
         });
-
     } else {
-      GroupApis.createGroup({ ...group, accountId: authState?.auth?.account?.id })
+      GroupApis.createGroup({ ...newGroup, accountId: authState?.auth?.account?.id })
         .then((response: AxiosResponse<GroupModel>) => {
           if (response.data) {
             const notification: NotificationProps = {
@@ -200,27 +214,40 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
             };
 
             dispatch(toggleNotification(notification));
-
             setGroups([...groups, response.data]);
-            setModalProps({ ...modalProps, toggle: false });
           }
+        })
+        .finally(() => {
+          setGroup({ name: "", id: null } as GroupModel);
+          setModalProps({ ...modalProps, toggle: false });
+          setLoading(false);
         });
     }
-  }, [modalProps, setGroups, setModalProps, dispatch]);
+  }, [modalProps, setGroups, setModalProps, setGroup]);
 
   const onCancel = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setModalProps({ ...modalProps, toggle: false });
-    setSelectedGroupForEdit({} as GroupModel);
-  }, [modalProps]);
-
-  const onCancelGroupDelete = React.useCallback((e: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>) => {
-    setGroupDeleteModalProps(false);
-    setSelectedGroupForDelete({} as GroupModel);
-  }, []);
+    setGroup({ name: "", id: null } as GroupModel);
+  }, [modalProps, setGroup]);
 
   const onCancelGroupDetailModal = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: false });
   }, [groupDetailsModalProps]);
+
+  const onDismissViewGroupDetail = React.useCallback(() => {
+    setGroup({ name: "", id: null } as GroupModel);
+    setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: false });
+  }, [setGroupDetailsModalProps, setGroup]);
+
+  const onDismissGroupModal = React.useCallback(() => {
+    setGroup({ name: "", id: null } as GroupModel);
+    setModalProps({ ...modalProps, toggle: false });
+  }, [setModalProps, setGroup]);
+
+  const onAddGroup = React.useCallback(() => {
+    setGroup({ name: "", id: null } as GroupModel);
+    setModalProps({ ...modalProps, toggle: true });
+  }, [setGroup, setModalProps]);
 
   const filterProps: FilterProps = React.useMemo(() => ({
     onAfterFilter: (rows: Array<TableRow>) => { },
@@ -237,31 +264,6 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
 
     setFilters(updatedFilterItems);
   }, [selectedStatus, setFilters]);
-
-  // if selected group id is set, render modal, else hide it
-  React.useEffect(() => {
-    if (selectedGroupForView?.id) {
-      setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: true });
-    } else {
-      setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: false });
-    }
-  }, [selectedGroupForView]);
-
-  React.useEffect(() => {
-    if (selectedGroupForEdit?.id) {
-      setModalProps({ ...modalProps, toggle: true });
-    } else {
-      setModalProps({ ...modalProps, toggle: false });
-    }
-  }, [selectedGroupForEdit]);
-
-  React.useEffect(() => {
-    if (selectedGroupForDelete?.id) {
-      setGroupDeleteModalProps(true);
-    } else {
-      setGroupDeleteModalProps(false);
-    }
-  }, [selectedGroupForDelete]);
 
   React.useEffect(() => {
     GroupApis.getGroupsByAccount(authState?.auth?.account?.id)
@@ -288,45 +290,35 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
   }, [authState]);
 
   return (
-    <div className="group-container">
-      <div className="control-holder">
-        <Button label="" size="sm" theme="outline-primary" title="Add" onClick={() => {
-          setModalProps({ ...modalProps, toggle: true });
-          setSelectedGroupForEdit({} as GroupModel);
-        }}>
-          <Icon src={<SvgElement type={icontypesEnum.ADD} />} /> Add
-                </Button>
-      </div>
+    <div className="groups-container">
       <div className="group-holder">
-
-        <div className="row table-filter-holder">
-          <div className="col">
-            <div className="d-flex">
-              <div className="col">
-                <Dropdown
-                  label=""
-                  list={statuses}
-                  selectedValue={selectedStatus}
-                  onChange={(value: DropdownItem) => setSelectedStatus(value)}
-                />
-              </div>
-            </div>
-          </div>
+        <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
+          <Dropdown
+            placeholder="Filter By Status"
+            list={statuses}
+            selectedValue={selectedStatus}
+            onChange={(value: DropdownItem) => setSelectedStatus(value)}
+          />
+          <Button label="Add" id="addBtn" theme="outline-primary" title="Add" onClick={onAddGroup} />
         </div>
         <div className="row">
           <div className="col">
-            <Table
-              columns={columns}
-              data={data}
-              offset={configs.tablePageSize}
-              currentpage={paginationValue}
-              primaryActionButton={primaryButton}
-              filterProps={filterProps}
-              actionLinks={actionLinks}
-              footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
-              sortProps={{
-                onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
-              }} />
+            <div className="card-container">
+              <div className="card">
+                <Table
+                  columns={columns}
+                  data={data}
+                  offset={configs.tablePageSize}
+                  currentpage={paginationValue}
+                  primaryActionButton={primaryButton}
+                  filterProps={filterProps}
+                  actionLinks={actionLinks}
+                  footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
+                  sortProps={{
+                    onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
+                  }} />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -335,61 +327,53 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
       <PortalComponent>
         <Modal
           {...modalProps}
-          onDismiss={() => setModalProps({ ...modalProps, toggle: false })}
-          header={<h3>{selectedGroupForEdit?.id ? 'Edit Group' : 'Create Group'}</h3>}
+          onDismiss={onDismissGroupModal}
+          header={modalProps?.toggle ? <h3>{group?.id ? 'Edit Group' : 'Create Group'}</h3> : null}
           body={
             modalProps?.toggle ?
               <AddAndEditGroup
                 onSave={handleSave}
                 onCancel={onCancel}
-                group={selectedGroupForEdit} /> : null
+                loading={loading}
+                group={group} />
+              : null
           }
         />
         <Modal
           {...groupDetailsModalProps}
-          onDismiss={() => {
-            setSelectedGroupForView({} as GroupModel)
-          }}
-          header={<h3>Group: {selectedGroupForView?.name}'s Users</h3>}
+          onDismiss={onDismissViewGroupDetail}
+          header={groupDetailsModalProps?.toggle ? <h3>Group: {group?.name}'s Users</h3> : null}
           body={
-            groupDetailsModalProps?.toggle ?
+            groupDetailsModalProps ?
               <GroupDetails
                 onCancel={onCancelGroupDetailModal}
-                group={selectedGroupForView}
+                group={group}
                 toggle={groupDetailsModalProps?.toggle}
               />
               : null
           }
         />
-
         <Modal
-          {...groupDetailsModalProps}
-          onDismiss={() => {
-            setSelectedGroupForView({} as GroupModel)
-          }}
-          header={<h3>Group: {selectedGroupForView?.name}'s Users</h3>}
+          {...groupDeleteModalProps}
+          onDismiss={onDismissDeleteGroup}
+          header={groupDeleteModalProps?.toggle ? <h4>Delete {group?.name} ?</h4> : null}
           body={
-            groupDetailsModalProps?.toggle ?
-              <GroupDetails
-                onCancel={onCancelGroupDetailModal}
-                group={selectedGroupForView}
-                toggle={groupDetailsModalProps?.toggle}
-              />
+            groupDeleteModalProps?.toggle ?
+              <p>Are you sure you want to delete this ?</p>
               : null
           }
-        />
-
-        <Dialogue
-          header="Delete group?"
-          desc={`Delete the group ${selectedGroupForDelete?.name}`}
-          toggle={groupDeleteModalProps}
-          primaryBtn="Yes, delete it!"
-          secondaryBtn="Cancel"
-          secondaryAction={(e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onCancelGroupDelete(e)}
-          primaryAction={handleDelete}
-          enableCloseButton
-          enableBackdropDismiss
-          onDismiss={(e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => onCancelGroupDelete(e)}
+          ariaLabel="My Label"
+          ariaDescribedby="My Description"
+          footer={
+            groupDeleteModalProps?.toggle ?
+              <div className="controls-holder d-flex flex-sm-row flex-column">
+                <Button label="Cancel" disabled={loading} theme="outline-primary" onClick={onDismissDeleteGroup} />
+                <Button label="Delete" theme="danger" onClick={handleDeleteGroup}>
+                  {<Loader toggle={loading} size='sm' />}
+                </Button>
+              </div>
+              : null
+          }
         />
       </PortalComponent>
     </div>

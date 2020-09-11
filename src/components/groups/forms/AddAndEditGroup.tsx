@@ -2,11 +2,13 @@ import React from "react";
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import { GroupModel } from "../../../interfaces/models";
 import { Button } from "@sebgroup/react-components/dist/Button";
+import { Loader } from "@sebgroup/react-components/dist/Loader";
 
 interface AddAndEditGroupProps {
     onSave: (e: React.FormEvent<HTMLFormElement>, group: GroupModel) => void;
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     group: GroupModel;
+    loading: boolean;
 }
 const AddAndEditGroup: React.FunctionComponent<AddAndEditGroupProps> = (props: AddAndEditGroupProps): React.ReactElement<void> => {
     const [group, setGroup] = React.useState<GroupModel>({ name: "" } as GroupModel);
@@ -33,9 +35,8 @@ const AddAndEditGroup: React.FunctionComponent<AddAndEditGroupProps> = (props: A
     }, [group]);
 
     React.useEffect(() => {
-        console.log("Try to sleep ", props.group)
         setGroup(props?.group);
-    }, [])
+    }, [props.group]);
 
     return (
         <form className="add-and-edit-group" onSubmit={onSave}>
@@ -46,6 +47,7 @@ const AddAndEditGroup: React.FunctionComponent<AddAndEditGroupProps> = (props: A
                         label="Group name"
                         placeholder="Name"
                         value={group?.name}
+                        disabled={props?.loading}
                         error={groupError?.name}
                         onChange={handleChange}
                     />
@@ -53,10 +55,12 @@ const AddAndEditGroup: React.FunctionComponent<AddAndEditGroupProps> = (props: A
             </div>
             <div className="row controls-holder">
                 <div className="col-12 col-sm-6">
-                    <Button label="Cancel" size="sm" theme="outline-primary" onClick={onCancel} />
+                    <Button label="Cancel" size="sm" disabled={props.loading} theme="outline-primary" onClick={onCancel} />
                 </div>
                 <div className="col-12 col-sm-6 text-right">
-                    <Button label="Save" type="submit" size="sm" theme="primary" title="Save" onClick={null} />
+                    <Button label="Save" type="submit" size="sm" theme="primary" title="Save" onClick={null}>
+                        <Loader toggle={props?.loading} />
+                    </Button>
                 </div>
             </div>
 

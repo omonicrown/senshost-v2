@@ -13,7 +13,7 @@ interface AddAndEditUserProps {
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: AddAndEditUserProps): React.ReactElement<void> => {
-    const [user, setUser] = React.useState<UserModel>({ name: "", email: "", password: "", } as UserModel);
+    const [user, setUser] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
     const [userError, setUserError] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
 
     const [selectedGroup, setSelectedGroup] = React.useState<DropdownItem>({} as DropdownItem);
@@ -22,12 +22,12 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
 
     const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setUser({ ...user, [e.target.name]: e.target.value });
-    }, [user]);
+    }, [setUser, user]);
 
     const onCancel = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        setUser({ name: "" } as UserModel);
+        setUser({ name: "", email: "", password: "" } as UserModel);
         props.onCancel(e);
-    }, [user]);
+    }, [setUser]);
 
     const handleDropdownChange = React.useCallback((value: DropdownItem) => {
         setSelectedGroup(value);
@@ -62,13 +62,11 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
 
     React.useEffect(() => {
         setUser({ ...user, groupId: selectedGroup?.value });
-    }, [selectedGroup, setUser]);
+    }, [selectedGroup]);
 
     React.useEffect(() => {
         setUser(props?.user);
-    }, [props?.user]);
-
-    React.useEffect(() => { setUser({ ...user, groupId: selectedGroup?.value }) }, [selectedGroup]);
+    }, [props?.user, setUser]);
 
     React.useEffect(() => {
         const selectedGroup: DropdownItem = groupOptions?.find((item: DropdownItem) => item?.value === props.user?.groupId);

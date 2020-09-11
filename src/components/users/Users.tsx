@@ -205,12 +205,12 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
     const onDismissDelete = React.useCallback(() => {
         setUser({ name: "", email: "", groupId: null, password: "" } as UserModel);
         setModalDeleteUserProps({ ...modalDeleteUserProps, toggle: false });
-    }, [setModalDeleteUserProps, setUser])
+    }, [setModalDeleteUserProps, setUser]);
 
     const onAdduser = React.useCallback(() => {
         setUser({ name: "", email: "", groupId: null, password: "" } as UserModel);
         setModalProps({ ...modalProps, toggle: true });
-    }, [setUser, setModalProps])
+    }, [setUser, setModalProps]);
 
     const filterProps: FilterProps = React.useMemo(() => ({
         onAfterFilter: (rows: Array<TableRow>) => { },
@@ -244,7 +244,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
             <div className="users-holder">
                 <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
                     <Dropdown
-                        label=""
+                        placeholder="Filter By Group"
                         list={groupOptions}
                         selectedValue={selectedGroup}
                         onChange={(value: DropdownItem) => setSelectedGroup(value)}
@@ -280,12 +280,12 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 <Modal
                     {...modalProps}
                     onDismiss={() => setModalProps({ ...modalProps, toggle: false })}
-                    header={<h4>{user?.name ? 'Edit user' : 'Create user'}</h4>}
+                    header={modalProps?.toggle ? <h4>{user?.name ? 'Edit user' : 'Create user'}</h4> : null}
                     body={
-                        <AddAndEditUser loading={loading} user={user} onSave={handleSave} onCancel={onCancel} groups={groupState?.groups} />
+                        modalProps?.toggle ?
+                            <AddAndEditUser loading={loading} user={user} onSave={handleSave} onCancel={onCancel} groups={groupState?.groups} />
+                            : null
                     }
-                    ariaLabel="My Label"
-                    ariaDescribedby="My Description"
                 />
 
                 <Modal
@@ -293,17 +293,19 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                     onDismiss={onDismissDelete}
                     header={<h4>Delete {user?.name} ?</h4>}
                     body={
-                        <p>Are you sure you want to delete this ?</p>
+                        modalDeleteUserProps?.toggle ?
+                            <p>Are you sure you want to delete this ?</p>
+                            : null
                     }
-                    ariaLabel="My Label"
-                    ariaDescribedby="My Description"
                     footer={
-                        <div className="controls-holder d-flex flex-sm-row flex-column">
-                            <Button label="Cancel" theme="outline-primary" onClick={onDismissDelete} />
-                            <Button label="Delete" theme="danger" onClick={handleDeleteUser}>
-                                {<Loader toggle={loading} size='sm' />}
-                            </Button>
-                        </div>
+                        modalDeleteUserProps?.toggle ?
+                            <div className="controls-holder d-flex flex-sm-row flex-column">
+                                <Button label="Cancel" theme="outline-primary" onClick={onDismissDelete} />
+                                <Button label="Delete" theme="danger" onClick={handleDeleteUser}>
+                                    {<Loader toggle={loading} size='sm' />}
+                                </Button>
+                            </div>
+                            : null
                     }
                 />
             </PortalComponent>

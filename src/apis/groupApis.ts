@@ -11,7 +11,7 @@ export class GroupApis {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
-            return this.groupApis.getGroupById({} as string);
+            return this.groupApis.createGroup(group);
         }
     }
 

@@ -154,39 +154,38 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
   return (
     <div className="device-container">
-      <div className="control-holder">
-        <Button label="" size="sm" theme="outline-primary" title="Add" onClick={() => setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: true })}>
-          <Icon src={<SvgElement type={icontypesEnum.ADD} />} /> Add
-        </Button>
-      </div>
       <div className="device-holder">
-        <div className="row table-filter-holder">
-          <div className="col">
-            <div className="d-flex">
-              <div className="col">
-                <Dropdown
-                  label=""
-                  list={deviceTypes}
-                  selectedValue={selectedDeviceType}
-                  onChange={(value: DropdownItem) => setSelectedDeviceType(value)}
-                />
-              </div>
-            </div>
-          </div>
+        <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
+          <Dropdown
+            placeholder="Filter By type"
+            list={deviceTypes}
+            selectedValue={selectedDeviceType}
+            onChange={(value: DropdownItem) => setSelectedDeviceType(value)}
+          />
+          <Button
+            label="Add"
+            size="sm"
+            theme="outline-primary"
+            id="btnAdd"
+            title="Add" onClick={() => setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: true })} />
         </div>
         <div className="row">
           <div className="col">
-            <Table
-              columns={columns}
-              data={data}
-              offset={configs.tablePageSize}
-              currentpage={paginationValue}
-              primaryActionButton={primaryButton}
-              filterProps={filterProps}
-              footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
-              sortProps={{
-                onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
-              }} />
+            <div className="card-container">
+              <div className="card">
+                <Table
+                  columns={columns}
+                  data={data}
+                  offset={configs.tablePageSize}
+                  currentpage={paginationValue}
+                  primaryActionButton={primaryButton}
+                  filterProps={filterProps}
+                  footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
+                  sortProps={{
+                    onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
+                  }} />
+              </div>
+            </div>
           </div>
         </div>
 
