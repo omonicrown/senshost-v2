@@ -30,7 +30,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
     const menuItems: Array<MenuItem> = [
         {
             name: "dashboard",
-            iconType: icontypesEnum.DEVICES,
+            iconType: icontypesEnum.DASHBAORD,
             title: "Dashboard"
         },
         {
@@ -45,7 +45,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
         },
         {
             name: "users",
-            iconType: icontypesEnum.USER,
+            iconType: icontypesEnum.USERS,
             title: "Users"
         },
     ];
