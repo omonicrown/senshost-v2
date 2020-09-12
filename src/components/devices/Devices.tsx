@@ -35,6 +35,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
   const [paginationValue, setPagination] = React.useState<number>(1);
   const [searchValue, setSearchValue] = React.useState<string>("");
   const [devices, setDevices] = React.useState<Array<DeviceModel>>(null);
+  const [device, setDevice] = React.useState<DeviceModel>(null);
 
   const [selectedDeviceType, setSelectedDeviceType] = React.useState<DropdownItem>(null);
   const deviceTypes: Array<DropdownItem> = React.useMemo(() => DEVICETYPES, []);
@@ -125,6 +126,11 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
     setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
   }, [toggleAddDeviceModal, setToggleAddDeviceModal]);
 
+  const onAddGroup = React.useCallback(() => {
+    setDevice({ name: "", id: null } as DeviceModel);
+    setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: true });
+  }, [setDevice, setToggleAddDeviceModal]);
+
   const filterProps: FilterProps = React.useMemo(() => ({
     onAfterFilter: (rows: Array<TableRow>) => { },
     filterItems: filters,
@@ -159,15 +165,15 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
           <Dropdown
             placeholder="Filter By type"
             list={deviceTypes}
+            searchable
             selectedValue={selectedDeviceType}
             onChange={(value: DropdownItem) => setSelectedDeviceType(value)}
           />
           <Button
             label="Add"
-            size="sm"
             theme="outline-primary"
             id="btnAdd"
-            title="Add" onClick={() => setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: true })} />
+            title="Add" onClick={onAddGroup} />
         </div>
         <div className="row">
           <div className="col">
@@ -194,6 +200,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
       <PortalComponent>
         <Modal
           {...toggleAddDeviceModal}
+          size="modal-lg"
           onDismiss={onDismissModal}
           header={<h3>Create Device</h3>}
           body={

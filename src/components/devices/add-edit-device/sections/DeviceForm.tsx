@@ -19,6 +19,7 @@ const DeviceForm: React.FunctionComponent<DeviceFormProps> = (props: DeviceFormP
             <div className="col-sm-6 col-12">
                 <Dropdown
                     label="Device type"
+                    searchable
                     list={deviceTypes}
                     selectedValue={props.selectedType}
                     onChange={props.handleDeviceTypeChange}

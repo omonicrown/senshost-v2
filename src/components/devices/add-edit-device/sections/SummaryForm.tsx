@@ -41,15 +41,15 @@ const SummaryForm: React.FunctionComponent<SummaryFormProps> = (props: SummaryFo
             <div className="row">
                 <div className="col">
                     <div className="title-holder">
-                        Device
+                        <h4>Device</h4>
                     </div>
                 </div>
             </div>
             <div className="row section-device-holder">
-                <div className="col-sm-6 col-12">
+                <div className="col">
                     <TextLabel label="Device name" value={props?.device?.name} />
                 </div>
-                <div className="col-sm-6 col-12">
+                <div className="col">
                     <TextLabel label="Device type" value={selectedDeviceType?.label} />
                 </div>
             </div>
@@ -58,14 +58,18 @@ const SummaryForm: React.FunctionComponent<SummaryFormProps> = (props: SummaryFo
             <div className="row">
                 <div className="col">
                     <div className="title-holder">
-                        Sensors
+                        <h4>Sensors</h4>
                     </div>
                 </div>
             </div>
 
             <div className="row section-sensor">
                 <div className="col">
-                    <Table columns={sensorColumns} data={props?.device?.fields} />
+                    <div className="card-container">
+                        <div className="card">
+                            <Table columns={sensorColumns} data={props?.device?.fields} />
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -74,14 +78,18 @@ const SummaryForm: React.FunctionComponent<SummaryFormProps> = (props: SummaryFo
             <div className="row">
                 <div className="col">
                     <div className="title-holder">
-                        Actuators
+                        <h4>Actuators</h4>
                     </div>
                 </div>
             </div>
 
             <div className="row section-actuator my-2">
                 <div className="col">
-                    <Table columns={actuatorColumns} data={actuatorRows} />
+                    <div className="card-container">
+                        <div className="card">
+                            <Table columns={actuatorColumns} data={actuatorRows} />
+                        </div>
+                    </div>
                 </div>
 
             </div>

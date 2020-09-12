@@ -226,7 +226,11 @@ const ActuatorForm: React.FunctionComponent<ActuatorFormProps> = (props: Actuato
 
             <div className="row">
                 <div className="col">
-                    <Table columns={actuatorColumns} data={actuatorRows} primaryActionButton={primaryButton} />
+                    <div className="card-container my-4">
+                        <div className="card">
+                            <Table columns={actuatorColumns} data={actuatorRows} primaryActionButton={primaryButton} />
+                        </div>
+                    </div>
                 </div>
             </div>
 

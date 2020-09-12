@@ -39,7 +39,7 @@ const SensorsForm: React.FunctionComponent<SensorsFormProps> = (props: SensorsFo
             setSensors(updatedSensors);
             props?.handleSensorSubmitChange(updatedSensors);
         },
-    }), [sensors, sensorData, setSensorData, setSensors,  props]);
+    }), [sensors, sensorData, setSensorData, setSensors, props]);
 
     const sensorColumns: Array<TableHeader> = React.useMemo(() => SENSORSTYPESCOLUMN, []);
 
@@ -111,7 +111,11 @@ const SensorsForm: React.FunctionComponent<SensorsFormProps> = (props: SensorsFo
             </div>
             <div className="row">
                 <div className="col">
-                    <Table columns={sensorColumns} data={sensorData} primaryActionButton={primaryButton} />
+                    <div className="card-container my-3">
+                        <div className="card">
+                            <Table columns={sensorColumns} data={sensorData} primaryActionButton={primaryButton} />
+                        </div>
+                    </div>
                 </div>
             </div>
         </React.Fragment>

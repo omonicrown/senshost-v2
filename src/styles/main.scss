@@ -32,20 +32,63 @@ body {
 }
 
 /**  modal*/
-.modal-body {
-    /**  Reset modal body overflow*/
-    overflow: unset;
-    >form {
-        .controls-holder {
-            margin-top: 2rem;
-            justify-content: space-between;
+.modal-dialog {
+    //height: 100%;
+    .modal-content {
+      //  height: 100%;
+        .modal-body {
+            >form {
+                .controls-holder {
+                    margin-top: 2rem;
+                    justify-content: space-between;
+                }
+
+            }
+
+            // overide text value font
+            .text-label {
+                .custom-label-value {
+                    font-weight: normal;
+                }
+            }
+
+            //card-container
+            .card-container {
+                margin: calculateRem(16) 0;
+
+                .card {
+                    width: 100%;
+                    background-color: #fff;
+                    border-radius: calculateRem(4);
+                    box-shadow: 0 2px 2px rgba(10, 16, 20, 0.24), 0 0 2px rgba(10, 16, 20, 0.12);
+                    box-sizing: border-box;
+                    transition: box-shadow 0.5s;
+                    padding: 1rem;
+                    position: relative;
+                }
+            }
         }
     }
 }
-.modal-footer{
+
+.modal-footer {
     >.controls-holder {
         width: 100%;
         margin-top: 2rem;
         justify-content: space-between;
+    }
+}
+
+/**
+* TODO: This should be removed when the dropdown is updated
+*/
+
+.dropdown.custom-dropdown {
+    .dropdown-menu.custom-dropdown-menu {
+        max-height: 280px;
+    }
+
+    >.dropdown-toggle.custom-dropdown-toggle {
+        height: 42px;
     }
 }
