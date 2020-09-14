@@ -17,7 +17,7 @@ export enum APILIST {
     DEVICE = 'Device',
     Group = 'Group',
     Sensor = 'DataField',
-    Actuators = 'DataValue',
+    Actuator = 'actuator',
     User = 'User',
 }
 

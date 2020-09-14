@@ -82,7 +82,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
   // memos
   const data: Array<DataItem> = React.useMemo(() => devices?.map((device: DeviceModel) => {
     const selectedDeviceType: string = deviceTypes?.find((item: DropdownItem) => item?.value === device.type)?.label;
-    return ({ name: device.name, type: device.type, deviceType: selectedDeviceType, accountId: device?.accountId, id: device.id  });
+    return ({ name: device.name, type: device.type, deviceType: selectedDeviceType, accountId: device?.accountId, id: device.id });
   }), [devices, deviceTypes]);
 
   const columns: Array<Column> = React.useMemo((): Array<Column> => [
@@ -170,6 +170,10 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
   const onDismissModal = React.useCallback(() => {
     setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
   }, [toggleAddDeviceModal, setToggleAddDeviceModal]);
+
+  const onDismissViewModal = React.useCallback(() => {
+    setModalViewDeviceProps({ ...modalViewDeviceProps, toggle: false });
+  }, [modalViewDeviceProps, setModalViewDeviceProps]);
 
   const onAddGroup = React.useCallback(() => {
     setDevice({ name: "", id: null } as DeviceModel);
@@ -263,13 +267,18 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
         <Modal
           {...modalViewDeviceProps}
           size="modal-lg"
-          onDismiss={onDismissModal}
+          onDismiss={onDismissViewModal}
           header={modalViewDeviceProps?.toggle ? <h3>Device Summary</h3> : null}
           body={
             modalViewDeviceProps?.toggle ?
               <ViewDevice
                 device={device}
               />
+              : null
+          }
+          footer={
+            modalViewDeviceProps?.toggle ?
+              <Button id='btnCancel' label='Close' size='sm' onClick={onDismissViewModal} ></Button>
               : null
           }
         />

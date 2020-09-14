@@ -2,7 +2,7 @@ import React from "react";
 import { DeviceModel, SensorModel, ActuatorModel } from "../../../interfaces/models";
 import { SensorApis } from "../../../apis/sensorApis";
 import { ActuatorApis } from '../../../apis/actuatorApis';
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosError } from "axios";
 
 import SummaryForm from "../add-edit-device/sections/SummaryForm";
 
@@ -11,45 +11,43 @@ interface ViewDeviceProps {
 }
 
 const ViewDevice: React.FunctionComponent<ViewDeviceProps> = (props: ViewDeviceProps) => {
-    const [device, setDevice] = React.useState<DeviceModel>({ actuators: [], id: null, name:""} as DeviceModel);
+    const [device, setDevice] = React.useState<DeviceModel>({ } as DeviceModel);
+    const [actuators, setActuators] = React.useState<Array<ActuatorModel>>(null);
+    const [sensors, setSensors] = React.useState<Array<SensorModel>>(null);
 
     // api calls
 
     const getSensors = React.useCallback(() => {
-        console.log("It has been mounted ", props.device)
         SensorApis.getSensorsByDeviceId(props?.device?.id)
             .then((response: AxiosResponse<Array<SensorModel>>) => {
                 if (response?.data) {
-                    setDevice({ ...device, fields: response.data });
+                    setSensors(response.data);
                 }
+            }).catch((error: AxiosError) => {
+                setSensors([]);
             });
-    }, [props?.device, device]);
+    }, [setSensors]);
 
     const getActuators = React.useCallback(() => {
-        device?.fields?.forEach((field: SensorModel) => {
-            ActuatorApis.getActuatorsByField(props?.device?.id)
-                .then((response: AxiosResponse<Array<ActuatorModel>>) => {
-                    console.log("Ikooo ", response.data);
-                    if (response?.data) {
-                        setDevice({ ...device, actuators: [...device.actuators, ...response.data] });
-                    }
-                });
-        })
-    }, [device, setDevice]);
+        ActuatorApis.getActuatorsByDeviceId(props?.device?.id)
+            .then((response: AxiosResponse<Array<ActuatorModel>>) => {
+                if (response?.data) {
+                    setActuators(response.data);
+                }
+            }).catch((error: AxiosError) => {
+                setActuators([]);
+            });
+    }, [setActuators]);
 
     React.useEffect(() => {
+        setDevice(props?.device);
         getActuators();
-    }, [device?.fields]);
-
-    React.useEffect(() => {
-        console.log("The device is ", props.device)
-        setDevice(props.device);
         getSensors();
-    }, [props?.device]);
+    }, [props?.device, setDevice]);
 
     return (
         <div className="view-device-container">
-            <SummaryForm device={device} />
+            <SummaryForm device={{...device, fields: sensors, actuators: actuators}} />
         </div>
     )
 

@@ -45,15 +45,18 @@ const SummaryForm: React.FunctionComponent<SummaryFormProps> = (props: SummaryFo
                     </div>
                 </div>
             </div>
-            <div className="row section-device-holder">
-                <div className="col">
-                    <TextLabel label="Device name" value={props?.device?.name} />
-                </div>
-                <div className="col">
-                    <TextLabel label="Device type" value={selectedDeviceType?.label} />
+            <div className="card-container">
+                <div className="card">
+                    <div className="row section-device-holder">
+                        <div className="col">
+                            <TextLabel label="Device name" value={props?.device?.name} />
+                        </div>
+                        <div className="col">
+                            <TextLabel label="Device type" value={selectedDeviceType?.label} />
+                        </div>
+                    </div>
                 </div>
             </div>
-
             {/** Sensors */}
             <div className="row">
                 <div className="col">
