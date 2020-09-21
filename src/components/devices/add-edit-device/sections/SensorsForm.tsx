@@ -111,8 +111,8 @@ const SensorsForm: React.FunctionComponent<SensorsFormProps> = (props: SensorsFo
             </div>
             <div className="row">
                 <div className="col">
-                    <div className="card-container my-3">
-                        <div className="card">
+                    <div className="card my-3">
+                        <div className="card-body">
                             <Table columns={sensorColumns} data={sensorData} primaryActionButton={primaryButton} />
                         </div>
                     </div>

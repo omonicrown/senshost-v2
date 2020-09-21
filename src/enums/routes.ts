@@ -12,3 +12,7 @@ export enum HomeRoutes {
     Groups = AppRoutes.Home + "/groups",
     Users = AppRoutes.Home + "/users"
 }
+
+export enum ViewDeviceRoutes {
+    ViewDevice = HomeRoutes.Devices + "/:deviceId",
+}

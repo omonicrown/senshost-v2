@@ -93,8 +93,8 @@ const ActuatorForm: React.FunctionComponent<ActuatorFormProps> = (props: Actuato
             error = { ...error, name: "Actuator name cannot be empty" };
         }
 
-        if (actuator?.type === null) {
-            error = { ...error, name: "Actuator type cannot be empty" };
+        if (!actuator?.type) {
+            error = { ...error, type: "Actuator type cannot be empty" };
         } else {
             if (actuator?.type === 0) {
                 if (!actuator?.propertise?.ON) {
@@ -114,7 +114,6 @@ const ActuatorForm: React.FunctionComponent<ActuatorFormProps> = (props: Actuato
                 }
             }
         }
-        console.log("it is here ", actuator)
 
         if (!error) {
             const updatedActuators: Array<ActuatorModel> = [...props.device?.actuators, actuator];
@@ -226,8 +225,8 @@ const ActuatorForm: React.FunctionComponent<ActuatorFormProps> = (props: Actuato
 
             <div className="row">
                 <div className="col">
-                    <div className="card-container my-4">
-                        <div className="card">
+                    <div className="card my-4">
+                        <div className="card-body">
                             <Table columns={actuatorColumns} data={actuatorRows} primaryActionButton={primaryButton} />
                         </div>
                     </div>

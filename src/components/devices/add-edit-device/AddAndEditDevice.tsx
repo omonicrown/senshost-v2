@@ -18,20 +18,26 @@ import SummaryForm from "./sections/SummaryForm";
 
 import { useSelector, useDispatch } from "react-redux";
 import { States } from "../../../interfaces/states";
-import { ACTUATORS } from "../../../constants";
+import { ACTUATORS, DEVICETYPES } from "../../../constants";
+import { Dispatch } from "redux";
+import { Loader } from "@sebgroup/react-components/dist/Loader";
 
 interface AddAndEditDeviceProps {
     onSave: (e: React.FormEvent<HTMLFormElement>, device: DeviceModel) => void;
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     toggle: boolean;
+    loading: boolean;
+    device?: DeviceModel;
 }
 
 const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props: AddAndEditDeviceProps) => {
     const [stepTracker, setStepTracker] = React.useState<number>(0);
     const stepList: Array<string> = React.useMemo(() => ["Device", "Sensor", "Actuator", "Summary"], []);
 
+    const deviceTypes: Array<DropdownItem> = React.useMemo(() => DEVICETYPES, []);
+
     // actions
-    const dispatch = useDispatch();
+    const dispatch: Dispatch = useDispatch();
 
     // account or profile ----------------------------
     const authState = useSelector((states: States) => states.auth);
@@ -89,7 +95,16 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
             groupId: null,
             fields: []
         } as DeviceModel);
-    }, [props?.toggle])
+    }, [props?.toggle]);
+
+    React.useEffect(() => {
+        if (props?.device) {
+            setDevice(props.device);
+
+            const deviceType: DropdownItem = deviceTypes?.find((item: DropdownItem) => item?.value === props?.device?.type);
+            setSelectedDeviceType(deviceType);
+        }
+    }, [props.device, deviceTypes])
 
     return (
         <div className="add-and-edit-device">
@@ -117,7 +132,7 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
                     />
                 }
                 {stepTracker === 3 &&
-                    <SummaryForm device={device} />
+                    <SummaryForm device={device} viewType="accordion" />
                 }
                 <div className="row controls-holder">
                     <div className="col-12 col-sm-6">
@@ -135,7 +150,9 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
                             }
 
                             {stepTracker === 3 &&
-                                <Button label="Save" type="submit" size="sm" theme="primary" title="Save" onClick={null} />
+                                <Button label="Save" type="submit" size="sm" theme="primary" title="Save" onClick={null}>
+                                    <Loader toggle={props.loading} />
+                                </Button>
                             }
                         </div>
                     </div>

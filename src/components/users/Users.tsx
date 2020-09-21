@@ -29,6 +29,8 @@ export interface UsersProps extends SharedProps {
 const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.ReactElement<void> => {
     const authState = useSelector((states: States) => states.auth);
     const [paginationValue, setPagination] = React.useState<number>(1);
+    const [paginationSize, setPaginationSize] = React.useState<number>(1);
+
     const [users, setUsers] = React.useState<Array<UserModel>>(null);
     const [user, setUser] = React.useState<UserModel>({} as UserModel);
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -213,7 +215,9 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
     }, [setUser, setModalProps]);
 
     const filterProps: FilterProps = React.useMemo(() => ({
-        onAfterFilter: (rows: Array<TableRow>) => { },
+        onAfterFilter: (rows: Array<TableRow>) => {
+            setPaginationSize(rows?.length);
+        },
         filterItems: filters,
     }), [filters]);
 
@@ -232,7 +236,10 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
     React.useEffect(() => {
         UserApis.getUsersByAccountId(authState?.auth?.account?.id)
             .then((response: AxiosResponse<Array<UserModel>>) => {
-                setUsers(response?.data || []);
+                if (response?.data) {
+                    setUsers(response?.data || []);
+                    setPaginationSize(response?.data?.length);
+                }
             }).catch((error: AxiosError) => {
                 console.log("error getting users", error);
                 setUsers([]);
@@ -250,13 +257,13 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                         onChange={(value: DropdownItem) => setSelectedGroup(value)}
                     />
 
-                    <Button label="Add" id="addBtn" theme="outline-primary" title="Add" onClick={onAdduser} />
+                    <Button label="Add" size="sm" id="addBtn" theme="outline-primary" title="Add" onClick={onAdduser} />
 
                 </div>
                 <div className="row">
                     <div className="col">
-                        <div className="card-container">
-                            <div className="card">
+                        <div className="card">
+                            <div className="card-body">
                                 <Table
                                     columns={columns}
                                     data={data}
@@ -264,7 +271,9 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                                     offset={configs.tablePageSize}
                                     currentpage={paginationValue}
                                     filterProps={filterProps}
-                                    footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
+                                    footer={data?.length ?
+                                        <Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />
+                                        : null}
                                     sortProps={{
                                         onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
                                     }}

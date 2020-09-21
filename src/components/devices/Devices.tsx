@@ -1,4 +1,5 @@
 import React from "react";
+import { } from "history";
 
 import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 
@@ -7,7 +8,6 @@ import PortalComponent from "../shared/Portal";
 import { SharedProps } from "../home/Home";
 import { Modal, ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import AddAndEditDevice from "./add-edit-device/AddAndEditDevice";
-import ViewDevice from "./modals/ViewDevice";
 
 import { DeviceApis } from "../../apis/deviceApis";
 import { States, AuthState } from "../../interfaces/states";
@@ -24,45 +24,35 @@ import { toggleNotification } from "../../actions";
 import { Dispatch } from "redux";
 import { useHistory } from "react-router";
 import { History } from "history";
-import { AppRoutes } from "../../enums/routes";
+import { AppRoutes, HomeRoutes, ViewDeviceRoutes } from "../../enums/routes";
 
 export interface DevicesProps extends SharedProps {
   onToggle: (value: boolean) => void;
 }
 
 const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): React.ReactElement<void> => {
-  const [paginationValue, setPagination] = React.useState<number>(1);
-  const [searchValue, setSearchValue] = React.useState<string>("");
+  const [paginationValue, setPaginationValue] = React.useState<number>(1);
   const [devices, setDevices] = React.useState<Array<DeviceModel>>(null);
-  const [device, setDevice] = React.useState<DeviceModel>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
+
+  const [paginationSize, setPaginationSize] = React.useState<number>(0);
 
   const [selectedDeviceType, setSelectedDeviceType] = React.useState<DropdownItem>(null);
   const deviceTypes: Array<DropdownItem> = React.useMemo(() => DEVICETYPES, []);
   const [toggleAddDeviceModal, setToggleAddDeviceModal] = React.useState<ModalProps>({ ...initialState });
 
-  const [modalDeleteDeviceProps, setModalDeleteDeviceProps] = React.useState<ModalProps>({ ...initialState });
-  const [modalViewDeviceProps, setModalViewDeviceProps] = React.useState<ModalProps>({ ...initialState });
+  const history: History = useHistory();
 
   const primaryButton: PrimaryActionButton = React.useMemo(() => ({
     label: "View",
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, selectedRow: TableRow) => {
-      setDevice({
-        name: selectedRow["name"],
-        type: selectedRow["type"],
-        accountId: selectedRow["accountId"],
-        groupId: selectedRow["groupId"],
-        id: selectedRow["id"],
-      } as DeviceModel);
-      console.log("The selected view is ", selectedRow)
-      setModalViewDeviceProps({ ...modalViewDeviceProps, toggle: true });
+      history.push(ViewDeviceRoutes.ViewDevice.toString().replace(":deviceId", selectedRow["id"]));
     },
-  }), [setDevice]);
+  }), [history]);
 
   // actions
   const authState: AuthState = useSelector((states: States) => states?.auth);
   const dispatch: Dispatch = useDispatch();
-
-  const history: History = useHistory();
 
   React.useEffect(() => {
     if (!authState?.auth?.identityToken) {
@@ -108,34 +98,6 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
   const [filters, setFilters] = React.useState<Array<FilterItem>>(columns.map((column: Column) => ({ accessor: column.accessor, filters: [] })));
 
-
-  const actionLinks: Array<ActionLinkItem> = React.useMemo(() => [
-    {
-      label: "Edit", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
-        setDevice({
-          name: selectedRow["name"],
-          type: selectedRow["type"],
-          accountId: selectedRow["accountId"],
-          groupId: selectedRow["groupId"],
-          id: selectedRow["id"],
-        } as DeviceModel);
-        setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: true });
-      }
-    },
-    {
-      label: "Delete", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
-        setDevice({
-          name: selectedRow["name"],
-          type: selectedRow["type"],
-          accountId: selectedRow["accountId"],
-          groupId: selectedRow["groupId"],
-          id: selectedRow["id"],
-        } as DeviceModel);
-        setModalDeleteDeviceProps({ ...modalDeleteDeviceProps, toggle: true });
-      }
-    },
-  ], [toggleAddDeviceModal, modalDeleteDeviceProps]);
-
   const onSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, device: DeviceModel) => {
     const createDeviceModel: DeviceModel = {
       ...device,
@@ -145,6 +107,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
       })
     };
 
+    setLoading(true);
     DeviceApis.createDevice(createDeviceModel).then((response: AxiosResponse<DeviceModel>) => {
       if (response?.data) {
         const notification: NotificationProps = {
@@ -157,12 +120,14 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
         dispatch(toggleNotification(notification));
 
-        setDevices([...devices, device]);
+        setDevices([device, ...devices]);
 
         setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
       }
     }).catch((err: AxiosError) => {
       console.log(err);
+    }).finally(() => {
+      setLoading(false);
     });
 
   }, [toggleAddDeviceModal, setDevices, devices, dispatch, setToggleAddDeviceModal, toggleNotification]);
@@ -171,17 +136,15 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
     setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
   }, [toggleAddDeviceModal, setToggleAddDeviceModal]);
 
-  const onDismissViewModal = React.useCallback(() => {
-    setModalViewDeviceProps({ ...modalViewDeviceProps, toggle: false });
-  }, [modalViewDeviceProps, setModalViewDeviceProps]);
-
-  const onAddGroup = React.useCallback(() => {
-    setDevice({ name: "", id: null } as DeviceModel);
+  const onAddDevice = React.useCallback(() => {
     setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: true });
-  }, [setDevice, setToggleAddDeviceModal]);
+  }, [setToggleAddDeviceModal]);
 
   const filterProps: FilterProps = React.useMemo(() => ({
-    onAfterFilter: (rows: Array<TableRow>) => { },
+    onAfterFilter: (rows: Array<TableRow>) => {
+      setPaginationSize(rows?.length);
+      setPaginationValue(1);
+    },
     filterItems: filters,
   }), [filters]);
 
@@ -199,10 +162,11 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
   React.useEffect(() => {
     DeviceApis.getDevicesByAccount(authState?.auth?.account?.id)
       .then((response: AxiosResponse<Array<DeviceModel>>) => {
-        console.log("Objective ", response);
-        setDevices(response?.data || []);
+        if (response?.data) {
+          setDevices(response?.data || []);
+          setPaginationSize(response?.data?.length);
+        }
       }).catch((error: AxiosError) => {
-        console.log("error getting devices", error);
         setDevices([]);
       })
   }, []);
@@ -222,21 +186,24 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
             label="Add"
             theme="outline-primary"
             id="btnAdd"
-            title="Add" onClick={onAddGroup} />
+            size="sm"
+            title="Add" onClick={onAddDevice} />
         </div>
         <div className="row">
           <div className="col">
-            <div className="card-container">
-              <div className="card">
+            <div className="card">
+              <div className="card-body">
                 <Table
                   columns={columns}
                   data={data}
                   offset={configs.tablePageSize}
                   currentpage={paginationValue}
                   primaryActionButton={primaryButton}
-                  actionLinks={actionLinks}
                   filterProps={filterProps}
-                  footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
+                  footer={data?.length ?
+                    <Pagination value={paginationValue} onChange={setPaginationValue} size={paginationSize} useFirstAndLast={true} />
+                    : null
+                  }
                   sortProps={{
                     onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
                   }} />
@@ -257,28 +224,10 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
             toggleAddDeviceModal?.toggle ?
               <AddAndEditDevice
                 onSave={onSave}
+                loading={loading}
                 onCancel={onDismissModal}
                 toggle={toggleAddDeviceModal?.toggle}
               />
-              : null
-          }
-        />
-
-        <Modal
-          {...modalViewDeviceProps}
-          size="modal-lg"
-          onDismiss={onDismissViewModal}
-          header={modalViewDeviceProps?.toggle ? <h3>Device Summary</h3> : null}
-          body={
-            modalViewDeviceProps?.toggle ?
-              <ViewDevice
-                device={device}
-              />
-              : null
-          }
-          footer={
-            modalViewDeviceProps?.toggle ?
-              <Button id='btnCancel' label='Close' size='sm' onClick={onDismissViewModal} ></Button>
               : null
           }
         />

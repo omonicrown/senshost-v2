@@ -45,7 +45,7 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
   const [groups, setGroups] = React.useState<Array<GroupModel>>(null);
   const [group, setGroup] = React.useState<GroupModel>({} as GroupModel);
   const [loading, setLoading] = React.useState<boolean>(false);
-
+  const [paginationSize, setPaginationSize] = React.useState<number>(0);
   const [selectedStatus, setSelectedStatus] = React.useState<DropdownItem>(null);
   const statuses: Array<DropdownItem> = React.useMemo(() => [
     { label: "All", value: null }, { label: "Active", value: 0 }, { label: "inActive", value: 1 }
@@ -96,7 +96,7 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
           creationDate: selectedRow["creationDate"]
         });
 
-        setGroupDeleteModalProps({ ...groupDeleteModalProps, toggle: true })
+        setGroupDeleteModalProps({ ...groupDeleteModalProps, toggle: true });
       }
     },
   ], [setGroup, setModalProps, setGroupDeleteModalProps]);
@@ -250,7 +250,9 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
   }, [setGroup, setModalProps]);
 
   const filterProps: FilterProps = React.useMemo(() => ({
-    onAfterFilter: (rows: Array<TableRow>) => { },
+    onAfterFilter: (rows: Array<TableRow>) => {
+      setPaginationSize(rows?.length);
+    },
     filterItems: filters,
   }), [filters]);
 
@@ -268,7 +270,10 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
   React.useEffect(() => {
     GroupApis.getGroupsByAccount(authState?.auth?.account?.id)
       .then((response: AxiosResponse<Array<GroupModel>>) => {
-        setGroups(response?.data || []);
+        if (response?.data) {
+          setGroups(response?.data || []);
+          setPaginationSize(response?.data?.length)
+        }
       }).catch((error: AxiosError) => {
         setGroups([]);
       })
@@ -299,12 +304,12 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
             selectedValue={selectedStatus}
             onChange={(value: DropdownItem) => setSelectedStatus(value)}
           />
-          <Button label="Add" id="addBtn" theme="outline-primary" title="Add" onClick={onAddGroup} />
+          <Button label="Add" id="addBtn" size="sm" theme="outline-primary" title="Add" onClick={onAddGroup} />
         </div>
         <div className="row">
           <div className="col">
-            <div className="card-container">
-              <div className="card">
+            <div className="card">
+              <div className="card-body">
                 <Table
                   columns={columns}
                   data={data}
@@ -313,7 +318,9 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
                   primaryActionButton={primaryButton}
                   filterProps={filterProps}
                   actionLinks={actionLinks}
-                  footer={<Pagination value={paginationValue} onChange={setPagination} size={data?.length} useFirstAndLast={true} />}
+                  footer={data?.length ?
+                    <Pagination value={paginationValue} onChange={setPagination} size={paginationSize} useFirstAndLast={true} />
+                    : null}
                   sortProps={{
                     onAfterSorting: (rows: Array<TableRow>, sortByColumn: TableHeader) => { },
                   }} />

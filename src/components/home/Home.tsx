@@ -1,7 +1,7 @@
 import React from "react";
 import { RouteComponentProps, Switch, Redirect } from "react-router";
 import { AppRoute } from "../../utils/functions";
-import { HomeRoutes, AppRoutes } from "../../enums/routes";
+import { HomeRoutes, AppRoutes, ViewDeviceRoutes } from "../../enums/routes";
 import { History } from "history";
 
 import SidebarComponent from "../shared/Sidebar";
@@ -16,6 +16,7 @@ import { Button } from "@sebgroup/react-components/dist/Button";
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import { GroupsProps } from "../groups/Groups";
 import { UsersProps } from "../users/Users";
+import { ViewDeviceProps } from "../viewDevice/ViewDevice";
 
 import { GroupApis } from "../../apis/groupApis";
 import { useSelector, useDispatch } from "react-redux";
@@ -27,7 +28,7 @@ const Devices: React.LazyExoticComponent<React.FC<DevicesProps>> = React.lazy(()
 const Dashbaord: React.LazyExoticComponent<React.FC<DashboardProps>> = React.lazy(() => import("../dashboard/Dashboard"));
 const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
 const Users: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../users/Users"));
-
+const ViewDevice: React.LazyExoticComponent<React.FC<ViewDeviceProps>> = React.lazy(() => import("../viewDevice/ViewDevice"));
 const NotFound: React.LazyExoticComponent<React.FC<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
 
 
@@ -70,51 +71,59 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
 
   React.useEffect(() => {
     dispatch(getGroupsByAccount(authState?.auth?.account?.id))
-}, []);
+  }, []);
 
   return (
-      <div className="home-container container-fluid">
-        <div className="row no-gutters">
-          <HeaderComponent onToggle={onToggle} toggle={toggleMenu} />
-        </div>
-        <div className="row no-gutters main-body">
-          <SidebarComponent toggle={toggleMenu} />
-          <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
-            <div className="main-holder">
-              <div className="container">
-                <Switch>
-                  <Redirect
-                    exact
-                    from={AppRoutes.Home}
-                    to={HomeRoutes.Dashboard.toString()}
-                  />
-                  <AppRoute
-                    path={HomeRoutes.Dashboard.toString()}
-                    component={Dashbaord}
-                  />
-                  <AppRoute
-                    path={HomeRoutes.Devices.toString()}
-                    component={Devices}
-                  />
-                  <AppRoute
-                    path={HomeRoutes.Groups.toString()}
-                    component={Groups}
-                  />
-
-                  <AppRoute path={HomeRoutes.Users.toString()} component={Users} />
-
-                  <AppRoute path="*" component={NotFound} props={props} />
-
-                </Switch>
-              </div>
-
-              <footer className="footer-container">
-                Copyright © 2019 Senshost. All rights reserved.
-              </footer>
-            </div>
-          </main>
-        </div>
+    <div className="home-container container-fluid">
+      <div className="row no-gutters">
+        <HeaderComponent onToggle={onToggle} toggle={toggleMenu} />
       </div>
+      <div className="row no-gutters main-body">
+        <SidebarComponent toggle={toggleMenu} />
+        <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
+          <div className="main-holder">
+            <div className="container">
+              <Switch>
+                <Redirect
+                  exact
+                  from={AppRoutes.Home}
+                  to={HomeRoutes.Dashboard.toString()}
+                />
+                <AppRoute
+                  path={HomeRoutes.Dashboard.toString()}
+                  component={Dashbaord}
+                />
+                <AppRoute
+                  path={HomeRoutes.Devices.toString()}
+                  exact={true}
+                  component={Devices}
+                />
+
+                <AppRoute
+                  path={ViewDeviceRoutes.ViewDevice.toString()}
+                  exact={true}
+                  component={ViewDevice}
+                />
+
+                <AppRoute
+                  path={HomeRoutes.Groups.toString()}
+                  component={Groups}
+                />
+
+                <AppRoute path={HomeRoutes.Users.toString()} component={Users} />
+
+                <AppRoute path="*" component={NotFound} props={props} />
+
+              </Switch>
+            </div>
+
+            <footer className="footer-container">
+              Copyright © 2019 Senshost. All rights reserved.
+              </footer>
+          </div>
+        </main>
+      </div>
+    </div>
   );
 
 });

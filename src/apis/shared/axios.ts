@@ -57,7 +57,7 @@ export class AxiosGlobal {
             return config;
         }, (error: AxiosError) => {
             if (error.request && error.request.data) {
-                return Promise.reject(...error.request);
+                return Promise.reject(error.request);
             } else {
                 return Promise.reject(error);
 
@@ -76,11 +76,11 @@ export class AxiosGlobal {
                     toggle: true,
                     onDismiss: () => { }
                 };
-                if (error && error.response && error.response.data && error.response.data.message) {
+                if (error?.response?.data?.message || error?.response?.data?.Message) {
                     if (error.response.data.name && error.response.data.name === 'TokenExipredError') {
                         store.dispatch(signoutUser());
                     }
-                    notification.message = error.response.data.message;
+                    notification.message = error.response.data.message || error.response.data.Message;
                 }
                 store.dispatch(toggleNotification(notification));
                 store.dispatch(signoutUser());
@@ -95,8 +95,8 @@ export class AxiosGlobal {
                     toggle: true,
                     onDismiss: () => { }
                 };
-                if (error && error.response && error.response.data && error.response.data.message) {
-                    notification.message = error.response.data.message;
+                if (error?.response?.data?.message || error?.response?.data?.Message) {
+                    notification.message = error.response.data.message || error.response.data.Message;
                 }
                 store.dispatch(toggleNotification(notification));
                 return Promise.reject({ ...error });
@@ -109,18 +109,19 @@ export class AxiosGlobal {
                     onDismiss: () => { }
                 };
 
-                if (error && Array.isArray(error.response.data)) {
+                if (error && Array.isArray(error?.response?.data)) {
                     const arrayOfErrors = error.response.data.map((item: { message: string }) => item.message);
                     notification.message = arrayOfErrors.join(", ");
-                } else if (error && error.response && error.response.data && error.response.data.message) {
-                    notification.message = error.response.data.message;
-                } else if (error && error.response.data) {
+                } else if (error?.response?.data?.message || error?.response?.data.Message) {
+                    notification.message = error.response.data.message || error.response.data.Message;
+                } else if (error?.response?.data) {
                     notification.message = error.response.data;
                 }
 
+                console.log("The deleted devices ate ", error?.response)
                 store.dispatch(toggleNotification(notification));
 
-                return Promise.reject({ ...error });
+                return Promise.reject(error);
             } else if (error && error.response && error.response.status === 404) {
                 const notification: NotificationProps = {
                     theme: "danger",
@@ -139,7 +140,7 @@ export class AxiosGlobal {
 
                 store.dispatch(toggleNotification(notification));
 
-                return Promise.reject({ ...error });
+                return Promise.reject(error);
             } else if (error && error.response && error.response.status === 500) {
                 const notification: NotificationProps = {
                     theme: "danger",

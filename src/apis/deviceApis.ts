@@ -19,7 +19,7 @@ export class DeviceApis {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
-            return this.deviceApis.createDevice(device);
+            return this.deviceApis.updateDevice(device);
         }
     }
 
@@ -28,6 +28,22 @@ export class DeviceApis {
             return {} as AxiosPromise;
         } else {
             return this.deviceApis.getDevicesByAccount(account);
+        }
+    }
+
+    static getDeviceById(deviceId: string): AxiosPromise<DeviceModel> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.deviceApis.getDeviceById(deviceId);
+        }
+    }
+
+    static deleteDeviceById(deviceId: string): AxiosPromise<DeviceModel> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.deviceApis.deleteDeviceById(deviceId);
         }
     }
 }
