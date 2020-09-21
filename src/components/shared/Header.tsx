@@ -5,12 +5,14 @@ import { SharedProps } from "../home/Home";
 import { Icon } from "@sebgroup/react-components/dist/Icon";
 import { SvgElement, icontypesEnum } from "../../utils/svgElement";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { States } from "../../interfaces/states";
+import { AuthState, States } from "../../interfaces/states";
 import { Link, useHistory } from "react-router-dom";
 import { History } from "history";
 
 import authReducer from "../../reducers/authReducer";
 import { SIGNOUT_USER } from "../../constants";
+import { useDispatch, useSelector } from "react-redux";
+import { Dispatch } from "redux";
 
 interface HeaderProps extends SharedProps {
     onToggle: (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => void;
@@ -21,25 +23,22 @@ const Header: React.FunctionComponent<HeaderProps> = (props: HeaderProps): React
     const history: History = useHistory();
 
     const [toggle, setToggle] = React.useState<boolean>(false);
-    const [authState, dispatch] = useReducer(authReducer, {
-        isFetching: false,
-        auth: null,
-        error: null,
-        isAuthenticated: false
-    });
+    const authState: AuthState = useSelector((states: States) => states?.auth);
+    const dispatch: Dispatch = useDispatch();
 
     const onSignOut = React.useCallback((e?: React.MouseEvent<HTMLAnchorElement>) => {
         dispatch({ type: SIGNOUT_USER });
     }, []);
 
     React.useEffect(() => {
+        console.log("The replace is ", authState)
         if (!authState?.auth?.identityToken) {
-            history.replace(AppRoutes.Account);
+           history.replace(AppRoutes.Account);
         }
     }, [authState?.auth])
 
     return (
-        <div className="header-container d-flex">
+        <div className="header-container d-flex flex-row">
             <div className="logo-holder">
                 <Icon src={<SvgElement type={icontypesEnum.BARS} onClick={props.onToggle} />} />
                 <Image

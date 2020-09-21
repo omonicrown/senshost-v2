@@ -36,6 +36,7 @@ export default (state: AuthState = initialState, action: authActions) => {
             return {
                 ...state,
                 isAuthenticated: false,
+                auth: null,
                 token: null,
                 isFetching: false,
                 user: false

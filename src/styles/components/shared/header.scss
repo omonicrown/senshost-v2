@@ -3,9 +3,10 @@ $user-menu-icon-size: calculateRem(13);
 .header-container {
     height: $header-height;
     align-items: center;
+    justify-content: space-between;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .3);
 
-    >.icon-holder {
+    .icon-holder {
         margin-right: 1rem;
         width: 1.2rem;
 
@@ -21,11 +22,8 @@ $user-menu-icon-size: calculateRem(13);
     padding-left: calculateRem(20);
     padding-right: calculateRem(20);
 
-    > .user-menu {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
+    .user-menu {
+        position: relative;
         width: auto;
         overflow: visible;
 
@@ -63,7 +61,7 @@ $user-menu-icon-size: calculateRem(13);
             border-style: solid;
             border-width: 0;
             transition: border-width 200ms;
-
+            z-index: 2;
             > a.user-menu-list-item {
                 overflow: hidden;
                 transition: max-height 200ms, padding 200ms linear, opacity 500ms ease-out,
