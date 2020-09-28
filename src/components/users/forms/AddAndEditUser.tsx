@@ -4,6 +4,8 @@ import { Button } from "@sebgroup/react-components/dist/Button";
 import { UserModel, GroupModel } from "../../../interfaces/models";
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
+import { States } from "../../../interfaces/states";
+import { useSelector } from "react-redux";
 
 interface AddAndEditUserProps {
     groups: Array<GroupModel>;
@@ -13,7 +15,7 @@ interface AddAndEditUserProps {
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: AddAndEditUserProps): React.ReactElement<void> => {
-    const [user, setUser] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
+    const [user, setUser] = React.useState<UserModel>({ name: "", email: "", password: "", accountId: null, groupId: null } as UserModel);
     const [userError, setUserError] = React.useState<UserModel>({ name: "", email: "", password: "" } as UserModel);
 
     const [selectedGroup, setSelectedGroup] = React.useState<DropdownItem>({} as DropdownItem);
@@ -23,6 +25,8 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
     const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     }, [setUser, user]);
+
+    const authState = useSelector((states: States) => states.auth);
 
     const onCancel = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setUser({ name: "", email: "", password: "" } as UserModel);
@@ -52,13 +56,13 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
         }
 
         if (!errors) {
-            props?.onSave(e, user);
+            props?.onSave(e, {...user,  accountId: authState?.auth?.account?.id });
         }
 
         setUserError(errors);
 
         e.preventDefault();
-    }, [user]);
+    }, [user, authState?.auth]);
 
     React.useEffect(() => {
         setUser({ ...user, groupId: selectedGroup?.value });
@@ -116,7 +120,7 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
                     <TextBoxGroup
                         name="password"
                         label="Password"
-                        type="text"
+                        type="password"
                         disabled={props?.loading}
                         placeholder="Password"
                         value={user?.password}

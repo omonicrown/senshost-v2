@@ -35,6 +35,7 @@ const ActuatorForm: React.FunctionComponent<ActuatorFormProps> = (props: Actuato
 
     const [actuator, setActuator] = React.useState<ActuatorModel>({
         name: "",
+        type: null,
         propertise: { ON: "", OFF: "", message: "", value: "" }
     } as ActuatorModel);
 
@@ -71,7 +72,7 @@ const ActuatorForm: React.FunctionComponent<ActuatorFormProps> = (props: Actuato
     const handleActuatorTypeChange = React.useCallback((e: DropdownItem) => {
         setSelectedActuatorType(e);
         setActuator({ ...actuator, type: e.value });
-    }, [selectedActuatorType, setSelectedActuatorType, setActuator, actuator]);
+    }, [selectedActuatorType, actuator]);
 
     const handleActuatorTextChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setActuator({ ...actuator, [e.target.name]: e.target.value });
@@ -93,7 +94,7 @@ const ActuatorForm: React.FunctionComponent<ActuatorFormProps> = (props: Actuato
             error = { ...error, name: "Actuator name cannot be empty" };
         }
 
-        if (!actuator?.type) {
+        if (actuator?.type === null) {
             error = { ...error, type: "Actuator type cannot be empty" };
         } else {
             if (actuator?.type === 0) {
