@@ -14,4 +14,12 @@ export class ActuatorApis {
             return this.actuatorApis.getActuatorsByDeviceId(deviceId);
         }
     }
+
+    static updateActuatorsById(deviceId: string): AxiosPromise<Array<ActuatorModel>> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.actuatorApis.getActuatorsByDeviceId(deviceId);
+        }
+    }
 }

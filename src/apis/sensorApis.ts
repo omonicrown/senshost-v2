@@ -14,4 +14,12 @@ export class SensorApis {
             return this.sensorApis.getSensorsByDeviceId(deviceId);
         }
     }
+
+    static updateSensorsByDeviceId(deviceId: string): AxiosPromise<Array<SensorModel>> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.sensorApis.updateSensorsByDeviceId(deviceId);
+        }
+    }
 }

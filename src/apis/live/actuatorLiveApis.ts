@@ -8,4 +8,8 @@ export class ActuatorLiveApis extends AxiosGlobal {
     getActuatorsByDeviceId(deviceId: string): AxiosPromise<Array<ActuatorModel>> {
         return this.axios.get(`${configs.context}/${configs.apiList.Actuator}/device/${deviceId}`);
     }
+
+    updateActuatorsById(deviceId: string): AxiosPromise<Array<ActuatorModel>> {
+        return this.axios.put(`${configs.context}/${configs.apiList.Actuator}/device/${deviceId}`);
+    }
 } 

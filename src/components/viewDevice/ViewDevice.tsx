@@ -61,7 +61,7 @@ const ViewDevice: React.FunctionComponent<ViewDeviceProps> = (props: ViewDeviceP
                 const notification: NotificationProps = {
                     theme: "success",
                     title: "device added successfully",
-                    message: `Deivce added successfully`,
+                    message: `Device added successfully`,
                     toggle: true,
                     onDismiss: () => { }
                 };
