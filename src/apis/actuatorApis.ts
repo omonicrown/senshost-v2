@@ -15,11 +15,29 @@ export class ActuatorApis {
         }
     }
 
-    static updateActuatorsById(deviceId: string): AxiosPromise<Array<ActuatorModel>> {
+    static updateActuatorById(id: string, actuator: ActuatorModel): AxiosPromise<ActuatorModel> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
-            return this.actuatorApis.getActuatorsByDeviceId(deviceId);
+            return this.actuatorApis.updateActuatorById(id, actuator);
         }
     }
+
+    static deleteActuatorById(id: string): AxiosPromise {
+        if(configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.actuatorApis.deleteActuatorById(id);
+        }
+    }
+
+    static createActuator(actuator: ActuatorModel): AxiosPromise<ActuatorModel> {
+        if(configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.actuatorApis.createActuator(actuator);
+        }
+    }
+
+
 }
