@@ -9,7 +9,15 @@ export class ActuatorLiveApis extends AxiosGlobal {
         return this.axios.get(`${configs.context}/${configs.apiList.Actuator}/device/${deviceId}`);
     }
 
-    updateActuatorsById(deviceId: string): AxiosPromise<Array<ActuatorModel>> {
-        return this.axios.put(`${configs.context}/${configs.apiList.Actuator}/device/${deviceId}`);
+    updateActuatorById(id: string, actuator: ActuatorModel): AxiosPromise<ActuatorModel> {
+        return this.axios.put(`${configs.context}/${configs.apiList.Actuator}/${id}`, actuator);
+    }
+
+    deleteActuatorById(id: string): AxiosPromise<PositiveResponse> {
+        return this.axios.delete(`${configs.context}/${configs.apiList.Actuator}/${id}`)
+    }
+
+    createActuator(actuator): AxiosPromise<ActuatorModel> {
+        return this.axios.post(`${configs.context}/${configs.apiList.Actuator}`, actuator);
     }
 } 

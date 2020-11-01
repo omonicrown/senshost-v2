@@ -120,7 +120,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
         dispatch(toggleNotification(notification));
 
-        setDevices([device, ...devices]);
+        setDevices([device, response.data]);
 
         setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
       }
@@ -168,7 +168,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
         }
       }).catch((error: AxiosError) => {
         setDevices([]);
-      })
+      });
   }, []);
 
   return (

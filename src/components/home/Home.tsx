@@ -24,6 +24,9 @@ import { GroupModel } from "../../interfaces/models";
 import { AxiosResponse, AxiosError } from "axios";
 import { getGroupsByAccount } from "../../actions/groupActions";
 
+import "../../styles/components/shared/modal.scss";
+
+
 const Devices: React.LazyExoticComponent<React.FC<DevicesProps>> = React.lazy(() => import("../devices/Devices"));
 const Dashbaord: React.LazyExoticComponent<React.FC<DashboardProps>> = React.lazy(() => import("../dashboard/Dashboard"));
 const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));

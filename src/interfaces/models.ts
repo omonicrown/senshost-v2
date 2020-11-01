@@ -28,18 +28,19 @@ export interface SensorModel {
     name: string;
     deviceId: string;
     dataType: number;
-    id: string;
-    creationDate: Date;
+    id?: string;
+    creationDate?: Date;
+    sensorDataType?: string;
 }
 
 export interface ActuatorModel {
-    deviceId: string;
+    deviceId?: string;
     accountId?: string;
     name: string;
     type: number
     propertise: { ON: "", OFF: "", message: "", value: "" };
     id: string;
-    creationDate: Date;
+    creationDate?: Date;
 }
 
 export interface GroupModel {

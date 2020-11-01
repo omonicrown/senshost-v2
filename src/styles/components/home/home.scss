@@ -16,7 +16,8 @@
 
                 &.sidemenu-opened {
                     z-index: 2;
-                    > .sidebar-content {
+
+                    >.sidebar-content {
                         width: $aside-width;
                         opacity: 1;
                         overflow: visible;
@@ -30,7 +31,7 @@
                 }
 
                 &.sidemenu-closed {
-                    > .sidebar-content {
+                    >.sidebar-content {
                         padding: 0rem;
                         width: 0rem;
                         opacity: 0;
@@ -53,16 +54,20 @@
                             ul {
                                 li {
                                     padding: 0.4rem 0px;
+
                                     a {
                                         &:not(.active) {
                                             color: inherit;
                                         }
+
                                         svg {
                                             fill: currentcolor;
                                         }
                                     }
+
                                     .title-holder {
                                         align-items: center;
+
                                         .icon-holder {
                                             margin-right: 0.5rem;
                                         }
@@ -77,6 +82,7 @@
 
         main {
             background-color: $white;
+
             &.main-container {
                 height: calc(100% - #{$header-height});
                 width: 100%;
@@ -84,20 +90,34 @@
 
                 // table override
                 @import "../shared/table.scss";
+
                 //card-container
                 .card {
                     margin: calculateRem(16) 0;
+
+                    .table-responsive {
+                        overflow-x: visible;
+                    }
+
+
+                }
+
+                // overide text value font
+                .text-label {
+                    .custom-label-value {
+                        font-weight: normal;
+                    }
                 }
 
                 &.sidemenu-opened {
                     width: calc(100% - #{$aside-width});
                 }
 
-                > .main-holder {
+                >.main-holder {
                     overflow-y: auto;
                     height: 100%;
 
-                    > .container {
+                    >.container {
                         width: 100%;
                         min-height: 100%;
                         margin: 1.25rem auto;
@@ -108,12 +128,12 @@
                             margin: 1rem 0;
                             padding: 1rem 0;
                             //border-bottom: 1px solid $blue;
-                
+
                             .dropdown {
                                 min-width: calculateRem(200);
                             }
                         }
-                        
+
                         @import "../dashboard/dashboard.scss";
                         @import "../device/device.scss";
                         @import "../users/users.scss";
@@ -157,7 +177,7 @@
                     &.sidemenu-opened {
                         width: 100%;
 
-                        > .sidebar-content {
+                        >.sidebar-content {
                             width: 100%;
                         }
 
@@ -165,11 +185,11 @@
                             width: 100%;
                         }
 
-                        > .hamburger-icon {
+                        >.hamburger-icon {
                             transform: translateX(calculateRem(-60));
                         }
 
-                        & + * {
+                        &+* {
                             width: 0;
                             height: 0;
                             opacity: 0;

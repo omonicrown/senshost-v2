@@ -15,11 +15,35 @@ export class SensorApis {
         }
     }
 
+    static createSensor(sensor: SensorModel): AxiosPromise<SensorModel> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.sensorApis.createSensor(sensor);
+        }
+    }
+
     static updateSensorsByDeviceId(deviceId: string): AxiosPromise<Array<SensorModel>> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
             return this.sensorApis.updateSensorsByDeviceId(deviceId);
+        }
+    }
+
+    static deleteSensorById(id: string): AxiosPromise<PositiveResponse> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.sensorApis.deleteSensorById(id);
+        }
+    }
+
+    static updateSensorsById(id: string, sensor: SensorModel): AxiosPromise<SensorModel> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.sensorApis.updateSensorById(id, sensor);
         }
     }
 }

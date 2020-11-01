@@ -12,4 +12,18 @@ export class SensorLiveApis extends AxiosGlobal {
     updateSensorsByDeviceId(deviceId: string): AxiosPromise<Array<SensorModel>> {
         return this.axios.put(`${configs.context}/${configs.apiList.Sensor}/device/${deviceId}`);
     }
+
+
+    deleteSensorById(id: string): AxiosPromise<PositiveResponse> {
+        return this.axios.delete(`${configs.context}/${configs.apiList.Sensor}/${id}`);
+    }
+
+
+    updateSensorById(id: string, sensor: SensorModel): AxiosPromise<SensorModel> {
+        return this.axios.put(`${configs.context}/${configs.apiList.Sensor}/${id}`, sensor);
+    }
+
+    createSensor(sensor: SensorModel): AxiosPromise<SensorModel> {
+        return this.axios.post(`${configs.context}/${configs.apiList.Sensor}`, sensor);
+    }
 } 

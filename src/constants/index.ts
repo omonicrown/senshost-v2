@@ -1,4 +1,5 @@
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
+import { Column } from "@sebgroup/react-components/dist/Table/Table";
 
 export const RECEIVE_AUTH_USER = "RECEIVE_AUTH_USER";
 export type RECEIVE_AUTH_USER = typeof RECEIVE_AUTH_USER;
@@ -13,21 +14,47 @@ export type SIGNOUT_USER = typeof SIGNOUT_USER;
 export const TOGGLE_NOTIFICATION = "TOGGLE_NOTIFICATION";
 export type TOGGLE_NOTIFICATION = typeof TOGGLE_NOTIFICATION;
 
-
-
 export const RECEIVE_GROUPS = "RECEIVE_GROUPS";
 export const LOG_GROUP_ERROR = "LOG_GROUP_ERROR";
 
 
-export const SENSORSTYPESCOLUMN = [{
+export const SENSORSTYPESCOLUMN: Array<Column> = [{
+    label: "id",
+    accessor: "id",
+    isHidden: true
+},
+{
+    label: "deviceId",
+    accessor: "deviceId",
+    isHidden: true
+}, {
     label: "Type",
     accessor: "dataType",
+    isHidden: true
+}, {
+    label: "Type",
+    accessor: "sensorDataType"
 }, {
     label: "Name",
     accessor: "name",
 }];
 
-export const ACTUATORCOLUMNS = [
+export const ACTUATORCOLUMNS: Array<Column> = [
+    {
+        label: "id",
+        accessor: "id",
+        isHidden: true
+    },
+    {
+        label: "deviceId",
+        accessor: "deviceId",
+        isHidden: true
+    },
+    {
+        label: "accountId",
+        accessor: "accountId",
+        isHidden: true
+    },
     {
         label: "Name",
         accessor: "name",
