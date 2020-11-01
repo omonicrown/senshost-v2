@@ -140,6 +140,5 @@ export const initialState: ModalProps = {
     centered: true,
     size: null,
     disableBackdropDismiss: true,
-    onDismiss: null,
-    trapFocus: false
+    onDismiss: null
 };
