@@ -22,6 +22,7 @@ import { UserApis } from "../../apis/userApis";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 import { toggleNotification } from "../../actions";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
+import { Dispatch } from "redux";
 
 export interface UsersProps extends SharedProps {
 }
@@ -35,7 +36,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
     const [user, setUser] = React.useState<UserModel>({} as UserModel);
     const [loading, setLoading] = React.useState<boolean>(false);
     // actions
-    const dispatch = useDispatch();
+    const dispatch: Dispatch = useDispatch();
 
     const groupState = useSelector((states: States) => states.groups)
 

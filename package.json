@@ -24,6 +24,7 @@
     "echarts-liquidfill": "^2.0.5",
     "moment": "^2.24.0",
     "node-sass": "^4.14.1",
+    "query-string": "^6.13.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-intl": "^4.3.1",
@@ -39,14 +40,16 @@
     "url-search-params-polyfill": "^8.0.0",
     "zrender": "^4.3.1"
   },
-  "config" : { "swaggerUrl" : "./swagger.json" },
+  "config": {
+    "swaggerUrl": "./swagger.json"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "api": "gradle swagger_api",
-    "generate:api" : "generate-api -i $npm_package_config_swaggerUrl -g typescript-axios --withCustomInterceptors"
+    "generate:api": "generate-api -i $npm_package_config_swaggerUrl -g typescript-axios --withCustomInterceptors"
   },
   "eslintConfig": {
     "extends": "react-app"

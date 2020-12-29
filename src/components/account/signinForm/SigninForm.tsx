@@ -112,6 +112,7 @@ class SigninForm extends React.Component<SigninProps, SigninStates> {
                         onChange={this.onChange}
                         rightIcon={userIcon}
                         error={this.state.errors.username}
+                        disabled={this.state.loading}
                     />
                 </div>
                 <div className="row">
@@ -124,6 +125,7 @@ class SigninForm extends React.Component<SigninProps, SigninStates> {
                         onChange={this.onChange}
                         rightIcon={keyIcon}
                         error={this.state.errors.password}
+                        disabled={this.state.loading}
                     />
                 </div>
                 <div className="row">
@@ -135,6 +137,7 @@ class SigninForm extends React.Component<SigninProps, SigninStates> {
                             theme="primary"
                             type="submit"
                             size="md"
+                            disabled={this.state.loading}
                         >
                             {this.state.loading && <Loader toggle={true} />}
                         </Button>

@@ -31,15 +31,14 @@ const Header: React.FunctionComponent<HeaderProps> = (props: HeaderProps): React
     }, []);
 
     React.useEffect(() => {
-        console.log("The replace is ", authState)
         if (!authState?.auth?.identityToken) {
-           history.replace(AppRoutes.Account);
+            history.replace(AppRoutes.Account);
         }
     }, [authState?.auth])
 
     return (
         <div className="header-container d-flex flex-row">
-            <div className="logo-holder">
+            <div className="d-flex logo-holder">
                 <Icon src={<SvgElement type={icontypesEnum.BARS} onClick={props.onToggle} />} />
                 <Image
                     src={require("../../assets/images/logo-inner.png")}
@@ -62,6 +61,14 @@ const Header: React.FunctionComponent<HeaderProps> = (props: HeaderProps): React
                     theme='link'
                 />
                 <div className='user-menu-list'>
+                    <Link
+                        to='#'
+                        className={'user-menu-list-item'}
+                        onClick={onSignOut}
+                    >
+                        Settings
+                    </Link>
+
                     <Link
                         to='#'
                         className={'user-menu-list-item'}

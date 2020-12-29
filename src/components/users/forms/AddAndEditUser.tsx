@@ -4,7 +4,7 @@ import { Button } from "@sebgroup/react-components/dist/Button";
 import { UserModel, GroupModel } from "../../../interfaces/models";
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
-import { States } from "../../../interfaces/states";
+import { AuthState, States } from "../../../interfaces/states";
 import { useSelector } from "react-redux";
 
 interface AddAndEditUserProps {
@@ -26,7 +26,7 @@ const AddAndEditUser: React.FunctionComponent<AddAndEditUserProps> = (props: Add
         setUser({ ...user, [e.target.name]: e.target.value });
     }, [setUser, user]);
 
-    const authState = useSelector((states: States) => states.auth);
+    const authState: AuthState = useSelector((states: States) => states.auth);
 
     const onCancel = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setUser({ name: "", email: "", password: "" } as UserModel);

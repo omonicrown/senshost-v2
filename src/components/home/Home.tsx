@@ -29,6 +29,8 @@ import "../../styles/components/shared/modal.scss";
 
 const Devices: React.LazyExoticComponent<React.FC<DevicesProps>> = React.lazy(() => import("../devices/Devices"));
 const Dashbaord: React.LazyExoticComponent<React.FC<DashboardProps>> = React.lazy(() => import("../dashboard/Dashboard"));
+const DashbaordItem: React.LazyExoticComponent<React.FC<DashboardProps>> = React.lazy(() => import("../dashboardItem/DashboardItem"));
+
 const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
 const Users: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../users/Users"));
 const ViewDevice: React.LazyExoticComponent<React.FC<ViewDeviceProps>> = React.lazy(() => import("../viewDevice/ViewDevice"));
@@ -94,7 +96,12 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                 />
                 <AppRoute
                   path={HomeRoutes.Dashboard.toString()}
+                  exact
                   component={Dashbaord}
+                />
+                <AppRoute
+                  path={HomeRoutes.DashboardItem.toString()}
+                  component={DashbaordItem}
                 />
                 <AppRoute
                   path={HomeRoutes.Devices.toString()}

@@ -1,19 +1,67 @@
-.dashboard-container {
+.dashboard-container,
+.dashboard-item-container {
     position: relative;
     height: 100%;
     width: 100%;
 
-    .row {
-        .gadgetPanel {
-            margin: calculateRem(10);
-            min-height: calculateRem(350);
-            border-radius: calculateRem(5);
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
-            @import "../shared/chart.scss";
+    .gadgetPanel {
+        margin: calculateRem(10);
+        min-height: calculateRem(350);
+        border-radius: calculateRem(5);
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+        @import "../shared/chart.scss";
+    }
+
+    >.pagination-holder {
+        margin: 1rem;
+    }
+
+    >.dashboards-holder {
+        flex-wrap: wrap;
+
+
+        .card {
+            &.dashboard-card {
+                max-width: calculateRem(400);
+                min-height: calculateRem(135);
+                width: calculateRem(300);
+                margin: 1rem;
+
+                &.empty-card {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                >.card-body {
+                    >.card-subtitle {
+                        margin: 0.5rem 0;
+                    }
+                }
+
+                >.card-header {
+                    &:first-child {
+                        border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+                    }
+
+                    padding: .75rem 1.25rem;
+                    margin-bottom: 0;
+                    background-color: rgba(0, 0, 0, .03);
+                    border-bottom: 1px solid rgba(0, 0, 0, .125);
+                }
+
+                a {
+                    text-align: right;
+                }
+
+                @import "../shared/chart.scss";
+            }
         }
     }
+
 }
 
 /* Mobile */

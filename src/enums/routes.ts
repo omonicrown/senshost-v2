@@ -9,6 +9,7 @@ export enum AppRoutes {
 export enum HomeRoutes {
     Devices = AppRoutes.Home + "/devices",
     Dashboard = AppRoutes.Home + "/dashboard",
+    DashboardItem = AppRoutes.Home + "/dashboard/:id",
     Groups = AppRoutes.Home + "/groups",
     Users = AppRoutes.Home + "/users"
 }

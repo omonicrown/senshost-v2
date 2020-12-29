@@ -19,6 +19,8 @@ export enum APILIST {
     Sensor = 'DataField',
     Actuator = 'actuator',
     User = 'User',
+    Dashboard = 'dashboard',
+    DashboardItem = 'dashboardItem'
 }
 
 //CONFIG DATA (Please change here only)

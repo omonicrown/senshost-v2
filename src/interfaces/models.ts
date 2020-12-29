@@ -51,6 +51,25 @@ export interface GroupModel {
     creationDate?: string;
 }
 
+export interface DashboardModel {
+    name: string;
+    description: string;
+    groupId: string;
+    accountId: string;
+    id: string;
+    creationDate: string;
+}
+
+export interface DashboardItemModel {
+    name: string;
+    type: number;
+    property: string;
+    possition: string;
+    dashboardId: string;
+    id: string,
+    creationDate: string;
+}
+
 export interface UserModel {
     accountId: string;
     groupId: string;
