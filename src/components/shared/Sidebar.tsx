@@ -3,7 +3,6 @@ import { Icon } from "@sebgroup/react-components/dist/Icon";
 import { SvgElement, icontypesEnum } from "../../utils/svgElement";
 import { useHistory } from "react-router";
 import { History } from 'history';
-import { HomeRoutes } from "../../enums/routes";
 import { Link } from "react-router-dom";
 
 interface SidebarProps {
@@ -13,17 +12,15 @@ interface SidebarProps {
 interface MenuItem {
     name: string;
     iconType: icontypesEnum;
-    title: string
+    title: string;
 }
+
 const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): React.ReactElement<void> => {
     const history: History = useHistory();
 
-    const activeTab: string = React.useMemo(() => {
+    const isActiveTab = React.useCallback((tabName: string) => {
         const historyArr = history.location?.pathname?.split("/");
-
-        const selectedRoute: string = historyArr[historyArr.length - 1];
-
-        return selectedRoute;
+        return historyArr?.some((tab: string) => tab === tabName);
     }, [history?.location.pathname]);
 
 
@@ -58,7 +55,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
                         <ul className="nav d-flex flex-column">
                             {menuItems?.map((menu: MenuItem) =>
                                 <li className={"nav-item"} key={menu.name}>
-                                    <Link className={"title-holder d-flex " + (activeTab === menu.name ? " active" : "")} to={`/home/${menu.name}`}>
+                                    <Link className={"title-holder d-flex " + (isActiveTab(menu.name) ? " active" : "")} to={`/home/${menu.name}`}>
                                         <Icon src={<SvgElement type={menu.iconType} />} />
                                         <span className="title">{menu.title}</span>
                                     </Link>

@@ -142,7 +142,7 @@ const AddAndEditDevice: React.FunctionComponent<AddAndEditDeviceProps> = (props:
                                 <Icon src={<SvgElement type={icontypesEnum.PREVIOUS} />} />
                             </Button>}
                             {stepTracker < 3 &&
-                                <Button label="" size="sm" theme="outline-primary" title="Next" onClick={() => setStepTracker(stepTracker + 1)}>
+                                <Button label="" size="sm" theme="primary" title="Next" onClick={() => setStepTracker(stepTracker + 1)}>
                                     <Icon src={<SvgElement type={icontypesEnum.NEXT} />} />
                                 </Button>
                             }

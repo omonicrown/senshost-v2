@@ -92,6 +92,51 @@ export const ACTUATORS = [{
     value: 2
 }];
 
+export const PROPERTIESCOLUMNS: Array<Column> = [
+    {
+        label: "id",
+        accessor: "id",
+        isHidden: true
+    },
+    {
+        label: "Property name",
+        accessor: "propertyName",
+        isHidden: true
+    },
+    {
+        label: "Label",
+        accessor: "propertyLabel"
+    },
+    {
+        label: "Custom label",
+        accessor: "otherPropertyLabel"
+    },
+    {
+        label: "Value",
+        accessor: "propertyValue"
+    }
+]
+
+export const DASHBOARDPROPERTIES = [
+    {
+        label: "Minimum value",
+        value: 'minimumValue',
+    },
+    {
+        label: "Maximum value",
+        value: 'maximumValue',
+    },
+    {
+
+        label: "Capacity",
+        value: "capacity",
+    },
+    {
+        label: "Refresh rate",
+        value: "refreshRate",
+    }
+];
+
 export const SENSORSTYPES = [{
     label: "decimal",
     value: 0

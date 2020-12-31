@@ -19,9 +19,14 @@
         margin: 1rem;
     }
 
+    >.custom-breadcrumb {
+        &.dashboard-breadcrumb {
+            margin: 0 1rem;
+        }
+    }
+
     >.dashboards-holder {
         flex-wrap: wrap;
-
 
         .card {
             &.dashboard-card {
@@ -66,7 +71,9 @@
 
 /* Mobile */
 @media only screen and (max-width: 767px) {
-    .dashboard-container {
+
+    .dashboard-container,
+    .dashboard-item-container {
         .row {
             .gadgetPanel {
                 margin-left: 0;

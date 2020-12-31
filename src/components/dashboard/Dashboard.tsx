@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { GroupState, States, AuthState } from "../../interfaces/states";
 import { AxiosResponse } from "axios";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
+
 import { Dispatch } from "redux";
 
 import { toggleNotification } from "../../actions";
@@ -75,7 +76,6 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
 
     const onEditDashboard = React.useCallback((e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, dashboard: DashboardDisplayModel) => {
         setDashboard(dashboard);
-        console.log("earlier ", dashboard);
         setModalProps({ ...modalProps, toggle: true });
     }, [modalProps]);
 
@@ -173,6 +173,7 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
 
     return (
         <div className="dashboard-container">
+
             <div className="d-flex flex-sm-row flex-column dashboards-holder">
                 {fetching ? arrayTemp.map((key: number) =>
                     <div className="card dashboard-card" key={`loader${key}`}>
@@ -192,7 +193,7 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
                                     <Link to={`${HomeRoutes.DashboardItem?.toString()?.replace(":id", dashboard.id)}`} className="card-link">Manage</Link>
                                 </div>
                                 <div className="card-footer text-muted">
-                                    Posted On: <FormattedDate value={dashboard.creationDate} year="numeric"
+                                    Created: <FormattedDate value={dashboard.creationDate} year="numeric"
                                         month="long"
                                         day="2-digit" />
                                 </div>

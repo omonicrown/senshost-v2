@@ -62,12 +62,12 @@ export interface DashboardModel {
 
 export interface DashboardItemModel {
     name: string;
-    type: number;
-    property: string;
-    possition: string;
+    type?: number;
+    property?: string;
+    possition?: string;
     dashboardId: string;
-    id: string,
-    creationDate: string;
+    id?: string,
+    creationDate?: string;
 }
 
 export interface UserModel {
