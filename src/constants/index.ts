@@ -104,16 +104,36 @@ export const PROPERTIESCOLUMNS: Array<Column> = [
         isHidden: true
     },
     {
-        label: "Label",
-        accessor: "propertyLabel"
+        label: "Property",
+        accessor: "propertyLabel",
     },
     {
         label: "Custom label",
-        accessor: "otherPropertyLabel"
+        accessor: "otherPropertyLabel",
+        isHidden: true
     },
     {
         label: "Value",
         accessor: "propertyValue"
+    }
+];
+
+export const DASHBOARDITEMTYPES = [
+    {
+        label: "tank",
+        value: 0,
+    },
+    {
+        label: "gauge",
+        value: 1,
+    },
+    {
+        label: "graph",
+        value: 2,
+    },
+    {
+        label: "other",
+        value: 3,
     }
 ]
 
@@ -132,8 +152,20 @@ export const DASHBOARDPROPERTIES = [
         value: "capacity",
     },
     {
+        label: "X-axis label",
+        value: "x-axis",
+    },
+    {
+        label: "Current Value",
+        value: "value",
+    },
+    {
         label: "Refresh rate",
         value: "refreshRate",
+    },
+    {
+        label: "Other",
+        value: "other",
     }
 ];
 
@@ -202,7 +234,6 @@ export const DEVICETYPES = [{
     label: "I R Sensor",
     value: 15
 }];
-
 
 
 export const initialState: ModalProps = {

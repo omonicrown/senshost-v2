@@ -5,7 +5,7 @@ import { Table } from "@sebgroup/react-components/dist/Table";
 import { Column, DataItem, PrimaryActionButton, TableRow } from "@sebgroup/react-components/dist/Table/Table";
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import React from "react";
-import { DASHBOARDPROPERTIES, PROPERTIESCOLUMNS } from "../../../constants";
+import { DASHBOARDPROPERTIES, PROPERTIESCOLUMNS, DASHBOARDITEMTYPES } from "../../../constants";
 import { DashboardItemModel } from "../../../interfaces/models";
 import { AuthState } from "../../../interfaces/states";
 
@@ -29,12 +29,15 @@ interface AddDashboardItemDisplayModel extends DashboardItemModel {
 }
 
 const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardItemProps) => {
-    const [dashboardItem, setDashboardItem] = React.useState<AddDashboardItemDisplayModel>({ name: '', type: null, dashboardId: null, possition: '', displayProperties: [] });
+    const [dashboardItem, setDashboardItem] = React.useState<AddDashboardItemDisplayModel>({ name: '', type: null, dashboardId: null, possition: '', displayProperties: [], property: null });
     const [dashboardItemErrors, setDashboardItemErrors] = React.useState<DashboardItemModel>(null);
     const [dashboardItemPropertyErrors, setDashboardItemPropertyErrors] = React.useState<PropertyItem>(null);
 
     const propertyOptions: Array<DropdownItem<string>> = React.useMemo(() => [{ label: 'Please select', value: null }, ...DASHBOARDPROPERTIES], []);
+    const dashboardItemTypes: Array<DropdownItem> = React.useMemo(() => [{ label: 'Please select', value: null }, ...DASHBOARDITEMTYPES], [])
     const [selectedProperty, setSelectedProperty] = React.useState<DropdownItem<string>>(propertyOptions[0]);
+    const [selectedItemType, setSelectedItemType] = React.useState<DropdownItem<string>>(propertyOptions[0]);
+
     const [selectedPropertyValue, setSelectedPropertyValue] = React.useState<string>("");
     const [selectedOtherProperty, setSelectedOtherProperty] = React.useState<string>("");
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -65,6 +68,11 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
         setSelectedProperty(value);
     }, []);
 
+    const handleItemDropdownChange = React.useCallback((value: DropdownItem) => {
+        setSelectedItemType(value);
+        setDashboardItem({ ...dashboardItem, type: Number(value?.value) });
+    }, [setDashboardItem, dashboardItem, setSelectedItemType]);
+
     const handlePropertyValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setSelectedPropertyValue(e.target.value);
     }, [setSelectedPropertyValue]);
@@ -93,7 +101,7 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
                 ...dashboardItem,
                 displayProperties: [
                     ...dashboardItem?.displayProperties, {
-                        propertyLabel: selectedProperty?.label,
+                        propertyLabel: selectedProperty.value === "other" ? selectedOtherProperty : selectedProperty?.label,
                         propertyValue: selectedPropertyValue,
                         propertyName: selectedProperty.value === "other" ? selectedOtherProperty : selectedProperty.value,
                     }
@@ -106,19 +114,17 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
     const onSave = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
         let errors: DashboardItemModel = null;
 
-        if (!dashboardItem?.possition) {
-            errors = { ...errors, possition: "possition is required" };
-
-        }
         if (!dashboardItem.name) {
             errors = { ...errors, name: "name is required" };
         }
-        if (!dashboardItem.dashboardId) {
-            errors = { ...errors, dashboardId: "Please select a dashboard" };
+
+        if (dashboardItem.type === null) {
+            errors = { ...errors, type: "select item type" as any };
         }
 
         if (!errors) {
-            props?.onSave(e, { ...dashboardItem, property: JSON.stringify(dashboardItem?.property) });
+            const updatedItem: AddDashboardItemDisplayModel = { ...dashboardItem, property: JSON.stringify(dashboardItem?.displayProperties) };
+            props?.onSave(e, updatedItem);
         }
 
         setDashboardItemErrors(errors);
@@ -158,62 +164,64 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
                     />
                 </div>
                 <div className="col-12 col-sm-6">
-                    <TextBoxGroup
-                        name="name"
-                        label="Name"
-                        type="text"
+                    <Dropdown
+                        label="Item Type"
+                        list={dashboardItemTypes}
                         disabled={props?.loading}
-                        placeholder="Dashboard name"
-                        value={dashboardItem?.name}
-                        error={dashboardItemErrors?.name}
-                        onChange={handleChange}
+                        selectedValue={selectedItemType}
+                        error={dashboardItemErrors?.type as any}
+                        onChange={handleItemDropdownChange}
                     />
                 </div>
             </div>
-            <div className="row">
-                <div className="col">
-                    <Dropdown
-                        label="Property Type"
-                        list={propertyOptions}
-                        disabled={props?.loading}
-                        selectedValue={selectedProperty}
-                        onChange={handlePropertyDropdownChange}
-                    />
-                </div>
-                {selectedProperty?.value === "other" &&
+            <fieldset className="properties-holder border p-2">
+                <legend className="w-auto"><h6 className="custom-label"> Item Properties </h6></legend>
+                <div className="row">
                     <div className="col">
-                        <TextBoxGroup
-                            name="otherProperty"
-                            label="Custom Property"
-                            type="text"
+                        <Dropdown
+                            label="Type"
+                            list={propertyOptions}
                             disabled={props?.loading}
-                            placeholder="Custom property label"
-                            value={selectedOtherProperty}
-                            error={dashboardItemPropertyErrors?.otherProperty}
-                            onChange={handleOtherPropertyLabelChange}
+                            selectedValue={selectedProperty}
+                            error={dashboardItemPropertyErrors?.propertyName}
+                            onChange={handlePropertyDropdownChange}
                         />
                     </div>
-                }
-                <div className="col">
-                    <TextBoxGroup
-                        name="propertyValue"
-                        label="Property value"
-                        type="text"
-                        disabled={props?.loading}
-                        placeholder="Property value"
-                        value={selectedPropertyValue}
-                        error={dashboardItemPropertyErrors?.propertyValue}
-                        onChange={handlePropertyValueChange}
-                    />
+                    {selectedProperty?.value === "other" &&
+                        <div className="col">
+                            <TextBoxGroup
+                                name="otherProperty"
+                                label="Custom Property"
+                                type="text"
+                                disabled={props?.loading}
+                                placeholder="Custom property label"
+                                value={selectedOtherProperty}
+                                error={dashboardItemPropertyErrors?.otherProperty}
+                                onChange={handleOtherPropertyLabelChange}
+                            />
+                        </div>
+                    }
+                    <div className="col">
+                        <TextBoxGroup
+                            name="propertyValue"
+                            label="value"
+                            type="text"
+                            disabled={props?.loading}
+                            placeholder="Property value"
+                            value={selectedPropertyValue}
+                            error={dashboardItemPropertyErrors?.propertyValue}
+                            onChange={handlePropertyValueChange}
+                        />
+                    </div>
                 </div>
-            </div>
-            <div className="row">
-                <div className="col text-right">
-                    <Button label="Add" type="button" size="sm" theme="primary" onClick={handleAddProperty}>
-                        <Loader toggle={loading} />
-                    </Button>
+                <div className="row">
+                    <div className="col text-right">
+                        <Button label="Add" type="button" size="sm" theme="primary" onClick={handleAddProperty}>
+                            <Loader toggle={loading} />
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            </fieldset>
             <div className="row">
                 <div className="col">
                     <div className="card my-4">

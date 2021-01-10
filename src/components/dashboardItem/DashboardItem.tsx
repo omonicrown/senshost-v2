@@ -26,6 +26,7 @@ interface BreadcrumbProps {
     list: Array<string>;
     activeIndex: number;
 }
+
 const DashboardItem: React.FC = () => {
     const [dashboardItems, setDashboardItems] = React.useState<Array<DashboardItemModel>>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -38,9 +39,11 @@ const DashboardItem: React.FC = () => {
     const match: match = useRouteMatch();
     const history: History = useHistory();
 
+    const dashboardId: string = React.useMemo(() => match?.params["id"], [match?.params]);
+
     const breadcrumbList: Array<string> = React.useMemo(() => {
-        return ['Dashboard list', dashboard?.name || match?.params['id']];
-    }, [match?.params, dashboard]);
+        return ['Dashboard list', dashboard?.name || dashboardId];
+    }, [dashboardId, dashboard]);
 
     const onEditDashboardItem = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>, dashboardItem: DashboardItemModel) => {
         setDashboardItem(dashboardItem);
@@ -74,7 +77,7 @@ const DashboardItem: React.FC = () => {
 
     const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => {
         setLoading(true);
-        DashboardApis.addDashboardItem(dashboardItem)
+        DashboardApis.addDashboardItem({ ...dashboardItem, dashboardId: dashboardId })
             .then((response: AxiosResponse) => {
                 setDashboardItems([...dashboardItems, response.data]);
 
@@ -92,11 +95,11 @@ const DashboardItem: React.FC = () => {
             }).finally(() => {
                 setLoading(false);
             });
-    }, [dashboardItems]);
+    }, [dashboardItems, dashboardId]);
 
     React.useEffect(() => {
         setFetching(true);
-        DashboardApis.getDashboardItemsByDashboardId(match?.params["id"])
+        DashboardApis.getDashboardItemsByDashboardId(dashboardId)
             .then((response: AxiosResponse<Array<DashboardItemModel>>) => {
                 if (response.data) {
                     setDashboardItems(response.data);
@@ -106,7 +109,7 @@ const DashboardItem: React.FC = () => {
                 setFetching(false);
             });
 
-        DashboardApis.getDashboardById(match?.params["id"])
+        DashboardApis.getDashboardById(dashboardId)
             .then((response: AxiosResponse<DashboardModel>) => {
                 if (response.data) {
                     setDashboard(response.data);
@@ -116,7 +119,7 @@ const DashboardItem: React.FC = () => {
                 setFetching(false);
             });
 
-    }, [match?.params]);
+    }, [dashboardId]);
 
     return (
         <div className="dashboard-item-container">
@@ -128,19 +131,23 @@ const DashboardItem: React.FC = () => {
                     </div>
                 ) :
                     dashboardItems.length ?
-                        dashboardItems?.map((dashboardItem: DashboardItemModel) =>
-                            <div className="card dashboard-card" key={dashboard.id}>
+                        dashboardItems?.map((dashboardItem: DashboardItemModel, i: number) =>
+                            <div className="card dashboard-card" key={dashboard?.id}>
                                 <h4 className="card-header">
                                     {dashboardItem.name}
                                 </h4>
                                 <div className="card-body">
+                                    <div className="chart">
+                                        <Gauge type={ i % 2 === 0 ? "circle": 'rectangle'} data={[0.9]} />
+                                    </div>
+
                                     <h5 className="card-subtitle text-muted">{dashboardItem.type}</h5>
-                                    <p className="card-text">{dashboard.description}.</p>
+                                    <p className="card-text">{dashboardItem?.type}.</p>
                                     <Button label="Edit" theme="secondary" className="card-link" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onEditDashboardItem(e, dashboardItem)} />
                                     <Button label="Delete" theme="secondary" className="card-link" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onDeleteDashboardItem(e, dashboardItem)} />
                                 </div>
                                 <div className="card-footer text-muted">
-                                    Created: <FormattedDate value={dashboard.creationDate} year="numeric"
+                                    Created: <FormattedDate value={dashboardItem?.creationDate} year="numeric"
                                         month="long"
                                         day="2-digit" />
                                 </div>

@@ -23,7 +23,7 @@ export class DashboardLiveApis extends AxiosGlobal {
     }
 
     getDashboardItemsByDashboardId(dashboardId: string): AxiosPromise<Array<DashboardItemModel>> {
-        return this.axios.post(`${configs.context}/${configs.apiList.DashboardItem}/dashboard/${dashboardId}`);
+        return this.axios.get(`${configs.context}/${configs.apiList.DashboardItem}/dashboard/${dashboardId}`);
     }
 
     addDashboardItem(dashboardItem: DashboardItemModel): AxiosPromise<DashboardItemModel> {
