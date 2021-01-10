@@ -1,5 +1,6 @@
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import { Column } from "@sebgroup/react-components/dist/Table/Table";
+import {DashboardPropertiesOptions} from "../components/dashboardItem/modals/AddDashboardItem";
 
 export const RECEIVE_AUTH_USER = "RECEIVE_AUTH_USER";
 export type RECEIVE_AUTH_USER = typeof RECEIVE_AUTH_USER;
@@ -120,52 +121,102 @@ export const PROPERTIESCOLUMNS: Array<Column> = [
 
 export const DASHBOARDITEMTYPES = [
     {
-        label: "tank",
+        label: "Tank",
         value: 0,
     },
     {
-        label: "gauge",
+        label: "Gauge",
         value: 1,
     },
     {
-        label: "graph",
+        label: "Bar graph",
         value: 2,
     },
     {
-        label: "other",
+        label: "Line graph",
         value: 3,
+    },
+    {
+        label: "other",
+        value: 4,
     }
 ]
 
-export const DASHBOARDPROPERTIES = [
+export const DASHBOARDPROPERTIES: Array<DashboardPropertiesOptions> = [
     {
-        label: "Minimum value",
-        value: 'minimumValue',
-    },
-    {
-        label: "Maximum value",
-        value: 'maximumValue',
-    },
-    {
+        type: 0,
+        properties: [
 
-        label: "Capacity",
-        value: "capacity",
+            {
+
+                label: "Capacity",
+                value: "capacity",
+            },
+            {
+                label: "Current Value",
+                value: "value",
+            },
+            {
+                label: "Refresh rate",
+                value: "refreshRate",
+            }
+        ]
     },
     {
-        label: "X-axis label",
-        value: "x-axis",
+        type: 1,
+        properties: [
+            {
+                label: "Minimum value",
+                value: 'minimumValue',
+            },
+            {
+                label: "Maximum value",
+                value: 'maximumValue',
+            }
+        ]
     },
     {
-        label: "Current Value",
-        value: "value",
+        type: 2,
+        properties: [
+            {
+                label: "X-axis label",
+                value: "x-axis",
+            },
+            {
+                label: "Y-axis label",
+                value: "y-axis",
+            },
+            {
+                label: "data",
+                value: "data",
+            },
+        ]
     },
     {
-        label: "Refresh rate",
-        value: "refreshRate",
+        type: 3,
+        properties: [
+            {
+                label: "X-axis label",
+                value: "x-axis",
+            },
+            {
+                label: "Y-axis label",
+                value: "y-axis",
+            },
+            {
+                label: "data",
+                value: "data",
+            },
+        ]
     },
     {
-        label: "Other",
-        value: "other",
+        type: 4,
+        properties: [
+            {
+                label: "Other",
+                value: "other",
+            }
+        ]
     }
 ];
 

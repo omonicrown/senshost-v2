@@ -24,6 +24,11 @@ interface PropertyItem {
     otherProperty?: string;
 }
 
+export interface DashboardPropertiesOptions {
+    type: number;
+    properties: Array<DropdownItem<string>>;
+}
+
 interface AddDashboardItemDisplayModel extends DashboardItemModel {
     displayProperties: Array<Partial<DataItem<PropertyItem>>>;
 }
@@ -33,10 +38,20 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
     const [dashboardItemErrors, setDashboardItemErrors] = React.useState<DashboardItemModel>(null);
     const [dashboardItemPropertyErrors, setDashboardItemPropertyErrors] = React.useState<PropertyItem>(null);
 
-    const propertyOptions: Array<DropdownItem<string>> = React.useMemo(() => [{ label: 'Please select', value: null }, ...DASHBOARDPROPERTIES], []);
     const dashboardItemTypes: Array<DropdownItem> = React.useMemo(() => [{ label: 'Please select', value: null }, ...DASHBOARDITEMTYPES], [])
+
+
+    const [selectedItemType, setSelectedItemType] = React.useState<DropdownItem<number>>(dashboardItemTypes[0]);
+
+    const propertyOptions: Array<DropdownItem<string>> = React.useMemo(() => {
+        const selectedPropertyOptions: DashboardPropertiesOptions = DASHBOARDPROPERTIES.find((item: DashboardPropertiesOptions) => item?.type === selectedItemType?.value);
+
+        if (selectedPropertyOptions) return [{ label: 'Please select', value: null }, ...selectedPropertyOptions.properties];
+
+        return [{ label: 'Please select', value: null }, ...DASHBOARDPROPERTIES[0].properties];
+    }, [selectedItemType]);
+
     const [selectedProperty, setSelectedProperty] = React.useState<DropdownItem<string>>(propertyOptions[0]);
-    const [selectedItemType, setSelectedItemType] = React.useState<DropdownItem<string>>(propertyOptions[0]);
 
     const [selectedPropertyValue, setSelectedPropertyValue] = React.useState<string>("");
     const [selectedOtherProperty, setSelectedOtherProperty] = React.useState<string>("");
@@ -143,10 +158,6 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
             setDashboardItem({ ...dashboardItem, name: '', type: null, dashboardId: null, possition: '', displayProperties: [] });
         }
     }, [props?.dashboardItem]);
-
-    React.useEffect(() => {
-        console.log("Field ", dashboardItem)
-    }, [dashboardItem])
 
     return (
         <form className="add-dashboard-item" onSubmit={onSave}>

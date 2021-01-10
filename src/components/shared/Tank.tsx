@@ -11,25 +11,30 @@ interface GaugeProps {
   data: Array<number>;
 }
 
-interface ChartOption {
+interface ChartOption extends EChartOption {
   name: string;
-  color?: string;
+  color?: Array<string>;
   properties: Option
 }
 type Option = {
   [k: string]: any;
 }
 
-const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
+const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
 
   const [selectedOption, setSelectedOption] = React.useState<Option>({});
   const [options, setOptions] = React.useState<Array<ChartOption>>([{
     name: "rectangle",
     properties: {
+      tooltip: {
+        formatter: '{a} <br/>{b} : {c}%'
+      },
       series: [{
         type: 'liquidFill',
-        data: [0.6],
-        radius: '70%',
+        name: "Tank",
+        data: [0.9],
+        detail: {formatter: '{value * 100}%'},
+        radius: '100%',
         backgroundStyle: {
           borderWidth: 2,
           borderColor: '#156ACF'
@@ -47,7 +52,7 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
       series: [{
         type: 'liquidFill',
         data: [0.6],
-        radius: '70%',
+        radius: '100%',
         outline: {
           show: false
         },
@@ -59,7 +64,7 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
       series: [{
         type: 'liquidFill',
         data: [0.6],
-        radius: '90%',
+        radius: '100%',
         itemStyle: {
           shadowBlur: 0
         },
@@ -105,4 +110,4 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
   );
 }
 
-export default Gauge;
+export default Tank;

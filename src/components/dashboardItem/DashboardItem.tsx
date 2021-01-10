@@ -9,7 +9,10 @@ import { States } from '../../interfaces/states';
 import { Dispatch } from "redux";
 import { History } from "history";
 
-import Gauge from "../gauge";
+import Gauge from "../shared/Gauge";
+import Tank from "../shared/Tank";
+import LineChart from "../shared/LineChart";
+
 import { toggleNotification } from '../../actions';
 import { NotificationProps } from '@sebgroup/react-components/dist/notification/Notification';
 import { match, useHistory, useRouteMatch } from 'react-router';
@@ -132,13 +135,22 @@ const DashboardItem: React.FC = () => {
                 ) :
                     dashboardItems.length ?
                         dashboardItems?.map((dashboardItem: DashboardItemModel, i: number) =>
-                            <div className="card dashboard-card" key={dashboard?.id}>
+                            <div className="card dashboard-card" key={dashboardItem?.id}>
                                 <h4 className="card-header">
                                     {dashboardItem.name}
                                 </h4>
                                 <div className="card-body">
-                                    <div className="chart">
-                                        <Gauge type={ i % 2 === 0 ? "circle": 'rectangle'} data={[0.9]} />
+                                    <div className="chart-holder">
+                                        {dashboardItem?.type === 0 &&
+                                            <Tank type={i % 2 === 0 ? "tears" : 'rectangle'} data={[0.9]} />
+                                        }
+                                         {dashboardItem?.type === 1 &&
+                                            <Gauge data={[0.9]} />
+                                        }
+                                        {
+                                            dashboardItem?.type === 3 &&
+                                            <LineChart data={[0.9]} />
+                                        }
                                     </div>
 
                                     <h5 className="card-subtitle text-muted">{dashboardItem.type}</h5>
@@ -170,7 +182,7 @@ const DashboardItem: React.FC = () => {
                 <Modal
                     {...modalProps}
                     onDismiss={() => setModalProps({ ...modalProps, toggle: false })}
-                    header={<h4>{dashboard ? `Edit ${dashboardItem?.name}` : 'Add Dashboard'}</h4>}
+                    header={<h4>{dashboardItem?.id ? `Edit ${dashboardItem?.name}` : 'Add Dashboard Item'}</h4>}
                     body={
                         modalProps?.toggle ?
                             <AddDashboardItem
