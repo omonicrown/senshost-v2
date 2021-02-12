@@ -4,7 +4,6 @@
     height: 100%;
     width: 100%;
 
-
     .gadgetPanel {
         margin: calculateRem(10);
         min-height: calculateRem(350);
@@ -15,17 +14,17 @@
         @import "../shared/chart.scss";
     }
 
-    >.pagination-holder {
+    > .pagination-holder {
         margin: 1rem;
     }
 
-    >.custom-breadcrumb {
+    > .custom-breadcrumb {
         &.dashboard-breadcrumb {
             margin: 0 1rem;
         }
     }
 
-    >.dashboards-holder {
+    > .dashboards-holder {
         flex-wrap: wrap;
 
         .card {
@@ -41,27 +40,46 @@
                     justify-content: center;
                 }
 
-                >.card-body {
-                    >.card-subtitle {
+                > .card-body {
+                    > .card-subtitle {
                         margin: 0.5rem 0;
                     }
 
-                    .chart-holder{
-                        height: 300px;
+                    .chart-holder {
+                        height: calculateRem(300);
                         padding: 1.25rem 0;
                         border-bottom: 1px solid rgba(0, 0, 0, 0.125);
                     }
+                    .chart-info {
+                        max-height: calculateRem(250);
+                        overflow-y: auto;
+                        margin: calculateRem(12) 0;
+                        .table {
+                            &.table-borderless {
+                                overflow-y: auto;
+                                > thead {
+                                    > tr {
+                                        > th {
+                                            background-color: $white;
+                                            top: 0;
+                                            position: sticky;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
-                >.card-header {
+                > .card-header {
                     &:first-child {
-                        border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+                        border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
                     }
 
-                    padding: .75rem 1.25rem;
+                    padding: 0.75rem 1.25rem;
                     margin-bottom: 0;
-                    background-color: rgba(0, 0, 0, .03);
-                    border-bottom: 1px solid rgba(0, 0, 0, .125);
+                    background-color: rgba(0, 0, 0, 0.03);
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
                 }
 
                 a {
@@ -72,12 +90,10 @@
             }
         }
     }
-
 }
 
 /* Mobile */
 @media only screen and (max-width: 767px) {
-
     .dashboard-container,
     .dashboard-item-container {
         .row {
@@ -87,5 +103,4 @@
             }
         }
     }
-
 }

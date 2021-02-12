@@ -5,7 +5,6 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
 
-import { IntlProvider } from "react-intl";
 import {  HashRouter as Browser } from "react-router-dom";
 import "url-search-params-polyfill";
 
@@ -16,20 +15,9 @@ import "./styles/main.scss";
 import { store, persistor } from "./store/configureStore";
 
 
-if (!Intl.PluralRules) {
-  require("@formatjs/intl-pluralrules/polyfill");
-  require("@formatjs/intl-pluralrules/dist/locale-data/en"); // Add locale data for de
-}
-
-if (!(Intl as any).RelativeTimeFormat) {
-  require("@formatjs/intl-relativetimeformat/dist/polyfill");
-  require("@formatjs/intl-relativetimeformat/dist/locale-data/en"); // Add locale data for de
-}
-
 
 ReactDOM.render(
   <Provider store={store}>
-    <IntlProvider locale="en">
       <PersistGate loading={<Loader toggle={true} />} persistor={persistor}>
         <Browser>
           <React.StrictMode>
@@ -37,7 +25,6 @@ ReactDOM.render(
           </React.StrictMode>
         </Browser>
       </PersistGate>
-    </IntlProvider>
   </Provider>,
   document.getElementById("root")
 );

@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DashboardApis } from '../../apis/dashboardApis';
-import { initialState } from '../../constants';
+import { ChartType, initialState } from '../../constants';
 import { DashboardItemModel, DashboardModel } from '../../interfaces/models';
 import { States } from '../../interfaces/states';
 import { Dispatch } from "redux";
@@ -12,18 +12,27 @@ import { History } from "history";
 import Gauge from "../shared/Gauge";
 import Tank from "../shared/Tank";
 import LineChart from "../shared/LineChart";
+import BarGraph from "../shared/BarGraph";
+import PieChart from "../shared/PieChart";
+import Doughnut from "../shared/Doughnut";
 
 import { toggleNotification } from '../../actions';
 import { NotificationProps } from '@sebgroup/react-components/dist/notification/Notification';
 import { match, useHistory, useRouteMatch } from 'react-router';
 import { Breadcrumb } from '@sebgroup/react-components/dist/Breadcrumb/Breadcrumb';
 import { Button } from '@sebgroup/react-components/dist/Button';
-import { FormattedDate } from 'react-intl';
-import { Link } from 'react-router-dom';
 import { HomeRoutes } from '../../enums/routes';
 import PortalComponent from '../shared/Portal';
 
 import AddDashboardItem from "./modals/AddDashboardItem";
+import { convertStringToJson } from '../../utils/functions';
+
+interface PropertyItem {
+    propertyName: string;
+    propertyValue: string;
+    propertyLabel: string;
+    otherProperty?: string;
+}
 
 interface BreadcrumbProps {
     list: Array<string>;
@@ -105,6 +114,7 @@ const DashboardItem: React.FC = () => {
         DashboardApis.getDashboardItemsByDashboardId(dashboardId)
             .then((response: AxiosResponse<Array<DashboardItemModel>>) => {
                 if (response.data) {
+                    console.log("What hbig eyes you have ", response.data)
                     setDashboardItems(response.data);
                 }
             })
@@ -124,6 +134,51 @@ const DashboardItem: React.FC = () => {
 
     }, [dashboardId]);
 
+    const renderCharts = (dashboardItem: DashboardItemModel, index: number) => {
+        switch (dashboardItem.type) {
+            case ChartType.Tank:
+                return <Tank type={index % 2 === 0 ? "tears" : 'rectangle'} data={[0.9]} />;
+            case ChartType.Gauge:
+                return <Gauge data={[0.9]} />;
+            case ChartType.LineGraph:
+                return <LineChart data={[0.9]} />;
+            case ChartType.BarGraph:
+                return <BarGraph data={[0.2]} />;
+            case ChartType.PieChart:
+                return <PieChart data={[0.2]} />;
+            case ChartType.Doughnut:
+                return <Doughnut data={[0.2]} />;
+            default:
+                return <PieChart data={[0.9]} />;
+        }
+    };
+
+    const renderChartTable = (dashboardItem: DashboardItemModel, index: number) => {
+        const chartProperties: Array<PropertyItem> = convertStringToJson<Array<PropertyItem>>(dashboardItem?.property);
+        return (
+            <div className="chart-info">
+                <table className="table table-borderless">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {chartProperties.map((property: PropertyItem, i: number) => {
+                            return (
+                                <tr key={`${property.propertyValue}-${i}`}>
+                                    <td>{property.propertyLabel}</td>
+                                    <td>{property.propertyValue}</td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
+
     return (
         <div className="dashboard-item-container">
             <Breadcrumb className="dashboard-breadcrumb" id="2" list={breadcrumbList} onClick={onBreadcrumbClick} />
@@ -134,34 +189,21 @@ const DashboardItem: React.FC = () => {
                     </div>
                 ) :
                     dashboardItems.length ?
-                        dashboardItems?.map((dashboardItem: DashboardItemModel, i: number) =>
+                        dashboardItems?.map((dashboardItem: DashboardItemModel, index: number) =>
                             <div className="card dashboard-card" key={dashboardItem?.id}>
                                 <h4 className="card-header">
                                     {dashboardItem.name}
                                 </h4>
                                 <div className="card-body">
                                     <div className="chart-holder">
-                                        {dashboardItem?.type === 0 &&
-                                            <Tank type={i % 2 === 0 ? "tears" : 'rectangle'} data={[0.9]} />
-                                        }
-                                         {dashboardItem?.type === 1 &&
-                                            <Gauge data={[0.9]} />
-                                        }
-                                        {
-                                            dashboardItem?.type === 3 &&
-                                            <LineChart data={[0.9]} />
-                                        }
+                                        {renderCharts(dashboardItem, index)}
                                     </div>
-
-                                    <h5 className="card-subtitle text-muted">{dashboardItem.type}</h5>
-                                    <p className="card-text">{dashboardItem?.type}.</p>
+                                    {renderChartTable(dashboardItem, index)}
                                     <Button label="Edit" theme="secondary" className="card-link" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onEditDashboardItem(e, dashboardItem)} />
                                     <Button label="Delete" theme="secondary" className="card-link" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onDeleteDashboardItem(e, dashboardItem)} />
                                 </div>
                                 <div className="card-footer text-muted">
-                                    Created: <FormattedDate value={dashboardItem?.creationDate} year="numeric"
-                                        month="long"
-                                        day="2-digit" />
+                                    Created: {dashboardItem?.creationDate}
                                 </div>
                             </div>
                         ) :
@@ -196,40 +238,6 @@ const DashboardItem: React.FC = () => {
                     }
                 />
             </PortalComponent>
-
-            {/* <div className="row no-gutters">
-                <div className="col-sm-3 col-12">
-                    <div className="card">
-                        <div className="card-header">
-                            header here
-                        </div>
-                        <div className="card-body">
-                            <Gauge type="rectangle" data={[0.6]} />
-                            <h5 className="card-title">Special title treatment</h5>
-                            <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" className="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-sm-3 col-12">
-                    <div className="gadgetPanel">
-                        <Gauge type="circle" data={[0.5]} />
-                    </div>
-                </div>
-
-                <div className="col-sm-3 col-12">
-                    <div className="gadgetPanel">
-                        <Gauge type="tears" data={[0.3]} />
-                    </div>
-                </div>
-                <div className="col-sm-3 col-12">
-                    <div className="gadgetPanel">
-                        <Gauge type="tears" data={[0.3]} />
-                    </div>
-                </div>
-            </div>
-     */}
         </div >
     );
 };

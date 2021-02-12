@@ -1,6 +1,7 @@
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import { Column } from "@sebgroup/react-components/dist/Table/Table";
-import {DashboardPropertiesOptions} from "../components/dashboardItem/modals/AddDashboardItem";
+import { DashboardPropertiesOptions } from "../components/dashboardItem/modals/AddDashboardItem";
+import Tank from "../components/shared/Tank";
 
 export const RECEIVE_AUTH_USER = "RECEIVE_AUTH_USER";
 export type RECEIVE_AUTH_USER = typeof RECEIVE_AUTH_USER;
@@ -137,10 +138,29 @@ export const DASHBOARDITEMTYPES = [
         value: 3,
     },
     {
-        label: "other",
+        label: "Doughnut graph",
         value: 4,
+    },
+    {
+        label: "PieChart graph",
+        value: 5,
+    },
+    {
+        label: "other",
+        value: 6,
     }
-]
+];
+
+
+export enum ChartType {
+    Tank = 0,
+    Gauge = 1,
+    BarGraph = 2,
+    LineGraph = 3,
+    Doughnut = 4,
+    PieChart = 5,
+    Other = 6
+}
 
 export const DASHBOARDPROPERTIES: Array<DashboardPropertiesOptions> = [
     {
@@ -285,7 +305,6 @@ export const DEVICETYPES = [{
     label: "I R Sensor",
     value: 15
 }];
-
 
 export const initialState: ModalProps = {
     toggle: false,

@@ -19,7 +19,6 @@ import AddDashboard from "./modals/AddDashboard";
 import PortalComponent from "../shared/Portal";
 import { initialState } from "../../constants";
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { FormattedDate, FormattedRelativeTime } from "react-intl";
 import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 
 import queryString from 'query-string';
@@ -193,9 +192,7 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
                                     <Link to={`${HomeRoutes.DashboardItem?.toString()?.replace(":id", dashboard.id)}`} className="card-link">Manage</Link>
                                 </div>
                                 <div className="card-footer text-muted">
-                                    Created: <FormattedDate value={dashboard.creationDate} year="numeric"
-                                        month="long"
-                                        day="2-digit" />
+                                    Created: {dashboard.creationDate}
                                 </div>
                             </div>
                         ) :

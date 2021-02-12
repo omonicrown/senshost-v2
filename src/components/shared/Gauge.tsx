@@ -1,58 +1,49 @@
 import * as React from "react";
 
-import 'echarts/lib/chart/gauge';
-import { EChartOption } from "echarts";
-
-import "echarts-liquidfill";
-import ReactEcharts from 'echarts-for-react';
+import * as echarts from 'echarts';
 
 interface GaugeProps {
     data: Array<number>;
 }
 
 
-interface ChartOption extends EChartOption {
-    tooltip: {
-        formatter: string
-    },
-    toolbox?: {
-        feature: {
-            restore: {},
-            saveAsImage: {}
-        }
-    },
-    series: Array<
-        {
-            name: string,
-            type: string,
-            detail: Option,
-            data: Array<Option>
-        }
-    >
-}
-
-type Option = {
-    [k: string]: any;
-}
-
 const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
+    const gaugeRef: React.MutableRefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
+    const styles = React.useMemo(() => ({ height: '100%' }), []);
 
-    const [options, setOptions] = React.useState<ChartOption>({
-        tooltip: {
-            formatter: '{a} <br/>{b} : {c}%'
-        },
-        series: [
-            {
-                name: 'First Gauge',
+    const [options, setOptions] = React.useState<echarts.EChartOption>(null);
+
+
+    React.useEffect(() => {
+        const gaugeChart = echarts.init(gaugeRef.current);
+
+        const option = {
+            tooltip: {
+                formatter: '{a} <br/>{b} : {c}%'
+            },
+            series: [{
+                name: 'Pressure',
                 type: 'gauge',
-                detail: { formatter: '{value}%', fontSize: 20 },
-                data: [{ value: 50, name: 'Test' }, { value: 20, name: 'Test Data 2' }]
-            }
-        ]
-    });
+                progress: {
+                    show: true
+                },
+                detail: {
+                    valueAnimation: true,
+                    formatter: '{value}'
+                },
+                data: [{
+                    value: 50,
+                    name: 'SCORE'
+                }]
+            }]
+        };
+
+        option && gaugeChart.setOption(option);
+
+    }, [gaugeRef.current]);
 
     return (
-        <ReactEcharts className="chart" option={options} />
+        <div className="gauge-graph" ref={gaugeRef} style={styles} />
     );
 }
 

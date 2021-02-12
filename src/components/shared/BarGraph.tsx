@@ -1,43 +1,15 @@
 import * as React from "react";
 
-import 'echarts/lib/chart/graph';
-import { EChartOption } from "echarts";
-
-import "echarts-liquidfill";
-import ReactEcharts from 'echarts-for-react';
+import * as echarts from 'echarts';
 
 interface GaugeProps {
     data: Array<number>;
 }
 
-
-interface ChartOption extends EChartOption {
-    tooltip: {
-        formatter: string
-    },
-    toolbox?: {
-        feature: {
-            restore: {},
-            saveAsImage: {}
-        }
-    },
-    series: Array<
-        {
-            name: string,
-            type: string,
-            detail: Option,
-            data: Array<Option>
-        }
-    >
-}
-
-type Option = {
-    [k: string]: any;
-}
-
 const BarGraph: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
+    const chartRef: React.MutableRefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
 
-    const [options, setOptions] = React.useState<ChartOption>({
+    const [options, setOptions] = React.useState<any>({
         tooltip: {
             formatter: '{a} <br/>{b} : {c}%'
         },
@@ -51,8 +23,32 @@ const BarGraph: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
         ]
     });
 
+    React.useEffect(() => {
+        const barChart = echarts.init(chartRef.current);
+
+        const option: echarts.EChartOption = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [120, 200, 150, 80, 70, 110, 130],
+                type: 'bar'
+            }]
+        };
+        if (option && typeof option === 'object') {
+            console.log("Does it even set the props  ? ", barChart)
+            option && barChart.setOption(option);
+        }
+    }, [chartRef.current]);
+
+    const styles = React.useMemo(() => ({ height: '100%' }), []);
+
     return (
-        <ReactEcharts className="chart" option={options} />
+        <div className="bar-chart" ref={chartRef} style={styles} />
     );
 }
 
