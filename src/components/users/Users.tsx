@@ -242,7 +242,6 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                     setPaginationSize(response?.data?.length);
                 }
             }).catch((error: AxiosError) => {
-                console.log("error getting users", error);
                 setUsers([]);
             })
     }, []);

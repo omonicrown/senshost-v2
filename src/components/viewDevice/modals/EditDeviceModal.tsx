@@ -62,7 +62,6 @@ const EditDeviceModal: React.FC<EditDeviceModalProps> = (props: EditDeviceModalP
     }, [device]);
 
     React.useEffect(() => {
-        console.log("Hopeless ", props.device);
         if (props.device?.id) {
             setDevice(props.device);
 

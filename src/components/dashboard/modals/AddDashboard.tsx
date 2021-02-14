@@ -39,8 +39,6 @@ const AddDashboard: React.FC<AddDashboardProps> = (props: AddDashboardProps): Re
     const onSave = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
         let errors: DashboardModel = null;
 
-        console.log("Here comes santa claus ", dashboard);
-
         if (!dashboard?.description) {
             errors = { ...errors, description: "description is required" };
 

@@ -27,7 +27,7 @@ import PortalComponent from '../shared/Portal';
 import AddDashboardItem from "./modals/AddDashboardItem";
 import { convertStringToJson } from '../../utils/functions';
 
-interface PropertyItem {
+export interface PropertyItem {
     propertyName: string;
     propertyValue: string;
     propertyLabel: string;
@@ -92,7 +92,6 @@ const DashboardItem: React.FC = () => {
         DashboardApis.addDashboardItem({ ...dashboardItem, dashboardId: dashboardId })
             .then((response: AxiosResponse) => {
                 setDashboardItems([...dashboardItems, response.data]);
-
                 const notification: NotificationProps = {
                     theme: "success",
                     title: "Dashboard item added",
@@ -114,7 +113,6 @@ const DashboardItem: React.FC = () => {
         DashboardApis.getDashboardItemsByDashboardId(dashboardId)
             .then((response: AxiosResponse<Array<DashboardItemModel>>) => {
                 if (response.data) {
-                    console.log("What hbig eyes you have ", response.data)
                     setDashboardItems(response.data);
                 }
             })
@@ -135,21 +133,22 @@ const DashboardItem: React.FC = () => {
     }, [dashboardId]);
 
     const renderCharts = (dashboardItem: DashboardItemModel, index: number) => {
+        const chartProperties: Array<PropertyItem> = convertStringToJson<Array<PropertyItem>>(dashboardItem?.property);
         switch (dashboardItem.type) {
             case ChartType.Tank:
-                return <Tank type={index % 2 === 0 ? "tears" : 'rectangle'} data={[0.9]} />;
+                return <Tank type={index % 2 === 0 ? "tears" : 'rectangle'} name={dashboardItem.name} data={chartProperties} />;
             case ChartType.Gauge:
-                return <Gauge data={[0.9]} />;
+                return <Gauge data={chartProperties} name={dashboardItem.name} />;
             case ChartType.LineGraph:
-                return <LineChart data={[0.9]} />;
+                return <LineChart data={chartProperties} />;
             case ChartType.BarGraph:
-                return <BarGraph data={[0.2]} />;
+                return <BarGraph data={chartProperties} />;
             case ChartType.PieChart:
-                return <PieChart data={[0.2]} />;
+                return <PieChart data={chartProperties} name={dashboardItem.name} />;
             case ChartType.Doughnut:
-                return <Doughnut data={[0.2]} />;
+                return <Doughnut data={chartProperties} name={dashboardItem.name} />;
             default:
-                return <PieChart data={[0.9]} />;
+                return <PieChart data={chartProperties} name={dashboardItem.name} />;
         }
     };
 
@@ -199,8 +198,6 @@ const DashboardItem: React.FC = () => {
                                         {renderCharts(dashboardItem, index)}
                                     </div>
                                     {renderChartTable(dashboardItem, index)}
-                                    <Button label="Edit" theme="secondary" className="card-link" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onEditDashboardItem(e, dashboardItem)} />
-                                    <Button label="Delete" theme="secondary" className="card-link" onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onDeleteDashboardItem(e, dashboardItem)} />
                                 </div>
                                 <div className="card-footer text-muted">
                                     Created: {dashboardItem?.creationDate}

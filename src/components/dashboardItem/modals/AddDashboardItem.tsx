@@ -9,6 +9,8 @@ import { DASHBOARDPROPERTIES, PROPERTIESCOLUMNS, DASHBOARDITEMTYPES } from "../.
 import { DashboardItemModel } from "../../../interfaces/models";
 import { AuthState } from "../../../interfaces/states";
 
+import { ChartType } from "../../../constants";
+
 interface AddDashboardItemProps {
     authState: AuthState;
     onSave: (e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => void;
@@ -54,6 +56,7 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
     const [selectedProperty, setSelectedProperty] = React.useState<DropdownItem<string>>(propertyOptions[0]);
 
     const [selectedPropertyValue, setSelectedPropertyValue] = React.useState<string>("");
+    const [selectedPropertyName, setSelectedPropertyName] = React.useState<string>("");
     const [selectedOtherProperty, setSelectedOtherProperty] = React.useState<string>("");
     const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -86,12 +89,16 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
     const handleItemDropdownChange = React.useCallback((value: DropdownItem) => {
         setSelectedItemType(value);
         setDashboardItem({ ...dashboardItem, type: Number(value?.value) });
+
     }, [setDashboardItem, dashboardItem, setSelectedItemType]);
 
     const handlePropertyValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setSelectedPropertyValue(e.target.value);
     }, [setSelectedPropertyValue]);
 
+    const handleDoughnutPropertryNameValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setSelectedPropertyName(e.target.value);
+    }, [setSelectedPropertyName]);
 
     const handleOtherPropertyLabelChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setSelectedOtherProperty(e.target.value);
@@ -100,7 +107,7 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
     const handleAddProperty = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
         let errors: PropertyItem = null;
 
-        if (!selectedProperty?.value) {
+        if (Number(selectedProperty.value) === ChartType.Doughnut && !selectedProperty?.value) {
             errors = { ...errors, propertyName: 'type cannot be empty' };
         }
 
@@ -110,15 +117,23 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
             if (!selectedOtherProperty) {
                 errors = { ...errors, otherProperty: 'value cannot be empty' };
             }
+        } else if (Number(selectedProperty.value) === ChartType.Doughnut) {
+            if (!selectedPropertyName) {
+                errors = { ...errors, propertyName: 'name cannot be empty' };
+            }
+
+            if (!selectedPropertyValue) {
+                errors = { ...errors, propertyValue: 'value cannot be empty' };
+            }
         }
         if (!errors) {
             setDashboardItem({
                 ...dashboardItem,
                 displayProperties: [
                     ...dashboardItem?.displayProperties, {
-                        propertyLabel: selectedProperty.value === "other" ? selectedOtherProperty : selectedProperty?.label,
+                        propertyLabel: selectedProperty.value === "other" ? selectedOtherProperty : selectedItemType.value === ChartType.Doughnut ? selectedPropertyName : selectedProperty?.label,
                         propertyValue: selectedPropertyValue,
-                        propertyName: selectedProperty.value === "other" ? selectedOtherProperty : selectedProperty.value,
+                        propertyName: selectedProperty.value === "other" ? selectedOtherProperty : selectedItemType.value === ChartType.Doughnut ? selectedPropertyName : selectedProperty.value,
                     }
                 ]
             });
@@ -136,7 +151,6 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
         if (dashboardItem.type === null) {
             errors = { ...errors, type: "select item type" as any };
         }
-
         if (!errors) {
             const updatedItem: AddDashboardItemDisplayModel = { ...dashboardItem, property: JSON.stringify(dashboardItem?.displayProperties) };
             props?.onSave(e, updatedItem);
@@ -185,45 +199,77 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
                     />
                 </div>
             </div>
+
             <fieldset className="properties-holder border p-2">
                 <legend className="w-auto"><h6 className="custom-label"> Item Properties </h6></legend>
                 <div className="row">
-                    <div className="col">
-                        <Dropdown
-                            label="Type"
-                            list={propertyOptions}
-                            disabled={props?.loading}
-                            selectedValue={selectedProperty}
-                            error={dashboardItemPropertyErrors?.propertyName}
-                            onChange={handlePropertyDropdownChange}
-                        />
-                    </div>
-                    {selectedProperty?.value === "other" &&
-                        <div className="col">
-                            <TextBoxGroup
-                                name="otherProperty"
-                                label="Custom Property"
-                                type="text"
-                                disabled={props?.loading}
-                                placeholder="Custom property label"
-                                value={selectedOtherProperty}
-                                error={dashboardItemPropertyErrors?.otherProperty}
-                                onChange={handleOtherPropertyLabelChange}
-                            />
-                        </div>
+                    {selectedItemType.value !== ChartType.Doughnut ?
+                        <React.Fragment>
+                            <div className="col">
+                                <Dropdown
+                                    label="Type"
+                                    list={propertyOptions}
+                                    disabled={props?.loading}
+                                    selectedValue={selectedProperty}
+                                    error={dashboardItemPropertyErrors?.propertyName}
+                                    onChange={handlePropertyDropdownChange}
+                                />
+                            </div>
+                            {selectedProperty?.value === "other" &&
+                                <div className="col">
+                                    <TextBoxGroup
+                                        name="otherProperty"
+                                        label="Custom Property"
+                                        type="text"
+                                        disabled={props?.loading}
+                                        placeholder="Custom property label"
+                                        value={selectedOtherProperty}
+                                        error={dashboardItemPropertyErrors?.otherProperty}
+                                        onChange={handleOtherPropertyLabelChange}
+                                    />
+                                </div>
+                            }
+                            <div className="col">
+                                <TextBoxGroup
+                                    name="propertyValue"
+                                    label="value"
+                                    type="text"
+                                    disabled={props?.loading}
+                                    placeholder="Property value"
+                                    value={selectedPropertyValue}
+                                    error={dashboardItemPropertyErrors?.propertyValue}
+                                    onChange={handlePropertyValueChange}
+                                />
+                            </div>
+                        </React.Fragment>
+                        :
+                        <React.Fragment>
+                            <div className="col">
+                                <TextBoxGroup
+                                    name="propertyName"
+                                    label="Name"
+                                    type="text"
+                                    disabled={props?.loading}
+                                    placeholder="Property name"
+                                    value={selectedPropertyName}
+                                    error={dashboardItemPropertyErrors?.propertyName}
+                                    onChange={handleDoughnutPropertryNameValueChange}
+                                />
+                            </div>
+                            <div className="col">
+                                <TextBoxGroup
+                                    name="propertyValue"
+                                    label="value"
+                                    type="text"
+                                    disabled={props?.loading}
+                                    placeholder="Property value"
+                                    value={selectedPropertyValue}
+                                    error={dashboardItemPropertyErrors?.propertyValue}
+                                    onChange={handlePropertyValueChange}
+                                />
+                            </div>
+                        </React.Fragment>
                     }
-                    <div className="col">
-                        <TextBoxGroup
-                            name="propertyValue"
-                            label="value"
-                            type="text"
-                            disabled={props?.loading}
-                            placeholder="Property value"
-                            value={selectedPropertyValue}
-                            error={dashboardItemPropertyErrors?.propertyValue}
-                            onChange={handlePropertyValueChange}
-                        />
-                    </div>
                 </div>
                 <div className="row">
                     <div className="col text-right">
@@ -233,6 +279,7 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
                     </div>
                 </div>
             </fieldset>
+
             <div className="row">
                 <div className="col">
                     <div className="card my-4">

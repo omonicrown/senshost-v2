@@ -1,9 +1,11 @@
 import * as React from "react";
 
 import * as echarts from 'echarts';
+import { PropertyItem } from "../dashboardItem/DashboardItem";
 
 interface GaugeProps {
-    data: Array<number>;
+    data: Array<PropertyItem>;
+    name: string;
 }
 
 
@@ -11,19 +13,21 @@ const Doughnut: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
     const doughnutRef: React.MutableRefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
     const styles = React.useMemo(() => ({ height: '100%' }), []);
 
-    const [options, setOptions] = React.useState<echarts.EChartOption>(null);
-
-
     React.useEffect(() => {
-        const gaugeChart = echarts.init(doughnutRef.current);
-
+        const doughnutChart = echarts.init(doughnutRef.current);
+        const data = props.data?.map((property: PropertyItem) => ({ name: property.propertyName, value: property.propertyValue }));
         const option: any = {
+            title: {
+                text: '',
+                subtext: '',
+                left: 'center'
+            },
             tooltip: {
                 trigger: 'item'
             },
             series: [
                 {
-                    name: '访问来源',
+                    name: props.name,
                     type: 'pie',
                     radius: ['40%', '70%'],
                     avoidLabelOverlap: false,
@@ -41,20 +45,14 @@ const Doughnut: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
                     labelLine: {
                         show: false
                     },
-                    data: [
-                        { value: 1048, name: '搜索引擎' },
-                        { value: 735, name: '直接访问' },
-                        { value: 580, name: '邮件营销' },
-                        { value: 484, name: '联盟广告' },
-                        { value: 300, name: '视频广告' }
-                    ]
+                    data: data
                 }
             ]
         };
 
-        option && gaugeChart.setOption(option);
+        option && doughnutChart.setOption(option);
 
-    }, [doughnutRef.current]);
+    }, [doughnutRef.current, props.data, props.name]);
 
     return (
         <div className="doughnut-graph" ref={doughnutRef} style={styles} />

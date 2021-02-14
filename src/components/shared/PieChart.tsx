@@ -1,9 +1,11 @@
 import * as React from "react";
 
 import * as echarts from 'echarts';
+import { PropertyItem } from "../dashboardItem/DashboardItem";
 
 interface GaugeProps {
-    data: Array<number>;
+    data: Array<PropertyItem>;
+    name: string;
 }
 
 
@@ -11,33 +13,29 @@ const PieChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
     const pieChartRef: React.MutableRefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
     const styles = React.useMemo(() => ({ height: '100%' }), []);
 
-    const [options, setOptions] = React.useState<echarts.EChartOption>(null);
-
-
     React.useEffect(() => {
-        const gaugeChart = echarts.init(pieChartRef.current);
+        const pieChart = echarts.init(pieChartRef.current);
+        const data = props.data?.map((property: PropertyItem) => ({ name: property.propertyName, value: property.propertyValue }));
 
-        const option: any = {
+        const option: echarts.EChartOption = {
             title: {
-                text: '某站点用户访问来源',
-                subtext: '纯属虚构',
+                text: '',
+                subtext: '',
                 left: 'center'
             },
             tooltip: {
                 trigger: 'item'
             },
+            legend: {
+                orient: 'horizontal',
+                left: 'bottom',
+            },
             series: [
                 {
-                    name: '访问来源',
+                    name: props.name,
                     type: 'pie',
                     radius: '50%',
-                    data: [
-                        { value: 1048, name: '搜索引擎' },
-                        { value: 735, name: '直接访问' },
-                        { value: 580, name: '邮件营销' },
-                        { value: 484, name: '联盟广告' },
-                        { value: 300, name: '视频广告' }
-                    ],
+                    data: data,
                     emphasis: {
                         itemStyle: {
                             shadowBlur: 10,
@@ -48,11 +46,11 @@ const PieChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
                 }
             ]
 
-        };
+        } as any;
 
-        option && gaugeChart.setOption(option);
+        option && pieChart.setOption(option);
 
-    }, [pieChartRef.current]);
+    }, [pieChartRef.current, props.data]);
 
     return (
         <div className="piechart-graph" ref={pieChartRef} style={styles} />

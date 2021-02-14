@@ -1,12 +1,12 @@
 import * as React from "react";
 
-import 'echarts/lib/chart/line';
+import * as echarts from 'echarts';
 import { EChartOption } from "echarts";
 
-import ReactEcharts from 'echarts-for-react';
+import { PropertyItem } from "../dashboardItem/DashboardItem";
 
 interface GaugeProps {
-    data: Array<number>;
+    data: Array<PropertyItem>;
 }
 
 
@@ -40,29 +40,42 @@ type Option = {
 }
 
 const LineChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
+    const lineGraphRef: React.MutableRefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
+    const styles = React.useMemo(() => ({ height: '100%' }), []);
 
-    const [options, setOptions] = React.useState<ChartOption>({
-        xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            type: 'value'
-        },
-        tooltip: {
-            formatter: '{a} <br/>{b} : {c}%'
-        },
-        series: [{
-            name: 'LineGraph',
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: 'line',
-            detail: { formatter: '{value}%', fontSize: 20 },
-            smooth: true
-        }]
-    });
+    React.useEffect(() => {
+        const lineChart = echarts.init(lineGraphRef.current);
+        const xAxis: Array<string> = props.data?.filter((item: PropertyItem) => item.propertyName === "x-axis")
+            .map((propertyItem: PropertyItem) => propertyItem.propertyValue);
+        const yAxis: Array<number> = props.data?.filter((item: PropertyItem) => item.propertyName === "y-axis")
+            .map((propertyItem: PropertyItem) => Number(propertyItem.propertyValue));
+
+        const option: ChartOption = {
+            xAxis: {
+                type: 'category',
+                data: xAxis
+            },
+            yAxis: {
+                type: 'value'
+            },
+            tooltip: {
+                formatter: '{a} <br/>{b} : {c}%'
+            },
+            series: [{
+                name: 'LineGraph',
+                data: yAxis,
+                type: 'line',
+                detail: { formatter: '{value}%', fontSize: 20 },
+                smooth: true
+            }]
+        };
+
+        option && lineChart.setOption(option);
+
+    }, [lineGraphRef.current, props.data]);
 
     return (
-        <ReactEcharts className="chart" option={options} />
+        <div className="line-graph" ref={lineGraphRef} style={styles} />
     );
 }
 

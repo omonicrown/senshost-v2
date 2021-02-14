@@ -118,7 +118,6 @@ export class AxiosGlobal {
                     notification.message = error.response.data;
                 }
 
-                console.log("The deleted devices ate ", notification)
                 store.dispatch(toggleNotification(notification));
 
                 return Promise.reject(error);

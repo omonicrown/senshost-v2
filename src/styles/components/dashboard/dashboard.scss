@@ -57,6 +57,7 @@
                         .table {
                             &.table-borderless {
                                 overflow-y: auto;
+                                margin-bottom: 0;
                                 > thead {
                                     > tr {
                                         > th {

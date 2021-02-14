@@ -42,7 +42,6 @@ export function loadLiquidFillGauge(element: any, value: any, config: any) {
   if (config == null) config = liquidFillGaugeDefaultSettings();
 
   var gauge = d3.select(element);
-  console.log("The gauge is ", gauge);
   var radius =
     Math.min(
       parseInt(gauge?.style("width")),
@@ -54,7 +53,6 @@ export function loadLiquidFillGauge(element: any, value: any, config: any) {
     Math.max(config.minValue, Math.min(config.maxValue, value)) /
     config.maxValue;
 
-    console.log("Leave mama ", fillPercent)
 
   let waveHeightScale: any;
   if (config.waveHeightScaling) {
@@ -293,7 +291,6 @@ export function loadLiquidFillGauge(element: any, value: any, config: any) {
   if (config.waveAnimate) animateWave();
 
   function animateWave() {
-    console.log("Oga solo ", wave.attr("T"));
     wave.attr(
       "transform",
       "translate(" + waveAnimateScale(wave.attr("T") as any) + ",0)"

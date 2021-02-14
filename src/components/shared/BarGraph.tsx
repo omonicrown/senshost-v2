@@ -1,49 +1,39 @@
 import * as React from "react";
 
 import * as echarts from 'echarts';
+import { PropertyItem } from "../dashboardItem/DashboardItem";
 
 interface GaugeProps {
-    data: Array<number>;
+    data: Array<PropertyItem>;
 }
 
 const BarGraph: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
     const chartRef: React.MutableRefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
 
-    const [options, setOptions] = React.useState<any>({
-        tooltip: {
-            formatter: '{a} <br/>{b} : {c}%'
-        },
-        series: [
-            {
-                name: 'First Gauge',
-                type: 'bar',
-                detail: { formatter: '{value}%', fontSize: 20 },
-                data: [{ value: 50, name: 'Test' }, { value: 20, name: 'Test Data 2' }]
-            }
-        ]
-    });
-
     React.useEffect(() => {
         const barChart = echarts.init(chartRef.current);
+        const xAxis: Array<string> = props.data?.filter((item: PropertyItem) => item.propertyName === "x-axis")
+            .map((propertyItem: PropertyItem) => propertyItem.propertyValue);
+        const yAxis: Array<string> = props.data?.filter((item: PropertyItem) => item.propertyName === "y-axis")
+            .map((propertyItem: PropertyItem) => propertyItem.propertyValue);
 
         const option: echarts.EChartOption = {
             xAxis: {
                 type: 'category',
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                data: xAxis
             },
             yAxis: {
                 type: 'value'
             },
             series: [{
-                data: [120, 200, 150, 80, 70, 110, 130],
+                data: yAxis,
                 type: 'bar'
             }]
         };
         if (option && typeof option === 'object') {
-            console.log("Does it even set the props  ? ", barChart)
             option && barChart.setOption(option);
         }
-    }, [chartRef.current]);
+    }, [chartRef.current, props.data]);
 
     const styles = React.useMemo(() => ({ height: '100%' }), []);
 

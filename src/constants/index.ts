@@ -164,7 +164,7 @@ export enum ChartType {
 
 export const DASHBOARDPROPERTIES: Array<DashboardPropertiesOptions> = [
     {
-        type: 0,
+        type: ChartType.Tank,
         properties: [
 
             {
@@ -183,7 +183,7 @@ export const DASHBOARDPROPERTIES: Array<DashboardPropertiesOptions> = [
         ]
     },
     {
-        type: 1,
+        type: ChartType.Gauge,
         properties: [
             {
                 label: "Minimum value",
@@ -196,7 +196,7 @@ export const DASHBOARDPROPERTIES: Array<DashboardPropertiesOptions> = [
         ]
     },
     {
-        type: 2,
+        type: ChartType.BarGraph,
         properties: [
             {
                 label: "X-axis label",
@@ -205,28 +205,46 @@ export const DASHBOARDPROPERTIES: Array<DashboardPropertiesOptions> = [
             {
                 label: "Y-axis label",
                 value: "y-axis",
+            }
+        ]
+    },
+    {
+        type: ChartType.LineGraph,
+        properties: [
+            {
+                label: "X-axis label",
+                value: "x-axis",
             },
             {
-                label: "data",
-                value: "data",
+                label: "Y-axis label",
+                value: "y-axis",
             },
         ]
     },
     {
-        type: 3,
+        type: ChartType.Doughnut,
         properties: [
             {
-                label: "X-axis label",
-                value: "x-axis",
+                label: "Value",
+                value: "value",
             },
             {
-                label: "Y-axis label",
-                value: "y-axis",
+                label: "Name",
+                value: "name",
+            }
+        ]
+    },
+    {
+        type: ChartType.PieChart,
+        properties: [
+            {
+                label: "Value",
+                value: "value",
             },
             {
-                label: "data",
-                value: "data",
-            },
+                label: "Name",
+                value: "name",
+            }
         ]
     },
     {

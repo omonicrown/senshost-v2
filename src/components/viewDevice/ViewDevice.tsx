@@ -63,7 +63,6 @@ const ViewDevice: React.FunctionComponent<ViewDeviceProps> = (props: ViewDeviceP
         {
             label: "Edit",
             onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
-                console.log("Hidean ", selectedRow);
                 setSensor({
                     name: selectedRow["name"],
                     id: selectedRow["id"],
