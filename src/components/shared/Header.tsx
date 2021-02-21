@@ -9,7 +9,6 @@ import { AuthState, States } from "../../interfaces/states";
 import { Link, useHistory } from "react-router-dom";
 import { History } from "history";
 
-import authReducer from "../../reducers/authReducer";
 import { SIGNOUT_USER } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";

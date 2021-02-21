@@ -81,6 +81,21 @@
                     margin-bottom: 0;
                     background-color: rgba(0, 0, 0, 0.03);
                     border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+
+                    .card-action {
+                        > button {
+                            min-height: calculateRem(20) !important;
+                            min-width: calculateRem(20) !important;
+                            padding: 0;
+                            .button-content {
+                                justify-content: flex-start;
+                            }
+                        }
+                        > .dropdown-menu {
+                            right: 0;
+                            left: unset;
+                        }
+                    }
                 }
 
                 a {

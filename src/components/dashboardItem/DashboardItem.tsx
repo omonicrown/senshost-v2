@@ -26,6 +26,7 @@ import PortalComponent from '../shared/Portal';
 
 import AddDashboardItem from "./modals/AddDashboardItem";
 import { convertStringToJson } from '../../utils/functions';
+import CardAction from './modals/CardAction';
 
 export interface PropertyItem {
     propertyName: string;
@@ -42,6 +43,8 @@ interface BreadcrumbProps {
 const DashboardItem: React.FC = () => {
     const [dashboardItems, setDashboardItems] = React.useState<Array<DashboardItemModel>>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [toggleAction, setToggleAction] = React.useState<boolean>(false);
+
     const [fetching, setFetching] = React.useState<boolean>(false);
     const [modalProps, setModalProps] = React.useState<ModalProps>({ ...initialState, size: 'modal-lg' });
 
@@ -179,7 +182,7 @@ const DashboardItem: React.FC = () => {
     }
 
     return (
-        <div className="dashboard-item-container">
+        <div className="dashboard-item-container" onClick={() => { setToggleAction(!toggleAction); }}>
             <Breadcrumb className="dashboard-breadcrumb" id="2" list={breadcrumbList} onClick={onBreadcrumbClick} />
             <div className="d-flex flex-sm-row flex-column dashboards-holder">
                 {fetching ? arrayTemp.map((key: number) =>
@@ -192,6 +195,9 @@ const DashboardItem: React.FC = () => {
                             <div className="card dashboard-card" key={dashboardItem?.id}>
                                 <h4 className="card-header">
                                     {dashboardItem.name}
+                                    <div className="float-right">
+                                        <CardAction toggle={toggleAction} />
+                                    </div>
                                 </h4>
                                 <div className="card-body">
                                     <div className="chart-holder">
