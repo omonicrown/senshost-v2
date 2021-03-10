@@ -4,14 +4,11 @@
     .modal-body {
         overflow: visible;
 
-        .add-and-edit-device {
-            .add-and-edit-form {
-                padding-top: 1rem;
-            }
-
+        .add-and-edit-device,
+        .add-and-edit-dashboard-item {
             .custom-step-tracker {
                 &.horizontal {
-                    padding: 0 30px;
+                    //  padding: 0 30px;
                 }
 
                 .step-wrapper {
@@ -20,7 +17,7 @@
                     }
                 }
             }
-            .title-holder{
+            .title-holder {
                 margin: 1rem 0;
                 font-weight: 700;
                 border-bottom: 1px solid $gray-300;
@@ -40,10 +37,10 @@
             .controls-holder {
                 margin-top: 2rem;
 
-                .next-and-previous{
-                    button{
-                        &:first-child{
-                            margin-right: 1rem;
+                .next-and-previous {
+                    button {
+                        &:last-child {
+                            margin-left: 1rem;
                         }
 
                         svg {
@@ -53,6 +50,5 @@
                 }
             }
         }
-
     }
 }

@@ -24,7 +24,9 @@ import { Button } from '@sebgroup/react-components/dist/Button';
 import { HomeRoutes } from '../../enums/routes';
 import PortalComponent from '../shared/Portal';
 
-import AddDashboardItem from "./modals/AddDashboardItem";
+// import AddDashboardItem from "./modals/AddDashboardItem";
+import AddDashboardItem from "./modals/NewAddDashboardItem";
+
 import { convertStringToJson } from '../../utils/functions';
 import CardAction from './modals/CardAction';
 
@@ -60,12 +62,12 @@ const DashboardItem: React.FC = () => {
         return ['Dashboard list', dashboard?.name || dashboardId];
     }, [dashboardId, dashboard]);
 
-    const onEditDashboardItem = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>, dashboardItem: DashboardItemModel) => {
+    const onEditDashboardItem = React.useCallback((e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, dashboardItem: DashboardItemModel) => {
         setDashboardItem(dashboardItem);
         setModalProps({ ...modalProps, toggle: true });
     }, [modalProps]);
 
-    const onDeleteDashboardItem = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>, dashboardItem: DashboardItemModel) => {
+    const onDeleteDashboardItem = React.useCallback((e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, dashboardItem: DashboardItemModel) => {
         setDashboardItem(dashboardItem);
         setModalProps({ ...modalProps, toggle: true });
     }, [modalProps]);
@@ -111,6 +113,7 @@ const DashboardItem: React.FC = () => {
             });
     }, [dashboardItems, dashboardId]);
 
+
     React.useEffect(() => {
         setFetching(true);
         DashboardApis.getDashboardItemsByDashboardId(dashboardId)
@@ -137,6 +140,7 @@ const DashboardItem: React.FC = () => {
 
     const renderCharts = (dashboardItem: DashboardItemModel, index: number) => {
         const chartProperties: Array<PropertyItem> = convertStringToJson<Array<PropertyItem>>(dashboardItem?.property);
+        if(!Array.isArray(chartProperties)) return null;
         switch (dashboardItem.type) {
             case ChartType.Tank:
                 return <Tank type={index % 2 === 0 ? "tears" : 'rectangle'} name={dashboardItem.name} data={chartProperties} />;
@@ -167,7 +171,7 @@ const DashboardItem: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {chartProperties.map((property: PropertyItem, i: number) => {
+                        {Array.isArray(chartProperties) && chartProperties?.map((property: PropertyItem, i: number) => {
                             return (
                                 <tr key={`${property.propertyValue}-${i}`}>
                                     <td>{property.propertyLabel}</td>
@@ -196,7 +200,12 @@ const DashboardItem: React.FC = () => {
                                 <h4 className="card-header">
                                     {dashboardItem.name}
                                     <div className="float-right">
-                                        <CardAction toggle={toggleAction} />
+                                        <CardAction
+                                            toggle={toggleAction}
+                                            onDeleteCardItem={onDeleteDashboardItem}
+                                            onEditCardItem={onEditDashboardItem}
+                                            dashboardItem={dashboardItem}
+                                        />
                                     </div>
                                 </h4>
                                 <div className="card-body">
@@ -236,7 +245,9 @@ const DashboardItem: React.FC = () => {
                                 loading={loading}
                                 dashboardItem={dashboardItem}
                                 authState={authState}
+                                dashboardId={dashboardId}
                             />
+                           
                             : null
                     }
                 />

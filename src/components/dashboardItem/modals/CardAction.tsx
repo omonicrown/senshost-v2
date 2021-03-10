@@ -2,10 +2,14 @@ import { Button } from "@sebgroup/react-components/dist/Button";
 import { Icon } from "@sebgroup/react-components/dist/Icon";
 import React from "react";
 import { Link } from "react-router-dom";
+import { DashboardItemModel } from "../../../interfaces/models";
 import { SvgElement, icontypesEnum } from "../../../utils/svgElement";
 
 interface CardActionprops {
     toggle: boolean;
+    onDeleteCardItem: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, card: DashboardItemModel) => void;
+    onEditCardItem: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, card: DashboardItemModel) => void;
+    dashboardItem: DashboardItemModel;
 }
 
 const CardAction: React.FC<CardActionprops> = (props: CardActionprops) => {
@@ -33,8 +37,8 @@ const CardAction: React.FC<CardActionprops> = (props: CardActionprops) => {
                 <Icon src={<SvgElement type={icontypesEnum.BARS} />} />
             </Button>
             <div className={"dropdown-menu" + (toggle ? " show" : "")}>
-                <Link className="dropdown-item" to="#">Edit</Link>
-                <Link className="dropdown-item" to="#">Delete</Link>
+                <Link className="dropdown-item" to="#" onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => props.onEditCardItem(e, props.dashboardItem)}>Edit</Link>
+                <Link className="dropdown-item" to="#" onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => props.onDeleteCardItem(e, props.dashboardItem)}>Delete</Link>
             </div>
         </div>
     )
