@@ -1,302 +1,257 @@
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
+import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
+import { Icon } from "@sebgroup/react-components/dist/Icon";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
-import { Table } from "@sebgroup/react-components/dist/Table";
-import { Column, DataItem, PrimaryActionButton, TableRow } from "@sebgroup/react-components/dist/Table/Table";
-import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
+import { StepTracker } from "@sebgroup/react-components/dist/StepTracker";
+
 import React from "react";
-import { DASHBOARDPROPERTIES, PROPERTIESCOLUMNS, DASHBOARDITEMTYPES } from "../../../constants";
+import { ChartType } from "../../../constants";
 import { DashboardItemModel } from "../../../interfaces/models";
 import { AuthState } from "../../../interfaces/states";
+import { icontypesEnum, SvgElement } from "../../../utils/svgElement";
 
-import { ChartType } from "../../../constants";
-
-interface AddDashboardItemProps {
-    authState: AuthState;
-    onSave: (e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => void;
-    onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-    loading: boolean;
-    dashboardItem?: DashboardItemModel;
-}
-
-interface PropertyItem {
-    propertyName: string;
-    propertyValue: string;
-    propertyLabel: string;
-    otherProperty?: string;
-}
+import DataSourcesSection from "./sections/DataSources";
+import ItemPropertySection from "./sections/ItemProperty";
+import DashabordItemSummarySection from "./sections/DashboardItemSummary";
+import { DashboardApis } from "../../../apis/dashboardApis";
+import { AxiosResponse } from "axios";
 
 export interface DashboardPropertiesOptions {
     type: number;
     properties: Array<DropdownItem<string>>;
 }
 
-interface AddDashboardItemDisplayModel extends DashboardItemModel {
-    displayProperties: Array<Partial<DataItem<PropertyItem>>>;
+export interface AddDashboardItemControls {
+    name: string;
+    type: DropdownItem;
+    tankProperties: {
+        capacity: number;
+    };
+    gaugeProperties: {
+        min: number;
+        max: number;
+    };
+    chartProperties: {
+        categoryColumn: string;
+        valueColumn: string;
+    };
+    dataSource: {
+        type: DatasourceType;
+        deviceSource: DropdownItem;
+        device: DropdownItem;
+        sensor: DropdownItem;
+        attribute: string;
+    }
 }
 
-const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardItemProps) => {
-    const [dashboardItem, setDashboardItem] = React.useState<AddDashboardItemDisplayModel>({ name: '', type: null, dashboardId: null, possition: '', displayProperties: [], property: null });
-    const [dashboardItemErrors, setDashboardItemErrors] = React.useState<DashboardItemModel>(null);
-    const [dashboardItemPropertyErrors, setDashboardItemPropertyErrors] = React.useState<PropertyItem>(null);
+interface AddDashboardItemProps {
+    authState: AuthState;
+    onSave: (e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => void;
+    onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    loading: boolean;
+    dashboardId: string;
+    dashboardItem?: DashboardItemModel;
+}
+export type DatasourceType = "device" | "aggregateField";
 
-    const dashboardItemTypes: Array<DropdownItem> = React.useMemo(() => [{ label: 'Please select', value: null }, ...DASHBOARDITEMTYPES], [])
+const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardItemProps): React.ReactElement<void> => {
 
-
-    const [selectedItemType, setSelectedItemType] = React.useState<DropdownItem<number>>(dashboardItemTypes[0]);
-
-    const propertyOptions: Array<DropdownItem<string>> = React.useMemo(() => {
-        const selectedPropertyOptions: DashboardPropertiesOptions = DASHBOARDPROPERTIES.find((item: DashboardPropertiesOptions) => item?.type === selectedItemType?.value);
-
-        if (selectedPropertyOptions) return [{ label: 'Please select', value: null }, ...selectedPropertyOptions.properties];
-
-        return [{ label: 'Please select', value: null }, ...DASHBOARDPROPERTIES[0].properties];
-    }, [selectedItemType]);
-
-    const [selectedProperty, setSelectedProperty] = React.useState<DropdownItem<string>>(propertyOptions[0]);
-
-    const [selectedPropertyValue, setSelectedPropertyValue] = React.useState<string>("");
-    const [selectedPropertyName, setSelectedPropertyName] = React.useState<string>("");
-    const [selectedOtherProperty, setSelectedOtherProperty] = React.useState<string>("");
+    const [dashboardItemErrors, setDashboardItemErrors] = React.useState<AddDashboardItemControls>({} as AddDashboardItemControls);
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [fetching, setFetching] = React.useState<boolean>(false);
 
-    const propertiesTableColumn: Array<Column> = React.useMemo(() => PROPERTIESCOLUMNS, []);
+    // Data Source State
+    const [itemControls, setItemControls] = React.useState<AddDashboardItemControls>({
+        name: '',
+        type: null,
+        dataSource: { type: "device" },
+        gaugeProperties: { min: 0, max: 0 },
+        tankProperties: { capacity: 0 },
+        chartProperties: { valueColumn: "", categoryColumn: "" },
+    } as AddDashboardItemControls);
+
+    // steps tracker
+    const [stepTracker, setStepTracker] = React.useState<number>(0);
+    const stepList: Array<string> = React.useMemo(() => ["Dashboard Item", "Data Source", "Summary"], []);
+
+    const handleDashboardItemNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setItemControls({ ...itemControls, [e.target.name]: e.target.value });
+    }, [itemControls]);
+
+    const handleItemTypeDropdownChange = React.useCallback((value: DropdownItem) => {
+        setItemControls({ ...itemControls, type: value });
+    }, [setItemControls, itemControls]);
+
+    const deviceDataSourcesDropdownChange = React.useCallback((value: DropdownItem) => {
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, deviceSource: value } });
+    }, [itemControls]);
+
+    const deviceDropdownChange = React.useCallback((value: DropdownItem) => {
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, device: value } });
+    }, [itemControls]);
+
+    const deviceSensorDropdownChange = React.useCallback((value: DropdownItem) => {
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, sensor: value } });
+    }, [itemControls]);
+
+    const selectedDataSourceChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, type: e.target.value as DatasourceType } });
+    }, [itemControls]);
+
+    const handleItemPropertyChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, type: "tank" | "gauge" | "chart") => {
+        switch (type) {
+            case "gauge":
+                setItemControls({ ...itemControls, gaugeProperties: { ...itemControls?.gaugeProperties, [e.target.name]: e.target.value } });
+                break;
+            case "tank":
+                setItemControls({ ...itemControls, tankProperties: { ...itemControls?.tankProperties, [e.target.name]: e.target.value } });
+                break;
+            case "chart":
+                setItemControls({ ...itemControls, chartProperties: { ...itemControls?.chartProperties, [e.target.name]: e.target.value } });
+                break;
+        }
+    }, [itemControls]);
 
 
-    const primaryButton: PrimaryActionButton = React.useMemo(() => ({
-        label: "Delete",
-        onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, selectedRow: TableRow) => {
-            const indexOfPropertyToBeRemoved: number = dashboardItem.displayProperties?.findIndex((p: PropertyItem) => p.propertyName === selectedRow["propertyName"]);
+    const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+        let property: { [k: string]: string | number } = {};
 
-            const updatedProperties: Array<Partial<DataItem<PropertyItem>>> = [
-                ...dashboardItem?.displayProperties.slice(0, indexOfPropertyToBeRemoved),
-                ...dashboardItem?.displayProperties?.slice(indexOfPropertyToBeRemoved + 1)
-            ];
-
-            setDashboardItem({ ...dashboardItem, displayProperties: updatedProperties });
-        },
-    }), [dashboardItem]);
-
-
-    const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setDashboardItem({ ...dashboardItem, [e.target.name]: e.target.value });
-    }, [setDashboardItem, dashboardItem]);
-
-    const handlePropertyDropdownChange = React.useCallback((value: DropdownItem) => {
-        setSelectedProperty(value);
-    }, []);
-
-    const handleItemDropdownChange = React.useCallback((value: DropdownItem) => {
-        setSelectedItemType(value);
-        setDashboardItem({ ...dashboardItem, type: Number(value?.value) });
-
-    }, [setDashboardItem, dashboardItem, setSelectedItemType]);
-
-    const handlePropertyValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setSelectedPropertyValue(e.target.value);
-    }, [setSelectedPropertyValue]);
-
-    const handleDoughnutPropertryNameValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setSelectedPropertyName(e.target.value);
-    }, [setSelectedPropertyName]);
-
-    const handleOtherPropertyLabelChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setSelectedOtherProperty(e.target.value);
-    }, [setSelectedOtherProperty]);
-
-    const handleAddProperty = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-        let errors: PropertyItem = null;
-
-        if (Number(selectedProperty.value) === ChartType.Doughnut && !selectedProperty?.value) {
-            errors = { ...errors, propertyName: 'type cannot be empty' };
+        switch (itemControls?.type?.value) {
+            case ChartType.Tank:
+                property["item"] = "tank";
+                property["capacity"] = itemControls?.tankProperties?.capacity;
+                break;
+            case ChartType.Gauge:
+                property["item"] = "gauge";
+                property["min"] = itemControls?.gaugeProperties?.min;
+                property["max"] = itemControls?.gaugeProperties?.max;
+                break;
+            case ChartType.LineGraph:
+                property["item"] = "lineGraph";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            case ChartType.BarGraph:
+                property["item"] = "barGraph";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            case ChartType.PieChart:
+                property["item"] = "pieChart";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            case ChartType.Doughnut:
+                property["item"] = "doughnut";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            default:
+                property["item"] = "status";
+                break;
         }
 
-        if (!selectedPropertyValue) {
-            errors = { ...errors, propertyValue: 'value cannot be empty' };
-        } else if (selectedProperty.value === "other") {
-            if (!selectedOtherProperty) {
-                errors = { ...errors, otherProperty: 'value cannot be empty' };
+        if (itemControls?.dataSource.type === "device") {
+            property["type"] = "device";
+            if (itemControls?.dataSource?.deviceSource?.value === "sensor") {
+                property["from"] = "sensor";
+                property["sourceId"] = itemControls?.dataSource?.sensor?.value;
+            } else {
+                // set attribute
+                property["from"] = "attribute";
+                property["sourceId"] = null;
             }
-        } else if (Number(selectedProperty.value) === ChartType.Doughnut) {
-            if (!selectedPropertyName) {
-                errors = { ...errors, propertyName: 'name cannot be empty' };
-            }
-
-            if (!selectedPropertyValue) {
-                errors = { ...errors, propertyValue: 'value cannot be empty' };
-            }
+        } else {
+            property["type"] = "aggregateField";
+            property["from"] = "aggregateField";
+            property["sourceId"] = "aggregateFieldSourceId";
         }
-        if (!errors) {
-            setDashboardItem({
-                ...dashboardItem,
-                displayProperties: [
-                    ...dashboardItem?.displayProperties, {
-                        propertyLabel: selectedProperty.value === "other" ? selectedOtherProperty : selectedItemType.value === ChartType.Doughnut ? selectedPropertyName : selectedProperty?.label,
-                        propertyValue: selectedPropertyValue,
-                        propertyName: selectedProperty.value === "other" ? selectedOtherProperty : selectedItemType.value === ChartType.Doughnut ? selectedPropertyName : selectedProperty.value,
-                    }
-                ]
+
+        const payload: DashboardItemModel = {
+            ...props.dashboardItem,
+            type: itemControls?.type?.value,
+            name: itemControls?.name,
+            property: JSON.stringify([property] || ""),
+            dashboardId: props.dashboardId
+        };
+        setLoading(true);
+        DashboardApis.addDashboardItem(payload)
+            .then((response: AxiosResponse) => {
+                props.onSave(e, response.data);
             });
-        }
-        setDashboardItemPropertyErrors(errors);
-    }, [selectedProperty, dashboardItem, selectedPropertyValue, selectedOtherProperty]);
 
-    const onSave = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        let errors: DashboardItemModel = null;
-
-        if (!dashboardItem.name) {
-            errors = { ...errors, name: "name is required" };
-        }
-
-        if (dashboardItem.type === null) {
-            errors = { ...errors, type: "select item type" as any };
-        }
-        if (!errors) {
-            const updatedItem: AddDashboardItemDisplayModel = { ...dashboardItem, property: JSON.stringify(dashboardItem?.displayProperties) };
-            props?.onSave(e, updatedItem);
-        }
-
-        setDashboardItemErrors(errors);
         e.preventDefault();
 
-    }, [props?.authState?.auth, dashboardItem]);
+    }, [props.dashboardItem, itemControls]);
 
     React.useEffect(() => {
-        try {
-            const parsedProperties: { [k: string]: string } = JSON.parse(props.dashboardItem?.property);
-            const propertiesArray: Array<{ [k: string]: string }> = Object.keys(parsedProperties)
-                .map((key: string): { [k: string]: string } => ({ accessor: key, label: key, value: parsedProperties[key] }));
+        setFetching(props?.loading);
+    }, [props.loading]);
 
-            setDashboardItem({ ...dashboardItem, displayProperties: propertiesArray });
-        } catch (err) {
-            setDashboardItem({ ...dashboardItem, name: '', type: null, dashboardId: null, possition: '', displayProperties: [] });
-        }
-    }, [props?.dashboardItem]);
 
     return (
-        <form className="add-dashboard-item" onSubmit={onSave}>
-            <div className="row">
-                <div className="col-12 col-sm-6">
-                    <TextBoxGroup
-                        name="name"
-                        label="Name"
-                        type="text"
-                        disabled={props?.loading}
-                        placeholder="Dashboard name"
-                        value={dashboardItem?.name}
-                        error={dashboardItemErrors?.name}
-                        onChange={handleChange}
+        <div className="add-and-edit-dashboard-item">
+            <StepTracker step={stepTracker} list={stepList} onClick={(index: number) => setStepTracker(index)} />
+            <form className="add-dashboard-item" onSubmit={handleSave}>
+                {stepTracker === 0 &&
+                    <ItemPropertySection
+                        loading={loading}
+                        fetching={fetching}
+                        itemControls={itemControls}
+                        dashboardItemErrors={dashboardItemErrors}
+                        handleDashboardItemNameChange={handleDashboardItemNameChange}
+                        handleItemTypeDropdownChange={handleItemTypeDropdownChange}
+                        handleItemPropertyChange={handleItemPropertyChange}
                     />
-                </div>
-                <div className="col-12 col-sm-6">
-                    <Dropdown
-                        label="Item Type"
-                        list={dashboardItemTypes}
-                        disabled={props?.loading}
-                        selectedValue={selectedItemType}
-                        error={dashboardItemErrors?.type as any}
-                        onChange={handleItemDropdownChange}
+                }
+                {
+                    stepTracker === 1 &&
+                    <DataSourcesSection
+                        loading={loading}
+                        fetching={fetching}
+                        deviceDataSourcesDropdownChange={deviceDataSourcesDropdownChange}
+                        deviceDropdownChange={deviceDropdownChange}
+                        dataSourceTypeChange={selectedDataSourceChange}
+                        authState={props.authState}
+                        itemControls={itemControls}
+                        deviceSensorChange={deviceSensorDropdownChange}
                     />
-                </div>
-            </div>
-
-            <fieldset className="properties-holder border p-2">
-                <legend className="w-auto"><h6 className="custom-label"> Item Properties </h6></legend>
-                <div className="row">
-                    {selectedItemType.value !== ChartType.Doughnut ?
-                        <React.Fragment>
-                            <div className="col">
-                                <Dropdown
-                                    label="Type"
-                                    list={propertyOptions}
-                                    disabled={props?.loading}
-                                    selectedValue={selectedProperty}
-                                    error={dashboardItemPropertyErrors?.propertyName}
-                                    onChange={handlePropertyDropdownChange}
-                                />
-                            </div>
-                            {selectedProperty?.value === "other" &&
-                                <div className="col">
-                                    <TextBoxGroup
-                                        name="otherProperty"
-                                        label="Custom Property"
-                                        type="text"
-                                        disabled={props?.loading}
-                                        placeholder="Custom property label"
-                                        value={selectedOtherProperty}
-                                        error={dashboardItemPropertyErrors?.otherProperty}
-                                        onChange={handleOtherPropertyLabelChange}
-                                    />
-                                </div>
-                            }
-                            <div className="col">
-                                <TextBoxGroup
-                                    name="propertyValue"
-                                    label="value"
-                                    type="text"
-                                    disabled={props?.loading}
-                                    placeholder="Property value"
-                                    value={selectedPropertyValue}
-                                    error={dashboardItemPropertyErrors?.propertyValue}
-                                    onChange={handlePropertyValueChange}
-                                />
-                            </div>
-                        </React.Fragment>
-                        :
-                        <React.Fragment>
-                            <div className="col">
-                                <TextBoxGroup
-                                    name="propertyName"
-                                    label="Name"
-                                    type="text"
-                                    disabled={props?.loading}
-                                    placeholder="Property name"
-                                    value={selectedPropertyName}
-                                    error={dashboardItemPropertyErrors?.propertyName}
-                                    onChange={handleDoughnutPropertryNameValueChange}
-                                />
-                            </div>
-                            <div className="col">
-                                <TextBoxGroup
-                                    name="propertyValue"
-                                    label="value"
-                                    type="text"
-                                    disabled={props?.loading}
-                                    placeholder="Property value"
-                                    value={selectedPropertyValue}
-                                    error={dashboardItemPropertyErrors?.propertyValue}
-                                    onChange={handlePropertyValueChange}
-                                />
-                            </div>
-                        </React.Fragment>
-                    }
-                </div>
-                <div className="row">
-                    <div className="col text-right">
-                        <Button label="Add" type="button" size="sm" theme="primary" onClick={handleAddProperty}>
-                            <Loader toggle={loading} />
-                        </Button>
+                }
+                {
+                    stepTracker === 2 &&
+                    <DashabordItemSummarySection
+                        fetching={fetching}
+                        itemControls={itemControls}
+                        authState={props.authState}
+                    />
+                }
+                <div className="row controls-holder">
+                    <div className="col-12 col-sm-6">
+                        <Button label="Cancel" size="sm" theme="outline-primary" onClick={props.onCancel} />
                     </div>
-                </div>
-            </fieldset>
-
-            <div className="row">
-                <div className="col">
-                    <div className="card my-4">
-                        <div className="card-body">
-                            <Table columns={propertiesTableColumn} data={dashboardItem?.displayProperties} primaryActionButton={primaryButton} />
+                    <div className="col-12 col-sm-6">
+                        <div className="d-flex justify-content-end next-and-previous">
+                            {stepTracker > 0 && <Button label="" size="sm" theme="outline-primary" title="Previous" onClick={() => setStepTracker(stepTracker - 1)}>
+                                <Icon src={<SvgElement type={icontypesEnum.PREVIOUS} />} />
+                            </Button>}
+                            {stepTracker < 2 &&
+                                <Button label="" size="sm" className="ml-6" theme="primary" title="Next" onClick={() => setStepTracker(stepTracker + 1)}>
+                                    <Icon src={<SvgElement type={icontypesEnum.NEXT} />} />
+                                </Button>
+                            }
+                            {stepTracker === 2 &&
+                                <Button label="Save" className="ml-6" type="submit" size="sm" theme="primary" title="Save" onClick={null}>
+                                    <Loader toggle={loading} />
+                                </Button>
+                            }
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="d-flex flex-sm-row flex-column controls-holder">
-                <Button label="Cancel" size="sm" theme="outline-primary" onClick={props.onCancel} />
-                <Button label="Save" type="submit" size="sm" theme="primary" title="Save" onClick={null}>
-                    <Loader toggle={props.loading} />
-                </Button>
-            </div>
-        </form>
-    )
-}
+
+            </form>
+        </div>
+
+    );
+};
 
 export default AddDashboardItem;

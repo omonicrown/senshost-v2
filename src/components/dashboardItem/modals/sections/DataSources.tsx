@@ -6,7 +6,7 @@ import { DeviceApis } from "../../../../apis/deviceApis";
 import { SensorApis } from "../../../../apis/sensorApis";
 import { DeviceModel, SensorModel } from "../../../../interfaces/models";
 import { AuthState } from "../../../../interfaces/states";
-import { AddDashboardItemControls } from "../NewAddDashboardItem";
+import { AddDashboardItemControls } from "../AddDashboardItem";
 
 const DEVICEDATASOURCES: Array<DropdownItem> = [
     { label: 'Please select', value: null },

@@ -2,7 +2,7 @@ import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import React from "react";
 import { ChartType, DASHBOARDITEMTYPES } from "../../../../constants";
-import { AddDashboardItemControls } from "../NewAddDashboardItem";
+import { AddDashboardItemControls } from "../AddDashboardItem";
 
 const dashboardItemTypes = [{ label: 'Please select', value: null }, ...DASHBOARDITEMTYPES];
 

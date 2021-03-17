@@ -2,7 +2,7 @@ import { TextLabel } from "@sebgroup/react-components/dist/TextLabel";
 import React from "react";
 import { ChartType } from "../../../../constants";
 import { AuthState } from "../../../../interfaces/states";
-import { AddDashboardItemControls } from "../NewAddDashboardItem";
+import { AddDashboardItemControls } from "../AddDashboardItem";
 
 
 interface DashboardItemSummaryProps {

@@ -24,8 +24,7 @@ import { Button } from '@sebgroup/react-components/dist/Button';
 import { HomeRoutes } from '../../enums/routes';
 import PortalComponent from '../shared/Portal';
 
-// import AddDashboardItem from "./modals/AddDashboardItem";
-import AddDashboardItem from "./modals/NewAddDashboardItem";
+import AddDashboardItem from "./modals/AddDashboardItem";
 
 import { convertStringToJson } from '../../utils/functions';
 import CardAction from './modals/CardAction';
