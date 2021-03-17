@@ -93,25 +93,18 @@ const DashboardItem: React.FC = () => {
     }, [modalProps]);
 
     const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => {
-        setLoading(true);
-        DashboardApis.addDashboardItem({ ...dashboardItem, dashboardId: dashboardId })
-            .then((response: AxiosResponse) => {
-                setDashboardItems([...dashboardItems, response.data]);
-                const notification: NotificationProps = {
-                    theme: "success",
-                    title: "Dashboard item added",
-                    message: `Dashboard item added successfully`,
-                    toggle: true,
-                    onDismiss: () => { }
-                };
+        setDashboardItems([...dashboardItems, dashboardItem]);
+        const notification: NotificationProps = {
+            theme: "success",
+            title: "Dashboard item added",
+            message: `Dashboard item added successfully`,
+            toggle: true,
+            onDismiss: () => { }
+        };
+        dispatch(toggleNotification(notification));
+        setModalProps({ ...modalProps, toggle: false });
 
-                dispatch(toggleNotification(notification));
-
-                setModalProps({ ...modalProps, toggle: false });
-            }).finally(() => {
-                setLoading(false);
-            });
-    }, [dashboardItems, dashboardId]);
+    }, [dashboardItems, modalProps]);
 
 
     React.useEffect(() => {
@@ -140,7 +133,7 @@ const DashboardItem: React.FC = () => {
 
     const renderCharts = (dashboardItem: DashboardItemModel, index: number) => {
         const chartProperties: Array<PropertyItem> = convertStringToJson<Array<PropertyItem>>(dashboardItem?.property);
-        if(!Array.isArray(chartProperties)) return null;
+        if (!Array.isArray(chartProperties)) return null;
         switch (dashboardItem.type) {
             case ChartType.Tank:
                 return <Tank type={index % 2 === 0 ? "tears" : 'rectangle'} name={dashboardItem.name} data={chartProperties} />;
@@ -247,7 +240,7 @@ const DashboardItem: React.FC = () => {
                                 authState={authState}
                                 dashboardId={dashboardId}
                             />
-                           
+
                             : null
                     }
                 />

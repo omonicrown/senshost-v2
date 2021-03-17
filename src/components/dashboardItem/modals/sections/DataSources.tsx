@@ -6,16 +6,17 @@ import { DeviceApis } from "../../../../apis/deviceApis";
 import { SensorApis } from "../../../../apis/sensorApis";
 import { DeviceModel, SensorModel } from "../../../../interfaces/models";
 import { AuthState } from "../../../../interfaces/states";
+import { AddDashboardItemControls } from "../NewAddDashboardItem";
 
 const DEVICEDATASOURCES: Array<DropdownItem> = [
     { label: 'Please select', value: null },
     {
         label: "Sensors",
-        value: "sensors"
+        value: "sensor"
     },
     {
         label: "Attributes",
-        value: "attributes"
+        value: "attribute"
     }
 ];
 
@@ -26,14 +27,12 @@ const DEVICEDATASOURCETYPE = [
 
 interface DataSourcesProps {
     loading: boolean;
-    selectedDeviceSource?: DropdownItem;
-    selectedDevice: DropdownItem;
-    selectedDeviceSensor: DropdownItem;
+    fetching: boolean;
+    itemControls: AddDashboardItemControls;
     deviceDataSourcesDropdownChange: (e: DropdownItem) => void;
     deviceSensorChange: (e: DropdownItem) => void;
     deviceDropdownChange: (e: DropdownItem) => void;
     dataSourceTypeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    selectedDataSourceType: string;
     authState: AuthState;
 }
 
@@ -55,8 +54,8 @@ const DataSources: React.FC<DataSourcesProps> = (props: DataSourcesProps): React
     }, []);
 
     React.useEffect(() => {
-        if (props.selectedDevice?.value) {
-            SensorApis.getSensorsByDeviceId(props.selectedDevice.value)
+        if (props.itemControls?.dataSource?.device?.value) {
+            SensorApis.getSensorsByDeviceId(props.itemControls?.dataSource?.device?.value)
                 .then((response: AxiosResponse<Array<SensorModel>>) => {
                     if (response.data) {
                         const updatedSensors: Array<DropdownItem> = response.data.map((sensor: SensorModel) => ({ label: sensor?.name, value: sensor?.id }));
@@ -66,7 +65,7 @@ const DataSources: React.FC<DataSourcesProps> = (props: DataSourcesProps): React
         } else {
             setSensors([{ label: 'Please select', value: null }]);
         }
-    }, [props.selectedDevice]);
+    }, [props.itemControls?.dataSource?.device]);
 
     return (
         <React.Fragment>
@@ -77,15 +76,16 @@ const DataSources: React.FC<DataSourcesProps> = (props: DataSourcesProps): React
                         <RadioGroup list={DEVICEDATASOURCETYPE}
                             name="dataSourceType"
                             label=""
-                            value={props.selectedDataSourceType}
+                            value={props.itemControls?.dataSource?.type}
                             onChange={props.dataSourceTypeChange}
+                            disableAll={props?.loading || props.fetching}
                             condensed
                             inline
                         />
                     </div>
                 </div>
             </fieldset>
-            { props.selectedDataSourceType === 'aggregateField' ?
+            { props.itemControls?.dataSource?.type === 'aggregateField' ?
                 <fieldset className="aggregatefield-datasource-properties border my-2 p-2">
                     <legend className="w-auto"><h5 className="custom-label"> Aggregate field </h5></legend>
 
@@ -98,8 +98,8 @@ const DataSources: React.FC<DataSourcesProps> = (props: DataSourcesProps): React
                             <Dropdown
                                 label="Device"
                                 list={devices}
-                                disabled={props?.loading}
-                                selectedValue={props.selectedDevice}
+                                disabled={props?.loading || props.fetching}
+                                selectedValue={props?.itemControls?.dataSource?.device}
                                 error={null}
                                 onChange={props.deviceDropdownChange}
                             />
@@ -108,21 +108,21 @@ const DataSources: React.FC<DataSourcesProps> = (props: DataSourcesProps): React
                             <Dropdown
                                 label="Device source"
                                 list={DEVICEDATASOURCES}
-                                disabled={props?.loading}
-                                selectedValue={props.selectedDeviceSource}
+                                disabled={props?.loading || props.fetching}
+                                selectedValue={props.itemControls?.dataSource?.deviceSource}
                                 error={null}
                                 onChange={props.deviceDataSourcesDropdownChange}
                             />
                         </div>
                     </div>
-                    {props.selectedDeviceSource.value === 'sensors' &&
+                    {props.itemControls?.dataSource?.deviceSource?.value === 'sensor' &&
                         <div className="row">
                             <div className="col-12 col-sm-6">
                                 <Dropdown
                                     label="Sensors"
                                     list={sensors}
-                                    disabled={props?.loading}
-                                    selectedValue={props.selectedDeviceSensor}
+                                    disabled={props?.loading || props.fetching}
+                                    selectedValue={props.itemControls?.dataSource?.sensor}
                                     error={null}
                                     onChange={props.deviceSensorChange}
                                 />

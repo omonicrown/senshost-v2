@@ -1,23 +1,44 @@
 import { Button } from "@sebgroup/react-components/dist/Button";
-import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
+import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { Icon } from "@sebgroup/react-components/dist/Icon";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
 import { StepTracker } from "@sebgroup/react-components/dist/StepTracker";
 
-import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
-
 import React from "react";
-import { DASHBOARDITEMTYPES } from "../../../constants";
+import { ChartType } from "../../../constants";
 import { DashboardItemModel } from "../../../interfaces/models";
 import { AuthState } from "../../../interfaces/states";
 import { icontypesEnum, SvgElement } from "../../../utils/svgElement";
 
 import DataSourcesSection from "./sections/DataSources";
+import ItemPropertySection from "./sections/ItemProperty";
 import DashabordItemSummarySection from "./sections/DashboardItemSummary";
 import { DashboardApis } from "../../../apis/dashboardApis";
 import { AxiosResponse } from "axios";
 
-const dashboardItemTypes = [{ label: 'Please select', value: null }, ...DASHBOARDITEMTYPES];
+
+export interface AddDashboardItemControls {
+    name: string;
+    type: DropdownItem;
+    tankProperties: {
+        capacity: number;
+    };
+    gaugeProperties: {
+        min: number;
+        max: number;
+    };
+    chartProperties: {
+        categoryColumn: string;
+        valueColumn: string;
+    };
+    dataSource: {
+        type: DatasourceType;
+        deviceSource: DropdownItem;
+        device: DropdownItem;
+        sensor: DropdownItem;
+        attribute: string;
+    }
+}
 
 interface AddDashboardItemProps {
     authState: AuthState;
@@ -27,83 +48,141 @@ interface AddDashboardItemProps {
     dashboardId: string;
     dashboardItem?: DashboardItemModel;
 }
-
 export type DatasourceType = "device" | "aggregateField";
-const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardItemProps): React.ReactElement<void> => {
-    const [dashboardItem, setDashboardItem] = React.useState<DashboardItemModel>({ name: '', type: null, dashboardId: null, possition: '', property: null });
-    const [selectedItemType, setSelectedItemType] = React.useState<DropdownItem<number>>(dashboardItemTypes[0]);
 
-    const [dashboardItemErrors, setDashboardItemErrors] = React.useState<DashboardItemModel>(null);
+const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardItemProps): React.ReactElement<void> => {
+
+    const [dashboardItemErrors, setDashboardItemErrors] = React.useState<AddDashboardItemControls>({} as AddDashboardItemControls);
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [fetching, setFetching] = React.useState<boolean>(false);
 
     // Data Source State
-    const [selectedDataSourceType, setSelectedDataSourceType] = React.useState<DatasourceType>("device");
-    const [selectedDeviceSource, setSelectedDeviceSource] = React.useState<DropdownItem>({} as DropdownItem);
-    const [selectedDevice, setSelectedDevice] = React.useState<DropdownItem>({} as DropdownItem);
-    const [selectedDeviceSensor, setSelectedDeviceSensor] = React.useState<DropdownItem>({} as DropdownItem);
-
+    const [itemControls, setItemControls] = React.useState<AddDashboardItemControls>({
+        name: '',
+        type: null,
+        dataSource: { type: "device" },
+        gaugeProperties: { min: 0, max: 0 },
+        tankProperties: { capacity: 0 },
+        chartProperties: { valueColumn: "", categoryColumn: "" },
+    } as AddDashboardItemControls);
 
     // steps tracker
     const [stepTracker, setStepTracker] = React.useState<number>(0);
     const stepList: Array<string> = React.useMemo(() => ["Dashboard Item", "Data Source", "Summary"], []);
 
-
     const handleDashboardItemNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setDashboardItem({ ...dashboardItem, [e.target.name]: e.target.value });
-    }, [setDashboardItem, dashboardItem]);
+        setItemControls({ ...itemControls, [e.target.name]: e.target.value });
+    }, [itemControls]);
 
     const handleItemTypeDropdownChange = React.useCallback((value: DropdownItem) => {
-        setSelectedItemType(value);
-        setDashboardItem({ ...dashboardItem, type: Number(value?.value) });
-
-    }, [setDashboardItem, dashboardItem, setSelectedItemType]);
+        setItemControls({ ...itemControls, type: value });
+    }, [setItemControls, itemControls]);
 
     const deviceDataSourcesDropdownChange = React.useCallback((value: DropdownItem) => {
-        setSelectedDeviceSource(value);
-    }, []);
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, deviceSource: value } });
+    }, [itemControls]);
 
     const deviceDropdownChange = React.useCallback((value: DropdownItem) => {
-        setSelectedDevice(value);
-    }, []);
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, device: value } });
+    }, [itemControls]);
 
     const deviceSensorDropdownChange = React.useCallback((value: DropdownItem) => {
-        setSelectedDeviceSensor(value);
-    }, []);
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, sensor: value } });
+    }, [itemControls]);
 
     const selectedDataSourceChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedDataSourceType(e.target.value as DatasourceType);
-    }, []);
+        setItemControls({ ...itemControls, dataSource: { ...itemControls.dataSource, type: e.target.value as DatasourceType } });
+    }, [itemControls]);
+
+    const handleItemPropertyChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, type: "tank" | "gauge" | "chart") => {
+        switch (type) {
+            case "gauge":
+                setItemControls({ ...itemControls, gaugeProperties: { ...itemControls?.gaugeProperties, [e.target.name]: e.target.value } });
+                break;
+            case "tank":
+                setItemControls({ ...itemControls, tankProperties: { ...itemControls?.tankProperties, [e.target.name]: e.target.value } });
+                break;
+            case "chart":
+                setItemControls({ ...itemControls, chartProperties: { ...itemControls?.chartProperties, [e.target.name]: e.target.value } });
+                break;
+        }
+    }, [itemControls]);
+
 
     const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        let property: { [k: string]: string | number }  = {};
+        let property: { [k: string]: string | number } = {};
 
-        if (selectedDataSourceType === "device") {
-            property["device"] = selectedDevice?.value;
-            console.log("The selected source is ", selectedDeviceSource);
-            if (selectedDeviceSource.value === "sensor") {
-                property["sensor"] = selectedDeviceSensor?.value;
+        switch (itemControls?.type?.value) {
+            case ChartType.Tank:
+                property["item"] = "tank";
+                property["capacity"] = itemControls?.tankProperties?.capacity;
+                break;
+            case ChartType.Gauge:
+                property["item"] = "gauge";
+                property["min"] = itemControls?.gaugeProperties?.min;
+                property["max"] = itemControls?.gaugeProperties?.max;
+                break;
+            case ChartType.LineGraph:
+                property["item"] = "lineGraph";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            case ChartType.BarGraph:
+                property["item"] = "barGraph";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            case ChartType.PieChart:
+                property["item"] = "pieChart";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            case ChartType.Doughnut:
+                property["item"] = "doughnut";
+                property["categoryColumn"] = itemControls?.chartProperties?.categoryColumn;
+                property["valueColumn"] = itemControls?.chartProperties?.valueColumn;
+                break;
+            default:
+                property["item"] = "status";
+                break;
+        }
+
+        if (itemControls?.dataSource.type === "device") {
+            property["type"] = "device";
+            if (itemControls?.dataSource?.deviceSource?.value === "sensor") {
+                property["from"] = "sensor";
+                property["sourceId"] = itemControls?.dataSource?.sensor?.value;
             } else {
-                // set att
-                property["attribute"] = null;
+                // set attribute
+                property["from"] = "attribute";
+                property["sourceId"] = null;
             }
         } else {
-            property["aggregateField"] = null;
-            property["aggregateFieldId"] = null;
+            property["type"] = "aggregateField";
+            property["from"] = "aggregateField";
+            property["sourceId"] = "aggregateFieldSourceId";
         }
 
         const payload: DashboardItemModel = {
-            ...dashboardItem,
-            property: JSON.stringify(property || ""),
+            ...props.dashboardItem,
+            type: itemControls?.type?.value,
+            name: itemControls?.name,
+            property: JSON.stringify([property] || ""),
             dashboardId: props.dashboardId
         };
-
+        setLoading(true);
         DashboardApis.addDashboardItem(payload)
             .then((response: AxiosResponse) => {
-                console.log("The response is here ", response);
-
-                // props.onSave(e, response.data);
+                props.onSave(e, response.data);
             });
 
-    }, [dashboardItem, selectedDeviceSource, selectedDeviceSensor, selectedDataSourceType]);
+        e.preventDefault();
+
+    }, [props.dashboardItem, itemControls]);
+
+    React.useEffect(() => {
+        setFetching(props?.loading);
+    }, [props.loading]);
 
 
     return (
@@ -111,57 +190,35 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
             <StepTracker step={stepTracker} list={stepList} onClick={(index: number) => setStepTracker(index)} />
             <form className="add-dashboard-item" onSubmit={handleSave}>
                 {stepTracker === 0 &&
-                    <div className="row">
-                        <div className="col-12 col-sm-6">
-                            <TextBoxGroup
-                                name="name"
-                                label="Name"
-                                type="text"
-                                disabled={props?.loading}
-                                placeholder="Dashboard name"
-                                value={dashboardItem?.name}
-                                error={dashboardItemErrors?.name}
-                                onChange={handleDashboardItemNameChange}
-                            />
-                        </div>
-                        <div className="col-12 col-sm-6">
-                            <Dropdown
-                                label="Item Type"
-                                list={dashboardItemTypes}
-                                disabled={props?.loading}
-                                selectedValue={selectedItemType}
-                                error={dashboardItemErrors?.type as any}
-                                onChange={handleItemTypeDropdownChange}
-                            />
-                        </div>
-                    </div>
+                    <ItemPropertySection
+                        loading={loading}
+                        fetching={fetching}
+                        itemControls={itemControls}
+                        dashboardItemErrors={dashboardItemErrors}
+                        handleDashboardItemNameChange={handleDashboardItemNameChange}
+                        handleItemTypeDropdownChange={handleItemTypeDropdownChange}
+                        handleItemPropertyChange={handleItemPropertyChange}
+                    />
                 }
                 {
                     stepTracker === 1 &&
                     <DataSourcesSection
-                        loading={props.loading}
-                        selectedDeviceSource={selectedDeviceSource}
-                        selectedDevice={selectedDevice}
+                        loading={loading}
+                        fetching={fetching}
                         deviceDataSourcesDropdownChange={deviceDataSourcesDropdownChange}
                         deviceDropdownChange={deviceDropdownChange}
                         dataSourceTypeChange={selectedDataSourceChange}
-                        selectedDataSourceType={selectedDataSourceType}
                         authState={props.authState}
-                        selectedDeviceSensor={selectedDeviceSensor}
+                        itemControls={itemControls}
                         deviceSensorChange={deviceSensorDropdownChange}
                     />
                 }
                 {
                     stepTracker === 2 &&
                     <DashabordItemSummarySection
-                        loading={props.loading}
-                        selectedDeviceSource={selectedDeviceSource}
-                        selectedDevice={selectedDevice}
-                        dashboardItem={dashboardItem}
-                        selectedDataSourceType={selectedDataSourceType}
+                        fetching={fetching}
+                        itemControls={itemControls}
                         authState={props.authState}
-                        selectedDeviceSensor={selectedDeviceSensor}
-                        selectedDashboardItemType={selectedItemType}
                     />
                 }
                 <div className="row controls-holder">
@@ -180,7 +237,7 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
                             }
                             {stepTracker === 2 &&
                                 <Button label="Save" className="ml-6" type="submit" size="sm" theme="primary" title="Save" onClick={null}>
-                                    <Loader toggle={props.loading} />
+                                    <Loader toggle={loading} />
                                 </Button>
                             }
                         </div>
