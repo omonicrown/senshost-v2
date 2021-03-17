@@ -151,32 +151,6 @@ const DashboardItem: React.FC = () => {
         }
     };
 
-    const renderChartTable = (dashboardItem: DashboardItemModel, index: number) => {
-        const chartProperties: Array<PropertyItem> = convertStringToJson<Array<PropertyItem>>(dashboardItem?.property);
-        return (
-            <div className="chart-info">
-                <table className="table table-borderless">
-                    <thead>
-                        <tr>
-                            <th>Property</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Array.isArray(chartProperties) && chartProperties?.map((property: PropertyItem, i: number) => {
-                            return (
-                                <tr key={`${property.propertyValue}-${i}`}>
-                                    <td>{property.propertyLabel}</td>
-                                    <td>{property.propertyValue}</td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
-
     return (
         <div className="dashboard-item-container" onClick={() => { setToggleAction(!toggleAction); }}>
             <Breadcrumb className="dashboard-breadcrumb" id="2" list={breadcrumbList} onClick={onBreadcrumbClick} />
@@ -204,7 +178,6 @@ const DashboardItem: React.FC = () => {
                                     <div className="chart-holder">
                                         {renderCharts(dashboardItem, index)}
                                     </div>
-                                    {renderChartTable(dashboardItem, index)}
                                 </div>
                                 <div className="card-footer text-muted">
                                     Created: {dashboardItem?.creationDate}
