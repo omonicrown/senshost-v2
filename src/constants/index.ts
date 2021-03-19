@@ -162,6 +162,10 @@ export enum ChartType {
     Other = 6
 }
 
+export enum DashboardItemStatus {
+    On = 1,
+    Off = 0
+}
 export const DASHBOARDPROPERTIES: Array<DashboardPropertiesOptions> = [
     {
         type: ChartType.Tank,

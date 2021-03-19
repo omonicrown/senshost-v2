@@ -4,12 +4,11 @@ import { EChartOption } from "echarts";
 
 import "echarts-liquidfill";
 import ReactEcharts from 'echarts-for-react';
-import { PropertyItem } from "../dashboardItem/DashboardItem";
+import { ItemChartProps } from "../dashboardItem/section/ItemChart";
 
 interface GaugeProps {
   type: "rectangle" | "tears" | "circle";
-  data: Array<PropertyItem>;
-  name: string;
+  data: ItemChartProps;
 }
 
 interface ChartOption extends EChartOption {
@@ -32,7 +31,7 @@ const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Rea
       },
       series: [{
         type: 'liquidFill',
-        name: props.name,
+        name: props.data?.name,
         data: [0.9],
         detail: { formatter: '{value * 100}%' },
         radius: '100%',
@@ -56,7 +55,7 @@ const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Rea
       series: [{
         type: 'liquidFill',
         data: [0.6],
-        name: props.name,
+        name: props.data?.name,
         detail: { formatter: '{value * 100}%' },
         radius: '100%',
         outline: {
@@ -76,7 +75,7 @@ const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Rea
         detail: { formatter: '{value * 100}%' },
         data: [0.6],
         radius: '100%',
-        name: props.name,
+        name: props?.data?.name,
         itemStyle: {
           shadowBlur: 0
         },
@@ -109,17 +108,17 @@ const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Rea
   React.useEffect(() => {
     const updatedOptions: Array<ChartOption> = options.map((option: ChartOption) => {
       if (option.name === props.type) {
-        const capacityItem: PropertyItem = props.data?.find((property: PropertyItem) => property.propertyName === "capacity");
-        const valueItem: PropertyItem = props.data?.find((property: PropertyItem) => property.propertyName === "value");
-        const data: number = (Number(valueItem?.propertyValue) / Number(capacityItem?.propertyValue));
-        return { ...option, properties: { ...option.properties, series: { ...option.properties.series, data: [data || 0] }} };
+        const capacity: number = Number(props.data?.capacity);
+        const value = Number(props.data?.value);
+        const data: number = Number(value) / Number(capacity);
+        return { ...option, properties: { ...option.properties, series: { ...option.properties.series, data: [data || 0] } } };
       }
 
       return option;
     }, [props.type]);
 
     setOptions(updatedOptions);
-  }, [props.type, props.data, props.name])
+  }, [props.type, props.data])
 
   return (
     <ReactEcharts className="chart" option={selectedOption} />

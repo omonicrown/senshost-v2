@@ -1,6 +1,6 @@
 import { AxiosPromise } from "axios";
 import configs from "../configs";
-import { PositiveResponse, SensorModel } from "../interfaces/models";
+import { PositiveResponse, SensorModel, SensorValue } from "../interfaces/models";
 import { SensorLiveApis } from "./live/sensorLiveApis";
 
 
@@ -44,6 +44,14 @@ export class SensorApis {
             return {} as AxiosPromise;
         } else {
             return this.sensorApis.updateSensorById(id, sensor);
+        }
+    }
+
+    static getSensorValuesById(id: string): AxiosPromise<Array<SensorValue>> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.sensorApis.getSensorValuesById(id);
         }
     }
 }

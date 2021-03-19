@@ -13,17 +13,14 @@
 
         @import "../shared/chart.scss";
     }
-
     > .pagination-holder {
         margin: 1rem;
     }
-
     > .custom-breadcrumb {
         &.dashboard-breadcrumb {
             margin: 0 1rem;
         }
     }
-
     > .dashboards-holder {
         flex-wrap: wrap;
 

@@ -1,10 +1,10 @@
 import * as React from "react";
 
 import * as echarts from 'echarts';
-import { PropertyItem } from "../dashboardItem/DashboardItem";
+import { ItemChartProps } from "../dashboardItem/section/ItemChart";
 
 interface GaugeProps {
-    data: Array<PropertyItem>;
+    data: ItemChartProps;
 }
 
 const BarGraph: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
@@ -12,21 +12,17 @@ const BarGraph: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
 
     React.useEffect(() => {
         const barChart = echarts.init(chartRef.current);
-        const xAxis: Array<string> = props.data?.filter((item: PropertyItem) => item.propertyName === "x-axis")
-            .map((propertyItem: PropertyItem) => propertyItem.propertyValue);
-        const yAxis: Array<string> = props.data?.filter((item: PropertyItem) => item.propertyName === "y-axis")
-            .map((propertyItem: PropertyItem) => propertyItem.propertyValue);
 
         const option: echarts.EChartOption = {
             xAxis: {
                 type: 'category',
-                data: xAxis
+                data: props?.data?.categoryColumnData
             },
             yAxis: {
                 type: 'value'
             },
             series: [{
-                data: yAxis,
+                data: props?.data?.valueColumnData,
                 type: 'bar'
             }]
         };

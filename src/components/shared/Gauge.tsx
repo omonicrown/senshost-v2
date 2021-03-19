@@ -1,13 +1,11 @@
 import * as React from "react";
 
 import * as echarts from 'echarts';
-import { PropertyItem } from "../dashboardItem/DashboardItem";
+import { ItemChartProps } from "../dashboardItem/section/ItemChart";
 
 interface GaugeProps {
-    data: Array<PropertyItem>;
-    name: string;
+    data: ItemChartProps;
 }
-
 
 const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
     const gaugeRef: React.MutableRefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
@@ -15,15 +13,16 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
 
     React.useEffect(() => {
         const gaugeChart = echarts.init(gaugeRef.current);
-        const data = props.data?.map((property: PropertyItem) => ({ name: '', value: property.propertyValue }));
 
         const option = {
             tooltip: {
                 formatter: '{a} <br/>{b} : {c}%'
             },
             series: [{
-                name: props.name,
+                name: props?.data?.name,
                 type: 'gauge',
+                min: props?.data?.min,
+                max: props?.data?.max,
                 progress: {
                     show: true
                 },
@@ -31,11 +30,11 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
                     valueAnimation: true,
                     formatter: '{value}'
                 },
-                data: data
+                data: props?.data?.value
             }]
         };
 
-        option && gaugeChart.setOption(option);
+        option && gaugeChart.setOption(option as any);
 
     }, [gaugeRef.current]);
 

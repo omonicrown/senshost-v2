@@ -1,11 +1,10 @@
 import * as React from "react";
 
 import * as echarts from 'echarts';
-import { PropertyItem } from "../dashboardItem/DashboardItem";
+import { ItemChartProps } from "../dashboardItem/section/ItemChart";
 
 interface GaugeProps {
-    data: Array<PropertyItem>;
-    name: string;
+    data: ItemChartProps;
 }
 
 
@@ -15,7 +14,11 @@ const Doughnut: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
 
     React.useEffect(() => {
         const doughnutChart = echarts.init(doughnutRef.current);
-        const data = props.data?.map((property: PropertyItem) => ({ name: property.propertyName, value: property.propertyValue }));
+        const doughnutData: Array<{ name: string, value: number }> = props?.data?.valueColumnData?.map((column: string, index: number) => ({
+            name: column as string,
+            value: props?.data?.valueColumnData[index] as number || 0
+        }));
+
         const option: any = {
             title: {
                 text: '',
@@ -27,7 +30,7 @@ const Doughnut: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
             },
             series: [
                 {
-                    name: props.name,
+                    name: props?.data?.name,
                     type: 'pie',
                     radius: ['40%', '70%'],
                     avoidLabelOverlap: false,
@@ -45,14 +48,14 @@ const Doughnut: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
                     labelLine: {
                         show: false
                     },
-                    data: data
+                    data: doughnutData || []
                 }
             ]
         };
 
         option && doughnutChart.setOption(option);
 
-    }, [doughnutRef.current, props.data, props.name]);
+    }, [doughnutRef.current, props.data]);
 
     return (
         <div className="doughnut-graph" ref={doughnutRef} style={styles} />

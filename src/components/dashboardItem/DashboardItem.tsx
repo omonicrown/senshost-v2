@@ -3,18 +3,13 @@ import { AxiosResponse } from 'axios';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DashboardApis } from '../../apis/dashboardApis';
-import { ChartType, initialState } from '../../constants';
+import { initialState } from '../../constants';
 import { DashboardItemModel, DashboardModel } from '../../interfaces/models';
 import { States } from '../../interfaces/states';
 import { Dispatch } from "redux";
 import { History } from "history";
 
-import Gauge from "../shared/Gauge";
-import Tank from "../shared/Tank";
-import LineChart from "../shared/LineChart";
-import BarGraph from "../shared/BarGraph";
-import PieChart from "../shared/PieChart";
-import Doughnut from "../shared/Doughnut";
+import ItemChart from "./section/ItemChart";
 
 import { toggleNotification } from '../../actions';
 import { NotificationProps } from '@sebgroup/react-components/dist/notification/Notification';
@@ -26,20 +21,7 @@ import PortalComponent from '../shared/Portal';
 
 import AddDashboardItem from "./modals/AddDashboardItem";
 
-import { convertStringToJson } from '../../utils/functions';
 import CardAction from './modals/CardAction';
-
-export interface PropertyItem {
-    propertyName: string;
-    propertyValue: string;
-    propertyLabel: string;
-    otherProperty?: string;
-}
-
-interface BreadcrumbProps {
-    list: Array<string>;
-    activeIndex: number;
-}
 
 const DashboardItem: React.FC = () => {
     const [dashboardItems, setDashboardItems] = React.useState<Array<DashboardItemModel>>([]);
@@ -130,27 +112,6 @@ const DashboardItem: React.FC = () => {
 
     }, [dashboardId]);
 
-    const renderCharts = (dashboardItem: DashboardItemModel, index: number) => {
-        const chartProperties: Array<PropertyItem> = convertStringToJson<Array<PropertyItem>>(dashboardItem?.property);
-        if (!Array.isArray(chartProperties)) return null;
-        switch (dashboardItem.type) {
-            case ChartType.Tank:
-                return <Tank type={index % 2 === 0 ? "tears" : 'rectangle'} name={dashboardItem.name} data={chartProperties} />;
-            case ChartType.Gauge:
-                return <Gauge data={chartProperties} name={dashboardItem.name} />;
-            case ChartType.LineGraph:
-                return <LineChart data={chartProperties} />;
-            case ChartType.BarGraph:
-                return <BarGraph data={chartProperties} />;
-            case ChartType.PieChart:
-                return <PieChart data={chartProperties} name={dashboardItem.name} />;
-            case ChartType.Doughnut:
-                return <Doughnut data={chartProperties} name={dashboardItem.name} />;
-            default:
-                return <PieChart data={chartProperties} name={dashboardItem.name} />;
-        }
-    };
-
     return (
         <div className="dashboard-item-container" onClick={() => { setToggleAction(!toggleAction); }}>
             <Breadcrumb className="dashboard-breadcrumb" id="2" list={breadcrumbList} onClick={onBreadcrumbClick} />
@@ -176,7 +137,7 @@ const DashboardItem: React.FC = () => {
                                 </h4>
                                 <div className="card-body">
                                     <div className="chart-holder">
-                                        {renderCharts(dashboardItem, index)}
+                                        <ItemChart {...dashboardItem} />
                                     </div>
                                 </div>
                                 <div className="card-footer text-muted">

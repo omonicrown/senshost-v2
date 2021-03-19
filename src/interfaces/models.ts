@@ -43,6 +43,13 @@ export interface ActuatorModel {
     creationDate?: Date;
 }
 
+export interface SensorValue {
+    fieldID: string;
+    value: string;
+    id: string;
+    creationDate: string
+}
+
 export interface GroupModel {
     accountId: string;
     name: string;

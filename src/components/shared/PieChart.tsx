@@ -1,11 +1,10 @@
 import * as React from "react";
 
 import * as echarts from 'echarts';
-import { PropertyItem } from "../dashboardItem/DashboardItem";
+import { ItemChartProps } from "../dashboardItem/section/ItemChart";
 
 interface GaugeProps {
-    data: Array<PropertyItem>;
-    name: string;
+    data: ItemChartProps;
 }
 
 
@@ -15,7 +14,11 @@ const PieChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
 
     React.useEffect(() => {
         const pieChart = echarts.init(pieChartRef.current);
-        const data = props.data?.map((property: PropertyItem) => ({ name: property.propertyName, value: property.propertyValue }));
+
+        const pieChartData: Array<{ name: string, value: number }> = props?.data?.valueColumnData?.map((column: string, index: number) => ({
+            name: column as string,
+            value: props?.data?.valueColumnData[index] as number || 0
+        }));
 
         const option: echarts.EChartOption = {
             title: {
@@ -32,10 +35,10 @@ const PieChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
             },
             series: [
                 {
-                    name: props.name,
+                    name: props.data?.name,
                     type: 'pie',
                     radius: '50%',
-                    data: data,
+                    data: pieChartData || [],
                     emphasis: {
                         itemStyle: {
                             shadowBlur: 10,

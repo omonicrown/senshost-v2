@@ -2,11 +2,10 @@ import * as React from "react";
 
 import * as echarts from 'echarts';
 import { EChartOption } from "echarts";
-
-import { PropertyItem } from "../dashboardItem/DashboardItem";
+import { ItemChartProps } from "../dashboardItem/section/ItemChart";
 
 interface GaugeProps {
-    data: Array<PropertyItem>;
+    data: ItemChartProps;
 }
 
 
@@ -45,15 +44,11 @@ const LineChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): Reac
 
     React.useEffect(() => {
         const lineChart = echarts.init(lineGraphRef.current);
-        const xAxis: Array<string> = props.data?.filter((item: PropertyItem) => item.propertyName === "x-axis")
-            .map((propertyItem: PropertyItem) => propertyItem.propertyValue);
-        const yAxis: Array<number> = props.data?.filter((item: PropertyItem) => item.propertyName === "y-axis")
-            .map((propertyItem: PropertyItem) => Number(propertyItem.propertyValue));
 
         const option: ChartOption = {
             xAxis: {
                 type: 'category',
-                data: xAxis
+                data: props?.data?.categoryColumnData as Array<string> || []
             },
             yAxis: {
                 type: 'value'
@@ -63,7 +58,7 @@ const LineChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): Reac
             },
             series: [{
                 name: 'LineGraph',
-                data: yAxis,
+                data: props?.data?.valueColumnData as any || [],
                 type: 'line',
                 detail: { formatter: '{value}%', fontSize: 20 },
                 smooth: true
