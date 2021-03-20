@@ -54,4 +54,20 @@ export class DashboardApis {
             return this.dashboardApis.addDashboardItem(dashboardItem);
         }
     }
+
+    static updateDashboardItemById(dashboardItem: DashboardItemModel): AxiosPromise<DashboardItemModel> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.dashboardApis.updateDashboardItemById(dashboardItem);
+        }
+    }
+
+    static deleteDashboardItemById(id: string): AxiosPromise<PositiveResponse> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.dashboardApis.deleteDashboardItemById(id);
+        }
+    }
 }

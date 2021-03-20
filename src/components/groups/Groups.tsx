@@ -369,8 +369,6 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
               <p>Are you sure you want to delete this ?</p>
               : null
           }
-          ariaLabel="My Label"
-          ariaDescribedby="My Description"
           footer={
             groupDeleteModalProps?.toggle ?
               <div className="controls-holder d-flex flex-sm-row flex-column">

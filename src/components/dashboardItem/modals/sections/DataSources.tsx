@@ -2,10 +2,11 @@ import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown
 import { RadioGroup } from "@sebgroup/react-components/dist/RadioGroup";
 import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
+import { useSelector } from "react-redux";
 import { DeviceApis } from "../../../../apis/deviceApis";
 import { SensorApis } from "../../../../apis/sensorApis";
 import { DeviceModel, SensorModel } from "../../../../interfaces/models";
-import { AuthState } from "../../../../interfaces/states";
+import { AuthState, DeviceState, States } from "../../../../interfaces/states";
 import { AddDashboardItemControls } from "../AddDashboardItem";
 
 const DEVICEDATASOURCES: Array<DropdownItem> = [
@@ -38,20 +39,13 @@ interface DataSourcesProps {
 
 const DataSources: React.FC<DataSourcesProps> = (props: DataSourcesProps): React.ReactElement<void> => {
 
-    const [devices, setDevices] = React.useState<Array<DropdownItem>>([{ label: 'Please select', value: null }]);
     const [sensors, setSensors] = React.useState<Array<DropdownItem>>([{ label: 'Please select', value: null }]);
 
-    React.useEffect(() => {
-        DeviceApis.getDevicesByAccount(props.authState?.auth?.account?.id)
-            .then((response: AxiosResponse<Array<DeviceModel>>) => {
-                if (response?.data) {
-                    const updatedDevices: Array<DropdownItem> = response?.data?.map((device: DeviceModel) => ({ label: device.name, value: device.id }));
-                    setDevices([...devices, ...updatedDevices]);
-                }
-            }).catch((error: AxiosError) => {
-                setDevices([{ label: 'Please select', value: null }]);
-            });
-    }, []);
+    const deviceState: DeviceState = useSelector((states: States) => states?.devices);
+    const devices: Array<DropdownItem> = React.useMemo(() => {
+        const updatedDevices: Array<DropdownItem> = deviceState?.devices?.map((device: DeviceModel) => ({ label: device.name, value: device.id }));
+        return [{ label: 'Please select', value: null }, ...updatedDevices];
+    }, [deviceState?.devices]);
 
     React.useEffect(() => {
         if (props.itemControls?.dataSource?.device?.value) {

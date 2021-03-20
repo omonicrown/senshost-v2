@@ -19,6 +19,8 @@ export type TOGGLE_NOTIFICATION = typeof TOGGLE_NOTIFICATION;
 export const RECEIVE_GROUPS = "RECEIVE_GROUPS";
 export const LOG_GROUP_ERROR = "LOG_GROUP_ERROR";
 
+export const RECEIVE_DEVICES = "RECEIVE_DEVICES";
+export const LOG_DEVICE_ERROR = "LOG_GROUP_ERROR";
 
 export const SENSORSTYPESCOLUMN: Array<Column> = [{
     label: "id",

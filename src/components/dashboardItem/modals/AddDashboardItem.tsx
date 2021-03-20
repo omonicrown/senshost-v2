@@ -5,9 +5,9 @@ import { Loader } from "@sebgroup/react-components/dist/Loader";
 import { StepTracker } from "@sebgroup/react-components/dist/StepTracker";
 
 import React from "react";
-import { ChartType } from "../../../constants";
-import { DashboardItemModel } from "../../../interfaces/models";
-import { AuthState } from "../../../interfaces/states";
+import { ChartType, DASHBOARDITEMTYPES } from "../../../constants";
+import { DashboardItemModel, DeviceModel } from "../../../interfaces/models";
+import { AuthState, DeviceState, States } from "../../../interfaces/states";
 import { icontypesEnum, SvgElement } from "../../../utils/svgElement";
 
 import DataSourcesSection from "./sections/DataSources";
@@ -15,6 +15,8 @@ import ItemPropertySection from "./sections/ItemProperty";
 import DashabordItemSummarySection from "./sections/DashboardItemSummary";
 import { DashboardApis } from "../../../apis/dashboardApis";
 import { AxiosResponse } from "axios";
+import { convertStringToJson } from "../../../utils/functions";
+import { useSelector } from "react-redux";
 
 export interface DashboardPropertiesOptions {
     type: number;
@@ -47,6 +49,7 @@ export interface AddDashboardItemControls {
 interface AddDashboardItemProps {
     authState: AuthState;
     onSave: (e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => void;
+    onUpdate: (e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => void;
     onCancel: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     loading: boolean;
     dashboardId: string;
@@ -55,7 +58,6 @@ interface AddDashboardItemProps {
 export type DatasourceType = "device" | "aggregateField";
 
 const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardItemProps): React.ReactElement<void> => {
-
     const [dashboardItemErrors, setDashboardItemErrors] = React.useState<AddDashboardItemControls>({} as AddDashboardItemControls);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [fetching, setFetching] = React.useState<boolean>(false);
@@ -151,15 +153,21 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
                 break;
         }
 
+        property["deviceSource"] = itemControls?.dataSource?.deviceSource?.label;
+        property["deviceSourceId"] = itemControls?.dataSource?.deviceSource?.value;
+        property["deviceId"] = itemControls?.dataSource?.device?.value;
+        property["device"] = itemControls?.dataSource?.device?.label;
+
         if (itemControls?.dataSource.type === "device") {
             property["type"] = "device";
             if (itemControls?.dataSource?.deviceSource?.value === "sensor") {
                 property["from"] = "sensor";
                 property["sourceId"] = itemControls?.dataSource?.sensor?.value;
+                property["sensor"] = itemControls?.dataSource?.sensor?.label;
             } else {
                 // set attribute
                 property["from"] = "attribute";
-                property["sourceId"] = null;
+                property["attribute"] = itemControls?.dataSource?.attribute;
             }
         } else {
             property["type"] = "aggregateField";
@@ -175,18 +183,58 @@ const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardIt
             dashboardId: props.dashboardId
         };
         setLoading(true);
-        DashboardApis.addDashboardItem(payload)
-            .then((response: AxiosResponse) => {
-                props.onSave(e, response.data);
-            });
-
+        if (payload?.id) {
+            DashboardApis.updateDashboardItemById(payload)
+                .then((response: AxiosResponse) => {
+                    props.onUpdate(e, response.data);
+                }).finally(() => {
+                    setLoading(false);
+                });
+        } else {
+            DashboardApis.addDashboardItem(payload)
+                .then((response: AxiosResponse) => {
+                    props.onSave(e, response.data);
+                }).finally(() => {
+                    setLoading(false);
+                });
+        }
         e.preventDefault();
 
     }, [props.dashboardItem, itemControls]);
 
     React.useEffect(() => {
         setFetching(props?.loading);
-    }, [props.loading]);
+
+        if (props?.dashboardItem?.id) {
+            const properties: Array<{ [k: string]: string & number }> = convertStringToJson(props?.dashboardItem?.property);
+            const selectedItemType = DASHBOARDITEMTYPES.find((item: DropdownItem) => item.value === props.dashboardItem?.type);
+            const property: { [k: string]: string & number } = properties[0];
+
+            const editItems: AddDashboardItemControls = {
+                ...props?.dashboardItem,
+                type: selectedItemType,
+                tankProperties: {
+                    capacity: property["capacity"]
+                },
+                gaugeProperties: {
+                    min: property["min"],
+                    max: property["max"]
+                },
+                chartProperties: {
+                    categoryColumn: property["categoryColumn"],
+                    valueColumn: property["valueColumn"]
+                },
+                dataSource: {
+                    type: property["type"],
+                    deviceSource: { label: property["deviceSource"], value: property["deviceSourceId"] },
+                    device: { label: property["device"], value: property["deviceId"] },
+                    sensor: { label: property["sensor"], value: property["sourceId"] },
+                    attribute: property["attribute"]
+                }
+            }
+            setItemControls(editItems);
+        }
+    }, [props.dashboardItem]);
 
 
     return (

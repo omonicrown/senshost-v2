@@ -29,4 +29,13 @@ export class DashboardLiveApis extends AxiosGlobal {
     addDashboardItem(dashboardItem: DashboardItemModel): AxiosPromise<DashboardItemModel> {
         return this.axios.post(`${configs.context}/${configs.apiList.DashboardItem}`, dashboardItem);
     }
+
+    updateDashboardItemById(dashboardItem: DashboardItemModel): AxiosPromise<DashboardItemModel> {
+        return this.axios.put(`${configs.context}/${configs.apiList.DashboardItem}/${dashboardItem?.id}`, dashboardItem);
+    }
+
+    deleteDashboardItemById(id: string): AxiosPromise<PositiveResponse> {
+        return this.axios.delete(`${configs.context}/${configs.apiList.DashboardItem}/${id}`);
+    }
+
 }

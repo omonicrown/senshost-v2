@@ -4,7 +4,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DashboardApis } from '../../apis/dashboardApis';
 import { initialState } from '../../constants';
-import { DashboardItemModel, DashboardModel } from '../../interfaces/models';
+import { DashboardItemModel, DashboardModel, PositiveResponse } from '../../interfaces/models';
 import { States } from '../../interfaces/states';
 import { Dispatch } from "redux";
 import { History } from "history";
@@ -22,6 +22,7 @@ import PortalComponent from '../shared/Portal';
 import AddDashboardItem from "./modals/AddDashboardItem";
 
 import CardAction from './modals/CardAction';
+import { Loader } from '@sebgroup/react-components/dist/Loader';
 
 const DashboardItem: React.FC = () => {
     const [dashboardItems, setDashboardItems] = React.useState<Array<DashboardItemModel>>([]);
@@ -30,6 +31,8 @@ const DashboardItem: React.FC = () => {
 
     const [fetching, setFetching] = React.useState<boolean>(false);
     const [modalProps, setModalProps] = React.useState<ModalProps>({ ...initialState, size: 'modal-lg' });
+    const [modalDeleteItemProps, setModalDeleteItemProps] = React.useState<ModalProps>({ ...initialState, size: 'modal-sm' });
+
 
     const [dashboard, setDashboard] = React.useState<DashboardModel>(null);
     const [dashboardItem, setDashboardItem] = React.useState<DashboardItemModel>(null);
@@ -50,8 +53,8 @@ const DashboardItem: React.FC = () => {
 
     const onDeleteDashboardItem = React.useCallback((e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, dashboardItem: DashboardItemModel) => {
         setDashboardItem(dashboardItem);
-        setModalProps({ ...modalProps, toggle: true });
-    }, [modalProps]);
+        setModalDeleteItemProps({ ...modalDeleteItemProps, toggle: true });
+    }, [modalDeleteItemProps]);
 
     const onAddDashboardItem = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setDashboardItem(null);
@@ -87,6 +90,57 @@ const DashboardItem: React.FC = () => {
 
     }, [dashboardItems, modalProps]);
 
+    const handleUpdateItem = React.useCallback((e: React.FormEvent<HTMLFormElement>, dashboardItem: DashboardItemModel) => {
+        const updatedItems: Array<DashboardItemModel> = dashboardItems?.map((item: DashboardItemModel) => {
+            if (item?.id === dashboardItem?.id) {
+                return dashboardItem;
+            }
+            return item;
+        })
+        setDashboardItems(updatedItems);
+        const notification: NotificationProps = {
+            theme: "success",
+            title: "Dashboard Item update",
+            message: `Dashboard item updated successfully`,
+            toggle: true,
+            onDismiss: () => { }
+        };
+        dispatch(toggleNotification(notification));
+        setModalProps({ ...modalProps, toggle: false });
+
+    }, [dashboardItems, modalProps]);
+
+    const handleDeleteItem = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        setLoading(true);
+        DashboardApis.deleteDashboardItemById(dashboardItem?.id)
+            .then((response: AxiosResponse<PositiveResponse>) => {
+                const indexOfItemToBeRemoved: number = dashboardItems?.findIndex((item: DashboardItemModel) => item.id === dashboardItem?.id);
+
+                const updatedItems: Array<DashboardItemModel> = [
+                    ...dashboardItems.slice(0, indexOfItemToBeRemoved),
+                    ...dashboardItems?.slice(indexOfItemToBeRemoved + 1)
+                ];
+
+                setDashboardItems(updatedItems);
+                const notification: NotificationProps = {
+                    theme: "success",
+                    title: "Dashboard Item delete",
+                    message: `Dashboard item deleted successfully`,
+                    toggle: true,
+                    onDismiss: () => { }
+                };
+                dispatch(toggleNotification(notification));
+                setModalDeleteItemProps({ ...modalDeleteItemProps, toggle: false });
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [modalDeleteItemProps, dashboardItems, dashboardItem]);
+
+    const handleDismissDeleteDashboardItem = React.useCallback((e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        setModalDeleteItemProps({ ...modalDeleteItemProps, toggle: false });
+        setDashboardItem({} as DashboardItemModel)
+    }, []);
 
     React.useEffect(() => {
         setFetching(true);
@@ -167,6 +221,7 @@ const DashboardItem: React.FC = () => {
                         modalProps?.toggle ?
                             <AddDashboardItem
                                 onSave={handleSave}
+                                onUpdate={handleUpdateItem}
                                 onCancel={onCancel}
                                 loading={loading}
                                 dashboardItem={dashboardItem}
@@ -174,6 +229,27 @@ const DashboardItem: React.FC = () => {
                                 dashboardId={dashboardId}
                             />
 
+                            : null
+                    }
+                />
+
+                <Modal
+                    {...modalDeleteItemProps}
+                    onDismiss={handleDismissDeleteDashboardItem}
+                    header={modalDeleteItemProps?.toggle ? <h4>Delete {dashboardItem?.name} ?</h4> : null}
+                    body={
+                        modalDeleteItemProps?.toggle ?
+                            <p>Are you sure you want to delete this ?</p>
+                            : null
+                    }
+                    footer={
+                        modalDeleteItemProps?.toggle ?
+                            <div className="controls-holder d-flex flex-sm-row flex-column">
+                                <Button label="Cancel" disabled={loading} theme="outline-primary" onClick={handleDismissDeleteDashboardItem} />
+                                <Button label="Delete" theme="danger" onClick={handleDeleteItem}>
+                                    {<Loader toggle={loading} size='sm' />}
+                                </Button>
+                            </div>
                             : null
                     }
                 />

@@ -12,17 +12,14 @@ import { actionTypes } from "../../types";
 import { DashboardProps } from "../dashboard/Dashboard";
 import { DevicesProps } from "../devices/Devices";
 
-import { Button } from "@sebgroup/react-components/dist/Button";
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import { GroupsProps } from "../groups/Groups";
 import { UsersProps } from "../users/Users";
 import { ViewDeviceProps } from "../viewDevice/ViewDevice";
 
-import { GroupApis } from "../../apis/groupApis";
 import { useSelector, useDispatch } from "react-redux";
-import { GroupModel } from "../../interfaces/models";
-import { AxiosResponse, AxiosError } from "axios";
 import { getGroupsByAccount } from "../../actions/groupActions";
+import { getDevicesByAccount } from "../../actions/deviceActions";
 
 import "../../styles/components/shared/modal.scss";
 
@@ -75,7 +72,8 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
   }, [toggleMenu, setMenuToggle]);
 
   React.useEffect(() => {
-    dispatch(getGroupsByAccount(authState?.auth?.account?.id))
+    dispatch(getGroupsByAccount(authState?.auth?.account?.id));
+    dispatch(getDevicesByAccount(authState?.auth?.account?.id));
   }, []);
 
   return (

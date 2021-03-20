@@ -1,4 +1,4 @@
-import { AuthResponseModel, Account, GroupModel } from "./models";
+import { AuthResponseModel, Account, GroupModel, DeviceModel } from "./models";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 
 export interface ErrorModel {
@@ -29,9 +29,14 @@ export interface GroupState extends IReducer {
     groups: Array<GroupModel>;
 }
 
+export interface DeviceState extends IReducer {
+    devices: Array<DeviceModel>;
+}
+
 export interface States {
     account: AccountState;
     auth: AuthState;
+    devices: DeviceState;
     notification: NotificationState;
     groups: GroupState;
 }
