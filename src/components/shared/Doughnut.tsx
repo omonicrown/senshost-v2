@@ -14,7 +14,7 @@ const Doughnut: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
 
     React.useEffect(() => {
         const doughnutChart = echarts.init(doughnutRef.current);
-        const doughnutData: Array<{ name: string, value: number }> = props?.data?.valueColumnData?.map((column: string, index: number) => ({
+        const doughnutData: Array<{ name: string, value: number }> = props?.data?.categoryColumnData?.map((column: string, index: number) => ({
             name: column as string,
             value: props?.data?.valueColumnData[index] as number || 0
         }));

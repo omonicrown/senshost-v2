@@ -15,7 +15,7 @@ const PieChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
     React.useEffect(() => {
         const pieChart = echarts.init(pieChartRef.current);
 
-        const pieChartData: Array<{ name: string, value: number }> = props?.data?.valueColumnData?.map((column: string, index: number) => ({
+        const pieChartData: Array<{ name: string, value: number }> = props?.data?.categoryColumnData?.map((column: string, index: number) => ({
             name: column as string,
             value: props?.data?.valueColumnData[index] as number || 0
         }));
