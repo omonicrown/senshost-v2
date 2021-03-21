@@ -82,7 +82,7 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
         setModalProps({ ...modalProps, toggle: true });
     }, [modalProps]);
 
-    const onDeleteDashboardClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>, dashboard: DashboardDisplayModel) => {
+    const onDeleteDashboardClick = React.useCallback((e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, dashboard: DashboardDisplayModel) => {
         setDashboard(dashboard);
         setModalDeleteDashboardProps({ ...modalDeleteDashboardProps, toggle: true });
     }, [modalDeleteDashboardProps]);
@@ -232,19 +232,27 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
                                     <h5 className="card-subtitle text-muted">{localDashboard.group}</h5>
                                     <p className="card-text">{localDashboard.description}.</p>
                                     <div className="controls-holder d-flex flex-row">
-                                        <Link to={`#`} className="card-link" onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => onEditDashboard(e, localDashboard)}>Edit</Link>
-                                        <Link to={`${HomeRoutes.DashboardItem?.toString()?.replace(":id", localDashboard.id)}`} className="card-link">Manage</Link>
+                                        <Link to={`#`} className="card-link" onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => onEditDashboard(e, localDashboard)}>
+                                            <span className="icon-holder">
+                                                <SvgElement type={icontypesEnum.PENCIL} />
+                                                Edit
+                                            </span>
 
-                                        <Button
-                                            title="Delete dashboard item"
-                                            label="Delete"
-                                            id="deleteDashbordBtn"
-                                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => onDeleteDashboardClick(e, localDashboard)}
-                                            theme="link"
-                                            icon={<SvgElement type={icontypesEnum.TRASH} />}
-                                            type="button"
-                                            size="md"
-                                        />
+                                        </Link>
+                                        <Link to={`${HomeRoutes.DashboardItem?.toString()?.replace(":id", localDashboard.id)}`} className="card-link">
+                                            <span className="icon-holder">
+                                                <SvgElement type={icontypesEnum.COG} />
+                                                Manage
+                                            </span>
+
+                                        </Link>
+                                        <Link to={`#`} id="deleteDashbordBtn" className="card-link" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => onDeleteDashboardClick(e, localDashboard)}>
+                                            <span className="icon-holder">
+                                                <SvgElement type={icontypesEnum.TRASH} />
+                                                Delete
+                                            </span>
+
+                                        </Link>
                                     </div>
                                 </div>
                                 <div className="card-footer text-muted">

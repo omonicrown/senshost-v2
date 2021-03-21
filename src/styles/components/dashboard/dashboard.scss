@@ -50,6 +50,19 @@
                         align-items: flex-end;
                         justify-content: flex-start;
 
+                        .icon-holder {
+                            text-align: left;
+                            width: auto;
+                            align-items: center;
+                            svg {
+                                fill: currentColor;
+                                width: auto;
+                                margin-right: calculateRem(8);
+                                width: 18px;
+                                height: 18px;
+                            }
+                        }
+
                         > #deleteDashbordBtn {
                             min-height: auto;
                             margin-left: auto;
