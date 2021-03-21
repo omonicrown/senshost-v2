@@ -2,7 +2,7 @@ import React from "react";
 import { SharedProps } from "../home/Home";
 import { HomeRoutes } from "../../enums/routes";
 import { Link, useHistory, useLocation } from "react-router-dom";
-import { DashboardModel, GroupModel } from "../../interfaces/models";
+import { DashboardModel, GroupModel, PositiveResponse } from "../../interfaces/models";
 import { DashboardApis } from "../../apis/dashboardApis";
 import { useDispatch, useSelector } from "react-redux";
 import { GroupState, States, AuthState } from "../../interfaces/states";
@@ -24,6 +24,9 @@ import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 import queryString from 'query-string';
 
 import { History, Location } from "history";
+import { icontypesEnum, SvgElement } from "../../utils/svgElement";
+import { Loader } from "@sebgroup/react-components/dist/Loader";
+
 
 export interface DashboardProps extends SharedProps {
 
@@ -49,6 +52,7 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
     const [loading, setLoading] = React.useState<boolean>(false);
     const [fetching, setFetching] = React.useState<boolean>(false);
     const [modalProps, setModalProps] = React.useState<ModalProps>({ ...initialState });
+    const [modalDeleteDashboardProps, setModalDeleteDashboardProps] = React.useState<ModalProps>({ ...initialState });
 
     const arrayTemp: Array<number> = React.useMemo(() => [1, 2, 3, 4], []);
 
@@ -77,6 +81,45 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
         setDashboard(dashboard);
         setModalProps({ ...modalProps, toggle: true });
     }, [modalProps]);
+
+    const onDeleteDashboardClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>, dashboard: DashboardDisplayModel) => {
+        setDashboard(dashboard);
+        setModalDeleteDashboardProps({ ...modalDeleteDashboardProps, toggle: true });
+    }, [modalDeleteDashboardProps]);
+
+    const handleDismissDeleteDashboard = React.useCallback((e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        setModalDeleteDashboardProps({ ...modalDeleteDashboardProps, toggle: false });
+        setDashboard({} as DashboardDisplayModel)
+    }, [modalDeleteDashboardProps]);
+
+
+    const handleDeleteDashboard = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+        setLoading(true);
+        DashboardApis.deleteDashboardById(dashboard?.id)
+            .then((response: AxiosResponse<PositiveResponse>) => {
+                const indexOfItemToBeRemoved: number = dashboards?.findIndex((item: DashboardDisplayModel) => item.id === dashboard?.id);
+
+                const updatedItems: Array<DashboardDisplayModel> = [
+                    ...dashboards.slice(0, indexOfItemToBeRemoved),
+                    ...dashboards?.slice(indexOfItemToBeRemoved + 1)
+                ];
+
+                setDashboards(updatedItems);
+                const notification: NotificationProps = {
+                    theme: "success",
+                    title: "Dashboard Item delete",
+                    message: `Dashboard item deleted successfully`,
+                    toggle: true,
+                    onDismiss: () => { }
+                };
+                dispatch(toggleNotification(notification));
+                setModalDeleteDashboardProps({ ...modalDeleteDashboardProps, toggle: false });
+            })
+            .finally(() => {
+                setLoading(false);
+                setDashboard({} as DashboardDisplayModel);
+            });
+    }, [dashboards, dashboard, modalDeleteDashboardProps]);
 
     const handleSave = React.useCallback((e: React.FormEvent<HTMLFormElement>, localDashboard: DashboardModel) => {
         setLoading(true);
@@ -180,19 +223,32 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
                     </div>
                 ) :
                     dashboards.length ?
-                        dashboards?.map((dashboard: DashboardDisplayModel) =>
-                            <div className="card dashboard-card" key={dashboard.id}>
+                        dashboards?.map((localDashboard: DashboardDisplayModel) =>
+                            <div className="card dashboard-card" key={localDashboard.id}>
                                 <h4 className="card-header">
-                                    {dashboard.name}
+                                    {localDashboard.name}
                                 </h4>
                                 <div className="card-body">
-                                    <h5 className="card-subtitle text-muted">{dashboard.group}</h5>
-                                    <p className="card-text">{dashboard.description}.</p>
-                                    <Link to={`#`} className="card-link" onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => onEditDashboard(e, dashboard)}>Edit</Link>
-                                    <Link to={`${HomeRoutes.DashboardItem?.toString()?.replace(":id", dashboard.id)}`} className="card-link">Manage</Link>
+                                    <h5 className="card-subtitle text-muted">{localDashboard.group}</h5>
+                                    <p className="card-text">{localDashboard.description}.</p>
+                                    <div className="controls-holder d-flex flex-row">
+                                        <Link to={`#`} className="card-link" onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => onEditDashboard(e, localDashboard)}>Edit</Link>
+                                        <Link to={`${HomeRoutes.DashboardItem?.toString()?.replace(":id", localDashboard.id)}`} className="card-link">Manage</Link>
+
+                                        <Button
+                                            title="Delete dashboard item"
+                                            label="Delete"
+                                            id="deleteDashbordBtn"
+                                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => onDeleteDashboardClick(e, localDashboard)}
+                                            theme="link"
+                                            icon={<SvgElement type={icontypesEnum.TRASH} />}
+                                            type="button"
+                                            size="md"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="card-footer text-muted">
-                                    Created: {dashboard.creationDate}
+                                    Created: {localDashboard.creationDate}
                                 </div>
                             </div>
                         ) :
@@ -232,6 +288,28 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
                                 dashboard={dashboard}
                                 authState={authState}
                             />
+                            : null
+                    }
+                />
+
+
+                <Modal
+                    {...modalDeleteDashboardProps}
+                    onDismiss={handleDismissDeleteDashboard}
+                    header={modalDeleteDashboardProps?.toggle ? <h4>Delete {dashboard?.name} ?</h4> : null}
+                    body={
+                        modalDeleteDashboardProps?.toggle ?
+                            <p>Are you sure you want to delete this ?</p>
+                            : null
+                    }
+                    footer={
+                        modalDeleteDashboardProps?.toggle ?
+                            <div className="controls-holder d-flex flex-sm-row flex-column">
+                                <Button label="Cancel" disabled={loading} theme="outline-primary" onClick={handleDismissDeleteDashboard} />
+                                <Button label="Delete" theme="danger" onClick={handleDeleteDashboard}>
+                                    {<Loader toggle={loading} size='sm' />}
+                                </Button>
+                            </div>
                             : null
                     }
                 />

@@ -44,7 +44,20 @@
 
                     .chart-holder {
                         height: calculateRem(300);
-                        padding: 1.25rem 0;
+                        // padding: 1.25rem 0;
+                    }
+                    .controls-holder {
+                        align-items: flex-end;
+                        justify-content: flex-start;
+
+                        > #deleteDashbordBtn {
+                            min-height: auto;
+                            margin-left: auto;
+                            color: $danger;
+                            svg {
+                                fill: currentColor;
+                            }
+                        }
                     }
                 }
 

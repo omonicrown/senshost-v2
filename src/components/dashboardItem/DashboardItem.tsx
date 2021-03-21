@@ -134,13 +134,14 @@ const DashboardItem: React.FC = () => {
             })
             .finally(() => {
                 setLoading(false);
+                setDashboardItem({} as DashboardItemModel)
             });
     }, [modalDeleteItemProps, dashboardItems, dashboardItem]);
 
     const handleDismissDeleteDashboardItem = React.useCallback((e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setModalDeleteItemProps({ ...modalDeleteItemProps, toggle: false });
         setDashboardItem({} as DashboardItemModel)
-    }, []);
+    }, [modalDeleteItemProps]);
 
     React.useEffect(() => {
         setFetching(true);

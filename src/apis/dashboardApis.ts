@@ -31,6 +31,14 @@ export class DashboardApis {
         }
     }
 
+    static deleteDashboardById(id: string): AxiosPromise<PositiveResponse> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.dashboardApis.deleteDashboardById(id);
+        }
+    }
+
     static getDashboardById(id: string): AxiosPromise<DashboardModel> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;

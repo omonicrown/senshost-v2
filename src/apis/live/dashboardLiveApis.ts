@@ -22,6 +22,10 @@ export class DashboardLiveApis extends AxiosGlobal {
         return this.axios.put(`${configs.context}/${configs.apiList.Dashboard}/${dashboard.id}`, dashboard);
     }
 
+    deleteDashboardById(id: string): AxiosPromise<PositiveResponse> {
+        return this.axios.delete(`${configs.context}/${configs.apiList.Dashboard}/${id}`);
+    }
+
     getDashboardItemsByDashboardId(dashboardId: string): AxiosPromise<Array<DashboardItemModel>> {
         return this.axios.get(`${configs.context}/${configs.apiList.DashboardItem}/dashboard/${dashboardId}`);
     }
