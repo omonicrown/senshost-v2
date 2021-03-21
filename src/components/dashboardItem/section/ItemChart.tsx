@@ -34,7 +34,7 @@ const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.React
         switch (props.type) {
             case ChartType.Tank:
             case ChartType.Gauge:
-                const latestData: SensorValue = response?.length && response[response?.length - 1] || {} as SensorValue;
+                const latestData: SensorValue = response?.length && response[0] || {} as SensorValue;
                 const updatedData: ItemChartProps = {
                     ...props,
                     value: latestData?.value,
