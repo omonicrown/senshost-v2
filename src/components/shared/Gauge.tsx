@@ -14,9 +14,10 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
     React.useEffect(() => {
         const gaugeChart = echarts.init(gaugeRef.current);
 
-        const option = {
+
+        const option = props?.data?.value ? {
             tooltip: {
-                formatter: '{a} <br/>{b} : {c}%'
+                formatter: '{a} <br/>{b} : {c}'
             },
             series: [{
                 name: props?.data?.name,
@@ -24,19 +25,39 @@ const Gauge: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Re
                 min: props?.data?.min,
                 max: props?.data?.max,
                 progress: {
-                    show: true
+                    show: true,
+                    roundCap: true,
+                },
+                axisLabel: {
+                    distance: 20,
+                    fontSize: 10
+                },
+                title: {
+                    show: false
                 },
                 detail: {
+                    backgroundColor: '#fff',
+                    borderColor: '#999',
+                    width: '30%',
                     valueAnimation: true,
-                    formatter: '{value}'
+                    formatter: function (value) {
+                        return '{value|' + value.toFixed(0) + '}';
+                    },
+                    rich: {
+                        value: {
+                            fontSize: 20,
+                            fontWeight: 'bolder',
+                            color: '#777'
+                        },
+                    }
                 },
-                data: props?.data?.value
+                data: [{ value: props?.data?.value }]
             }]
-        };
+        } : {};
 
         option && gaugeChart.setOption(option as any);
 
-    }, [gaugeRef.current]);
+    }, [gaugeRef.current, props.data]);
 
     return (
         <div className="gauge-graph" ref={gaugeRef} style={styles} />

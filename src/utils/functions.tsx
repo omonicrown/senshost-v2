@@ -2,9 +2,18 @@
 import React from 'react';
 import { Route, RouteProps } from 'react-router';
 
+import dayjs from "dayjs";
+
 export function validateEmail(email: string): boolean {
   var re = /\S+@\S+\.\S+/;
   return re.test(email);
+}
+
+export function covertDateTimeField(date: Date | string): string {
+  if (dayjs(date).isValid()) {
+    return dayjs(date).format("DD/MM/YYYY");
+  }
+  return date as string;
 }
 
 export function convertStringToJson<T>(strValue: string): T {

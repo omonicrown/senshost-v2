@@ -14,6 +14,7 @@ import * as serviceWorker from "./serviceWorker";
 import "./styles/main.scss";
 import { store, persistor } from "./store/configureStore";
 
+import 'dayjs/locale/es' // load on demand
 
 
 ReactDOM.render(

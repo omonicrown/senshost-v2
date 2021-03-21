@@ -2,7 +2,7 @@ import React from "react";
 import { DashboardItemModel, SensorValue } from "../../../interfaces/models";
 
 import { SensorApis } from "../../../apis/sensorApis";
-import { convertStringToJson } from "../../../utils/functions";
+import { convertStringToJson, covertDateTimeField } from "../../../utils/functions";
 
 //charts
 
@@ -35,13 +35,12 @@ const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.React
             case ChartType.Tank:
             case ChartType.Gauge:
                 const latestData: SensorValue = response?.length && response[response?.length - 1] || {} as SensorValue;
-                const capacity: string = properties?.find((property: { [k: string]: string }) => property.capacity)?.capacity;
                 const updatedData: ItemChartProps = {
                     ...props,
                     value: latestData?.value,
-                    capacity: Number(capacity),
-                    min: latestData["min"] ? latestData["min"] : props.min,
-                    max: latestData["max"] ? latestData["max"] : props.min,
+                    capacity: Number(properties[0]?.capacity) || Number(latestData?.value),
+                    min: latestData["min"] ? latestData["min"] : properties[0]?.min,
+                    max: latestData["max"] ? latestData["max"] : properties[0]?.max,
                     status: latestData["status"] ? latestData["status"] : DashboardItemStatus.On
                 };
                 setChartItem(updatedData);
@@ -52,7 +51,7 @@ const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.React
             case ChartType.Doughnut:
                 const categoryColumnName: string = properties?.find((property: { [k: string]: string }) => property.categoryColumn)?.categoryColumn;
                 const valueColumn: string = properties?.find((property: { [k: string]: string }) => property.valueColumn)?.valueColumn;
-                const columnsData: Array<string | number> = response?.map((sensor: SensorValue) => sensor[categoryColumnName]);
+                const columnsData: Array<string | number> = response?.map((sensor: SensorValue) => covertDateTimeField(sensor[categoryColumnName]));
                 const rowsData: Array<string | number> = response?.map((sensor: SensorValue) => sensor[valueColumn]);
                 setChartItem({ ...chartItem, categoryColumnData: columnsData, valueColumnData: rowsData });
         }

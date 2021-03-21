@@ -14,12 +14,22 @@ const BarGraph: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React
         const barChart = echarts.init(chartRef.current);
 
         const option: echarts.EChartOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                containLabel: true
+            },
             xAxis: {
                 type: 'category',
-                data: props?.data?.categoryColumnData
+                data: props?.data?.categoryColumnData,
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
             },
             series: [{
                 data: props?.data?.valueColumnData,
