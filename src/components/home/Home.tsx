@@ -77,7 +77,7 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
   }, []);
 
   return (
-    <div className="home-container container-fluid">
+    <div className="home-container">
       <div className="row no-gutters">
         <HeaderComponent onToggle={onToggle} toggle={toggleMenu} />
       </div>
@@ -85,7 +85,7 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
         <SidebarComponent toggle={toggleMenu} />
         <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
           <div className="main-holder">
-            <div className="container">
+            <div className="container-fluid">
               <Switch>
                 <Redirect
                   exact

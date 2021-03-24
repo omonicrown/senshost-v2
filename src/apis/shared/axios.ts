@@ -121,7 +121,7 @@ export class AxiosGlobal {
                 store.dispatch(toggleNotification(notification));
 
                 return Promise.reject(error);
-            } else if (error && error.response && error.response.status === 404) {
+            } else if (error?.response?.status === 404) {
                 const notification: NotificationProps = {
                     theme: "danger",
                     title: "Record not found",

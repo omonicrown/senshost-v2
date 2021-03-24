@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DashboardApis } from '../../apis/dashboardApis';
-import { initialState } from '../../constants';
+import { ChartType, initialState } from '../../constants';
 import { DashboardItemModel, DashboardModel, PositiveResponse } from '../../interfaces/models';
 import { States } from '../../interfaces/states';
 import { Dispatch } from "redux";
@@ -178,7 +178,7 @@ const DashboardItem: React.FC = () => {
                 ) :
                     dashboardItems.length ?
                         dashboardItems?.map((dashboardItem: DashboardItemModel, index: number) =>
-                            <div className="card dashboard-card" key={dashboardItem?.id}>
+                            <div className={"card dashboard-card" + (dashboardItem?.type === ChartType.LineGraph || dashboardItem?.type === ChartType.BarGraph ? " wide-card" : "")} key={dashboardItem?.id}>
                                 <h4 className="card-header">
                                     {dashboardItem.name}
                                     <div className="float-right">

@@ -27,6 +27,9 @@
         .card {
             &.dashboard-card {
                 max-width: calculateRem(400);
+                &.wide-card {
+                    max-width: calculateRem(600);
+                }
                 min-height: calculateRem(135);
                 width: calculateRem(300);
                 margin: 1rem;

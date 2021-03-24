@@ -117,10 +117,10 @@
                     overflow-y: auto;
                     height: 100%;
 
-                    >.container {
-                        width: 100%;
+                    >.container-fluid {
+                        // width: 100%;
                         min-height: 100%;
-                        margin: 1.25rem auto;
+                        // margin: 1.25rem auto;
 
                         .table-filter-and-control-holder {
                             justify-content: space-between;

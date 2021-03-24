@@ -54,7 +54,7 @@ const LineChart: React.FunctionComponent<GaugeProps> = (props: GaugeProps): Reac
                 type: 'value'
             },
             tooltip: {
-                formatter: '{a} <br/>{b} : {c}%'
+                formatter: '{a} <br/>{b} : {c}'
             },
             grid: {
                 left: '3%',
