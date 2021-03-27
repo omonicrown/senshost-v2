@@ -12,7 +12,6 @@ import { actionTypes } from "../../types";
 import { DashboardProps } from "../dashboard/Dashboard";
 import { DevicesProps } from "../devices/Devices";
 
-import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import { GroupsProps } from "../groups/Groups";
 import { UsersProps } from "../users/Users";
 import { ViewDeviceProps } from "../viewDevice/ViewDevice";
@@ -30,19 +29,10 @@ const DashbaordItem: React.LazyExoticComponent<React.FC<DashboardProps>> = React
 
 const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
 const Users: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../users/Users"));
+const Actions: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../actions/Actions"));
+
 const ViewDevice: React.LazyExoticComponent<React.FC<ViewDeviceProps>> = React.lazy(() => import("../viewDevice/ViewDevice"));
 const NotFound: React.LazyExoticComponent<React.FC<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
-
-
-const initialState: ModalProps = {
-  toggle: false,
-  fullscreen: false,
-  centered: false,
-  size: "modal-lg",
-  disableBackdropDismiss: true,
-  onDismiss: null,
-};
-
 
 export interface SharedProps {
   history?: History;
@@ -52,11 +42,6 @@ export interface SharedProps {
 
 interface HomeProps extends RouteComponentProps {
 
-}
-
-interface HomeStates {
-  toggle: boolean;
-  onToggleAdd?: (e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => void;
 }
 
 
@@ -111,6 +96,12 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                   path={ViewDeviceRoutes.ViewDevice.toString()}
                   exact={true}
                   component={ViewDevice}
+                />
+
+                <AppRoute
+                  path={HomeRoutes.Actions.toString()}
+                  exact={true}
+                  component={Actions}
                 />
 
                 <AppRoute

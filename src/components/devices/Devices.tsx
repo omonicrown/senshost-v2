@@ -25,6 +25,7 @@ import { Dispatch } from "redux";
 import { useHistory } from "react-router";
 import { History } from "history";
 import { AppRoutes, HomeRoutes, ViewDeviceRoutes } from "../../enums/routes";
+import PageTitle from "../shared/PageTitle";
 
 export interface DevicesProps extends SharedProps {
   onToggle: (value: boolean) => void;
@@ -173,6 +174,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
   return (
     <div className="device-container">
+      <PageTitle title="Devices" />
       <div className="device-holder">
         <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
           <Dropdown

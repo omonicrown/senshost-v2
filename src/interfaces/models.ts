@@ -1,4 +1,4 @@
-import { Status } from "../enums/status"
+import { ActionType, Status } from "../enums/status"
 
 export interface AuthResponseModel {
     identityToken: string;
@@ -12,6 +12,15 @@ export interface Account {
     id: string;
     creationDate: Date;
     name?: string;
+}
+
+export interface ActionModel {
+    name: string;
+    type: ActionType;
+    properties: string
+    accountId: string;
+    id: string;
+    creationDate: string;
 }
 
 export interface HttpBasicAuth {

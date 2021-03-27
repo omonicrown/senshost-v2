@@ -26,6 +26,7 @@ import queryString from 'query-string';
 import { History, Location } from "history";
 import { icontypesEnum, SvgElement } from "../../utils/svgElement";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
+import PageTitle from "../shared/PageTitle";
 
 
 export interface DashboardProps extends SharedProps {
@@ -215,7 +216,9 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
 
     return (
         <div className="dashboard-container">
-
+            <div className="px-3">
+                <PageTitle title="Dashboard" />
+            </div>
             <div className="d-flex flex-sm-row flex-column dashboards-holder">
                 {fetching ? arrayTemp.map((key: number) =>
                     <div className="card dashboard-card" key={`loader${key}`}>
@@ -256,7 +259,7 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
                                     </div>
                                 </div>
                                 <div className="card-footer text-muted">
-                                    Created: {localDashboard.creationDate}
+                                    Last received date: {localDashboard.creationDate}
                                 </div>
                             </div>
                         ) :

@@ -11,7 +11,7 @@ export function validateEmail(email: string): boolean {
 
 export function covertDateTimeField(date: Date | string): string {
   if (dayjs(date).isValid()) {
-    return dayjs(date).format("DD/MM/YYYY h:mm A");
+    return dayjs(date).format("DD - MMM h:mm A");
   }
   return date as string;
 }

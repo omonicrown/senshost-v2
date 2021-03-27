@@ -24,6 +24,8 @@ import AddDashboardItem from "./modals/AddDashboardItem";
 import CardAction from './modals/CardAction';
 import { Loader } from '@sebgroup/react-components/dist/Loader';
 
+import PageTitle from "../shared/PageTitle";
+
 const DashboardItem: React.FC = () => {
     const [dashboardItems, setDashboardItems] = React.useState<Array<DashboardItemModel>>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -176,35 +178,39 @@ const DashboardItem: React.FC = () => {
                         <div className="skeleton-loader skeleton-loader-fill rounded " />
                     </div>
                 ) :
-                    dashboardItems.length ?
-                        dashboardItems?.map((dashboardItem: DashboardItemModel, index: number) =>
-                            <div className={"card dashboard-card" + (dashboardItem?.type === ChartType.LineGraph || dashboardItem?.type === ChartType.BarGraph ? " wide-card" : "")} key={dashboardItem?.id}>
-                                <h4 className="card-header">
-                                    {dashboardItem.name}
-                                    <div className="float-right">
-                                        <CardAction
-                                            toggle={toggleAction}
-                                            onDeleteCardItem={onDeleteDashboardItem}
-                                            onEditCardItem={onEditDashboardItem}
-                                            dashboardItem={dashboardItem}
-                                        />
+                    <div className="row no-gutters">
+                        {
+                            dashboardItems.length ?
+                                dashboardItems?.map((dashboardItem: DashboardItemModel, index: number) =>
+                                    <div className={"card dashboard-card " + (dashboardItem?.type === ChartType.LineGraph || dashboardItem?.type === ChartType.BarGraph ? "col-4 wide-card" : "col-3")} key={dashboardItem?.id}>
+                                        <h4 className="card-header">
+                                            {dashboardItem.name}
+                                            <div className="float-right">
+                                                <CardAction
+                                                    toggle={toggleAction}
+                                                    onDeleteCardItem={onDeleteDashboardItem}
+                                                    onEditCardItem={onEditDashboardItem}
+                                                    dashboardItem={dashboardItem}
+                                                />
+                                            </div>
+                                        </h4>
+                                        <div className="card-body">
+                                            <div className="chart-holder">
+                                                <ItemChart {...dashboardItem} />
+                                            </div>
+                                        </div>
+                                        <div className="card-footer text-muted">
+                                            Last received date: {dashboardItem?.creationDate}
+                                        </div>
                                     </div>
-                                </h4>
-                                <div className="card-body">
-                                    <div className="chart-holder">
-                                        <ItemChart {...dashboardItem} />
-                                    </div>
-                                </div>
-                                <div className="card-footer text-muted">
-                                    Created: {dashboardItem?.creationDate}
-                                </div>
-                            </div>
-                        ) :
-                        <div className="card dashboard-card empty-card">
-                            <span className="text-primary text-primary">
-                                Dashboard empty
+                                ) :
+                                <div className="card dashboard-card empty-card">
+                                    <span className="text-primary text-primary">
+                                        Dashboard empty
                             </span>
-                        </div>
+                                </div>
+                        }
+                    </div>
 
                 }
 

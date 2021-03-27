@@ -1,6 +1,6 @@
 import { AxiosGlobal } from "../shared/axios";
 import { AxiosPromise } from "axios";
-import { PositiveResponse, GroupModel, ActuatorModel } from "../../interfaces/models";
+import { PositiveResponse, ActuatorModel } from "../../interfaces/models";
 import configs from "../../configs";
 
 

@@ -23,6 +23,7 @@ import { NotificationProps } from "@sebgroup/react-components/dist/notification/
 import { toggleNotification } from "../../actions";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
 import { Dispatch } from "redux";
+import PageTitle from "../shared/PageTitle";
 
 export interface UsersProps extends SharedProps {
 }
@@ -248,6 +249,8 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
 
     return (
         <div className="users-container">
+            <PageTitle title="Users" />
+
             <div className="users-holder">
                 <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
                     <Dropdown

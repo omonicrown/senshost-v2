@@ -17,7 +17,7 @@
                 &.sidemenu-opened {
                     z-index: 2;
 
-                    >.sidebar-content {
+                    > .sidebar-content {
                         width: $aside-width;
                         opacity: 1;
                         overflow: visible;
@@ -31,7 +31,7 @@
                 }
 
                 &.sidemenu-closed {
-                    >.sidebar-content {
+                    > .sidebar-content {
                         padding: 0rem;
                         width: 0rem;
                         opacity: 0;
@@ -98,8 +98,12 @@
                     .table-responsive {
                         overflow-x: visible;
                     }
+                }
 
-
+                .page-title {
+                    .col {
+                        padding: 1rem 0;
+                    }
                 }
 
                 // overide text value font
@@ -113,11 +117,11 @@
                     width: calc(100% - #{$aside-width});
                 }
 
-                >.main-holder {
+                > .main-holder {
                     overflow-y: auto;
                     height: 100%;
 
-                    >.container-fluid {
+                    > .container-fluid {
                         // width: 100%;
                         min-height: 100%;
                         // margin: 1.25rem auto;
@@ -177,7 +181,7 @@
                     &.sidemenu-opened {
                         width: 100%;
 
-                        >.sidebar-content {
+                        > .sidebar-content {
                             width: 100%;
                         }
 
@@ -185,11 +189,11 @@
                             width: 100%;
                         }
 
-                        >.hamburger-icon {
+                        > .hamburger-icon {
                             transform: translateX(calculateRem(-60));
                         }
 
-                        &+* {
+                        & + * {
                             width: 0;
                             height: 0;
                             opacity: 0;

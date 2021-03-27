@@ -11,7 +11,8 @@ export enum HomeRoutes {
     Dashboard = AppRoutes.Home + "/dashboard",
     DashboardItem = AppRoutes.Home + "/dashboard/:id",
     Groups = AppRoutes.Home + "/groups",
-    Users = AppRoutes.Home + "/users"
+    Users = AppRoutes.Home + "/users",
+    Actions = AppRoutes.Home + "/Actions"
 }
 
 export enum ViewDeviceRoutes {

@@ -29,6 +29,7 @@ import { Dispatch } from "redux";
 import { History } from "history";
 import { AppRoutes } from "../../enums/routes";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
+import PageTitle from "../shared/PageTitle";
 
 export interface GroupsProps extends SharedProps {
 }
@@ -296,6 +297,7 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
 
   return (
     <div className="groups-container">
+      <PageTitle title="Groups" />
       <div className="group-holder">
         <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
           <Dropdown
