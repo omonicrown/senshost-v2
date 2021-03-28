@@ -49,13 +49,12 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
     const [paginationSize, setPaginationSize] = React.useState<number>(0);
 
 
-    const [selectedStatus, setSelectedStatus] = React.useState<DropdownItem>(null);
+    const [selectedType, setSelectedType] = React.useState<DropdownItem>(null);
 
     const [modalProps, setModalProps] = React.useState<ModalProps>({ ...initialState });
     const [modalDeleteActionProps, setModalDeleteActionProps] = React.useState<ModalProps>({ ...initialState });
 
     const [actionViewModalProps, setActionViewModalProps] = React.useState<ModalProps>({ ...initialState });
-    const [filters, setFilters] = React.useState<Array<FilterItem>>([{ accessor: 'type', filters: [] }]);
 
 
     const columns: Array<Column> = React.useMemo((): Array<Column> => [
@@ -83,13 +82,14 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
         },
     ], []);
 
+    const [filters, setFilters] = React.useState<Array<FilterItem>>(columns.map((column: Column) => ({ accessor: column.accessor, filters: [] })));
     // memos
     const actionTypes: Array<DropdownItem> = [{ label: "Please select", value: null }, ...ACTIONTYPES];
 
     const data: Array<DataItem> = React.useMemo(() => actions?.map((action: ActionDisplayProps): ActionDisplayProps => {
         const newActionType: string = actionTypes?.find((item: DropdownItem) => item?.value === action.type)?.label;
         return ({ ...action, actionType: newActionType, accountId: authState?.auth?.account?.name });
-    }), [actions, actionTypes]);
+    }), [actions]);
 
     const filterProps: FilterProps = React.useMemo(() => ({
         onAfterFilter: (rows: Array<TableRow>) => {
@@ -255,9 +255,21 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
     React.useEffect(() => {
         ActionApis.getActionsByAccountId(authState?.auth?.account?.id)
             .then((response: AxiosResponse<Array<ActionModel>>) => {
-                setActions(response?.data)
+                setActions(response?.data);
+                setPaginationSize(response?.data?.length);
             });
     }, []);
+
+    React.useEffect(() => {
+        const updatedFilterItems: Array<FilterItem> = filters?.map((filterItem: FilterItem) => {
+            if (filterItem.accessor === "type" && selectedType?.value !== null && Number(selectedType?.value) > -1) {
+                return { ...filterItem, filters: [selectedType?.value] };
+            }
+            return { ...filterItem, filters: [] };
+        });
+        console.log("Tabe kwari ", updatedFilterItems)
+        setFilters(updatedFilterItems);
+    }, [selectedType, setFilters]);
 
 
     return (
@@ -266,10 +278,10 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
             <div className="actions-holder">
                 <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
                     <Dropdown
-                        placeholder="Filter By Status"
+                        placeholder="Filter By Type"
                         list={actionTypes}
-                        selectedValue={selectedStatus}
-                        onChange={(value: DropdownItem) => setSelectedStatus(value)}
+                        selectedValue={selectedType}
+                        onChange={(value: DropdownItem) => setSelectedType(value)}
                     />
                     <Button label="Add" id="addBtn" size="sm" theme="outline-primary" title="Add" onClick={onAddAction} />
                 </div>

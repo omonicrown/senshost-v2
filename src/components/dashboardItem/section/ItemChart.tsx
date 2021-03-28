@@ -24,6 +24,7 @@ export interface ItemChartProps extends DashboardItemModel {
     min?: number;
     max?: number;
     status?: DashboardItemStatus;
+    deviceId?: string;
 }
 
 const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.ReactElement<void> => {
@@ -41,6 +42,7 @@ const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.React
                     capacity: Number(properties[0]?.capacity) || Number(latestData?.value),
                     min: latestData["min"] ? latestData["min"] : properties[0]?.min,
                     max: latestData["max"] ? latestData["max"] : properties[0]?.max,
+                    deviceId: properties[0]?.deviceId,
                     status: latestData["status"] ? latestData["status"] : DashboardItemStatus.On
                 };
                 setChartItem(updatedData);
@@ -53,7 +55,12 @@ const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.React
                 const valueColumn: string = properties?.find((property: { [k: string]: string }) => property.valueColumn)?.valueColumn;
                 const columnsData: Array<string | number> = response?.map((sensor: SensorValue) => covertDateTimeField(sensor[categoryColumnName]));
                 const rowsData: Array<string | number> = response?.map((sensor: SensorValue) => sensor[valueColumn]);
-                setChartItem({ ...chartItem, categoryColumnData: columnsData, valueColumnData: rowsData });
+                setChartItem({
+                    ...chartItem,
+                    categoryColumnData: columnsData,
+                    valueColumnData: rowsData,
+                    deviceId: properties[0]?.deviceId,
+                });
         }
     }, [props, chartItem]);
 

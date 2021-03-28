@@ -207,7 +207,7 @@ const DashboardItem: React.FC = () => {
                                 <div className="card dashboard-card empty-card">
                                     <span className="text-primary text-primary">
                                         Dashboard empty
-                            </span>
+                                    </span>
                                 </div>
                         }
                     </div>
