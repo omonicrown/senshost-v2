@@ -1,4 +1,6 @@
 import React from "react";
+import mqtt from "mqtt";
+
 import { DashboardItemModel, SensorValue } from "../../../interfaces/models";
 
 import { SensorApis } from "../../../apis/sensorApis";
@@ -30,6 +32,14 @@ export interface ItemChartProps extends DashboardItemModel {
 const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.ReactElement<void> => {
 
     const [chartItem, setChartItem] = React.useState<ItemChartProps>({} as ItemChartProps);
+    const client: mqtt.Client = mqtt.connect('mqtt://senshost.com',
+        {
+            port: 8002,
+            path: "/mqtt",
+            username: props?.deviceId,
+            password: "",
+        });
+
 
     const calculateChartData = React.useCallback((response: Array<SensorValue>, properties: Array<{ [k: string]: string }>) => {
         switch (props.type) {
@@ -64,19 +74,21 @@ const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.React
         }
     }, [props, chartItem]);
 
+    const fetchData = async () => {
+        try {
+            const properties: Array<{ [k: string]: string }> = convertStringToJson(props?.property);
+            const source: { [k: string]: string } = properties?.find((property: { [k: string]: string }) => property?.sourceId);
+
+            const respose: AxiosResponse<Array<SensorValue>> = await SensorApis.getSensorValuesById(source?.sourceId);
+
+            calculateChartData(respose?.data || [], properties);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     React.useEffect(() => {
-        (async function fetchData() {
-            try {
-                const properties: Array<{ [k: string]: string }> = convertStringToJson(props?.property);
-                const source: { [k: string]: string } = properties?.find((property: { [k: string]: string }) => property?.sourceId);
-
-                const respose: AxiosResponse<Array<SensorValue>> = await SensorApis.getSensorValuesById(source?.sourceId);
-
-                calculateChartData(respose?.data || [], properties);
-            } catch (err) {
-                console.error(err);
-            }
-        })()
+        fetchData();
     }, []);
 
     const renderCharts = () => {
@@ -97,6 +109,28 @@ const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.React
                 return <PieChart data={chartItem} />;
         }
     };
+
+    React.useEffect(() => {
+        client.on('connect', () => {
+            console.log("SOCKET CONNECTED")
+            client.subscribe(`${props?.deviceId}/telemetry`, (err) => {
+                if (err) {
+                    console.error("SUBSCRIPTION FAILED", err);
+                }
+            });
+        });
+
+        client.on('message', (topic, message) => {
+            fetchData();
+        });
+
+        client.on("error", (error) => {
+            console.error("SOCKET failed ", error);
+        });
+
+        return () => { client.end() };
+
+    }, [props?.deviceId]);
 
     return (
         <React.Fragment>

@@ -2,8 +2,6 @@ import * as React from "react";
 
 import { EChartOption } from "echarts";
 
-import mqtt from "mqtt";
-
 import "echarts-liquidfill";
 import ReactEcharts from 'echarts-for-react';
 import { ItemChartProps } from "../dashboardItem/section/ItemChart";
@@ -23,7 +21,6 @@ type Option = {
 }
 
 const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.ReactElement<void> => {
-  const client = mqtt.connect("mqtt://senshost.com", { port: 8002, username: props?.data?.deviceId, password: "", protocol: "mqtt" });
 
   const [selectedOption, setSelectedOption] = React.useState<Option>({});
   const [options, setOptions] = React.useState<Array<ChartOption>>([{
@@ -122,30 +119,6 @@ const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Rea
 
     setOptions(updatedOptions);
   }, [props.type, props.data]);
-
-  React.useEffect(() => {
-    client.on('connect', function () {
-      client.subscribe('presence', function (err) {
-        if (!err) {
-          client.publish('presence', 'Hello mqtt')
-        }
-      });
-    });
-
-    client.on('message', function (topic, message) {
-      // message is Buffer
-      console.log("The message is ", topic)
-      console.log(message.toString())
-      client.end()
-    });
-
-    client.on("error", function (error) {
-      console.log("zafin nema ", error);
-    });
-
-    return () => { client.end() };
-
-  }, []);
 
   return (
     <ReactEcharts className="chart" option={selectedOption} />
