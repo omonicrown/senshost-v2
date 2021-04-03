@@ -15,6 +15,7 @@ import { DevicesProps } from "../devices/Devices";
 import { GroupsProps } from "../groups/Groups";
 import { UsersProps } from "../users/Users";
 import { ViewDeviceProps } from "../viewDevice/ViewDevice";
+import { RulesHolderProps } from "../rules/Rules";
 
 import { useSelector, useDispatch } from "react-redux";
 import { getGroupsByAccount } from "../../actions/groupActions";
@@ -30,6 +31,7 @@ const DashbaordItem: React.LazyExoticComponent<React.FC<DashboardProps>> = React
 const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
 const Users: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../users/Users"));
 const Actions: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../actions/Actions"));
+const Rules: React.LazyExoticComponent<React.FC<RulesHolderProps>> = React.lazy(() => import("../rules/Rules"));
 
 const ViewDevice: React.LazyExoticComponent<React.FC<ViewDeviceProps>> = React.lazy(() => import("../viewDevice/ViewDevice"));
 const NotFound: React.LazyExoticComponent<React.FC<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
@@ -102,6 +104,12 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                   path={HomeRoutes.Actions.toString()}
                   exact={true}
                   component={Actions}
+                />
+
+                <AppRoute
+                  path={HomeRoutes.Rules.toString()}
+                  exact={true}
+                  component={Rules}
                 />
 
                 <AppRoute
