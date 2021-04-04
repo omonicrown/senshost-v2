@@ -87,6 +87,7 @@
                 height: calc(100% - #{$header-height});
                 width: 100%;
                 overflow-y: hidden;
+                overflow-x: hidden;
 
                 // table override
                 @import "../shared/table.scss";
@@ -142,6 +143,7 @@
                         @import "../device/device.scss";
                         @import "../users/users.scss";
                         @import "../viewDevice/vewDevice.scss";
+                        @import "../rules/rules.scss";
                     }
 
                     footer {

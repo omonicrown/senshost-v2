@@ -4,9 +4,12 @@ import PageTitle from "../shared/PageTitle";
 
 import ReactFlow from "react-flow-renderer";
 
+import EventBody from "./sections/EventBody";
+
 export interface RulesHolderProps extends SharedProps {
 
 }
+
 const RulesHolder: React.FunctionComponent<RulesHolderProps> = (props: RulesHolderProps): React.ReactElement<void> => {
     const elements = [
         {
@@ -33,18 +36,16 @@ const RulesHolder: React.FunctionComponent<RulesHolderProps> = (props: RulesHold
         { id: 'e2-3', source: '2', target: '3' },
     ];
 
-
     return (
         <div className="rules-container">
             <PageTitle title="Rules" />
             <div className="rules-holder">
-                <div style={{ height: 300 }}>
-                    <ReactFlow elements={elements} />
+                <div className="rule-engine-body d-flex">
+                    <EventBody />
                 </div>
             </div>
         </div>
-    )
-
+    );
 };
 
 export default RulesHolder;

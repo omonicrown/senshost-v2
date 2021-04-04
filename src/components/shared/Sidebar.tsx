@@ -38,7 +38,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
         {
             name: "rules",
             iconType: icontypesEnum.RULES,
-            title: "Rules"
+            title: "Rules engine"
         },
         {
             name: "actions",
