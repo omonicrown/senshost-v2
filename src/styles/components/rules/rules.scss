@@ -4,6 +4,7 @@
     width: 100%;
     > .rules-holder {
         width: 100%;
+        border-top: 1px solid $gray-300;
         height: calc(100% - #{$footer-height});
         .rule-engine-body {
             flex-direction: row;
@@ -12,6 +13,18 @@
             > .reactflow-wrapper {
                 flex-grow: 1;
                 height: 100%;
+
+                .controls-holder {
+                    position: absolute;
+                    right: 10px;
+                    top: 10px;
+                    z-index: 4;
+                    font-size: 12px;
+
+                    button {
+                        margin-left: 5px;
+                    }
+                }
             }
             > aside {
                 width: 20%;
@@ -22,6 +35,12 @@
                 }
                 &.controls-holder {
                     border-right: 1px solid #eee;
+
+                    .title {
+                        border-bottom: 1px solid $gray-300;
+                        padding: 0.5rem 0;
+                        margin: 1rem 0;
+                    }
                 }
                 padding: calculateRem(15) calculateRem(10);
                 font-size: 12px;
@@ -32,7 +51,7 @@
                 }
             }
 
-            .dndnode {
+            .rule-node {
                 height: calculateRem(30);
                 padding: 4px;
                 border: 1px solid #1a192b;

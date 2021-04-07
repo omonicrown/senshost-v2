@@ -9,15 +9,43 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     return (
         <aside className="controls-holder">
             <div className="description">You can drag these nodes to the pane on the right.</div>
-            <div className="dndnode input" onDragStart={(event) => onDragStart(event, 'input')} draggable>
-                Input Node
-              </div>
-            <div className="dndnode" onDragStart={(event) => onDragStart(event, 'default')} draggable>
-                Default Node
-              </div>
-            <div className="dndnode output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output')} draggable>
-                Output Node
+
+            <h5 className="title">Engine</h5>
+            <div className="rule-node input" onDragStart={(event) => onDragStart(event, 'input')} draggable>
+                Engine
             </div>
+
+            <h5 className="title">Rules</h5>
+            <div className="rule-node" onDragStart={(event) => onDragStart(event, 'default')} draggable>
+                String
+            </div>
+
+            <div className="rule-node" onDragStart={(event) => onDragStart(event, 'default')} draggable>
+                Time
+            </div>
+
+            <div className="rule-node" onDragStart={(event) => onDragStart(event, 'default')} draggable>
+                Number
+              </div>
+
+            <h5 className="title">Actions</h5>
+
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output')} draggable>
+                Email
+            </div>
+
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output')} draggable>
+                Publish
+            </div>
+
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output')} draggable>
+                Actuator
+            </div>
+
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output')} draggable>
+                Expression
+            </div>
+
         </aside>
     );
 };
