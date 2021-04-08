@@ -27,6 +27,8 @@ const initialElements = [
     },
 ];
 
+export type RuleTypes = "string" | "time" | "number";
+export type RuleActionTypes = "email" | "publish" | "actuator" | "expression";
 
 const EventBody: React.FC = (): React.ReactElement<void> => {
     const reactFlowWrapper = React.useRef<HTMLDivElement>(null);
@@ -54,11 +56,32 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         event.dataTransfer.dropEffect = 'move';
     };
 
+    const getNodeLabel = (nodeType: "default" | "input" | "output", ruleType: RuleActionTypes | RuleTypes | "engine"): string => {
+        switch (ruleType) {
+            case "actuator":
+                return `Actuator Action`;
+            case "email":
+                return "Email Action";
+            case "number":
+                return "Number Rule";
+            case "string":
+                return "String Rule";
+            case "publish":
+                return "Publish Action";
+            case "expression":
+                return "Expression Action"; 
+            case "time":
+                return "Time Rule";    
+            default:
+                return "Engine";
+        }
+    }
     const onDrop = React.useCallback((event) => {
         event.preventDefault();
 
         const reactFlowBounds = reactFlowWrapper?.current?.getBoundingClientRect();
-        const type = event.dataTransfer?.getData('application/reactflow');
+        const type = event.dataTransfer?.getData('application/reactflow-node-type');
+        const ruleType = event.dataTransfer?.getData('application/reactflow-rule-type');
 
         const position = reactFlowInstance?.project({
             x: event.clientX - reactFlowBounds.left,
@@ -69,7 +92,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             id: getId(),
             type,
             position,
-            data: { label: `${type} node` },
+            data: { label: getNodeLabel(type, ruleType) },
         };
 
         setElements((es) => es.concat(newNode));

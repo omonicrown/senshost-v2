@@ -5,6 +5,7 @@ import PageTitle from "../shared/PageTitle";
 import ReactFlow from "react-flow-renderer";
 
 import EventBody from "./sections/EventBody";
+import { Button } from "@sebgroup/react-components/dist/Button";
 
 export interface RulesHolderProps extends SharedProps {
 
@@ -14,7 +15,9 @@ const RulesHolder: React.FunctionComponent<RulesHolderProps> = (props: RulesHold
 
     return (
         <div className="rules-container">
-            <PageTitle title="Rules engine" />
+            <PageTitle title="Rules engine">
+                <Button label="Save" id="saveBtn" size="sm" theme="outline-primary" title="Add" onClick={null} />
+            </PageTitle>
             <div className="rules-holder">
                 <EventBody />
             </div>
