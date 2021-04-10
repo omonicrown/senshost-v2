@@ -9,7 +9,8 @@ import ReactFlow, {
     Background,
     Elements,
     updateEdge,
-    FlowElement
+    FlowElement,
+    Edge
 } from "react-flow-renderer";
 import EventControls from "./EventControls";
 import EventProperties from "./EventProperties";
@@ -34,7 +35,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     const reactFlowWrapper = React.useRef<HTMLDivElement>(null);
     const [reactFlowInstance, setReactFlowInstance] = React.useState(null);
     const [elements, setElements] = React.useState<Elements>([]);
-    const [selectedElement, setSelectedElement] = React.useState<FlowElement>();
+    const [selectedElement, setSelectedElement] = React.useState<FlowElement & Edge>();
 
     // gets called after end of edge gets dragged to another source or target
 
@@ -59,19 +60,19 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     const getNodeLabel = (nodeType: "default" | "input" | "output", ruleType: RuleActionTypes | RuleTypes | "engine"): string => {
         switch (ruleType) {
             case "actuator":
-                return `Actuator Action`;
+                return `Actuator action`;
             case "email":
-                return "Email Action";
+                return "Email action";
             case "number":
-                return "Number Rule";
+                return "Number rule";
             case "string":
-                return "String Rule";
+                return "String rule";
             case "publish":
-                return "Publish Action";
+                return "Publish action";
             case "expression":
-                return "Expression Action"; 
+                return "Expression action";
             case "time":
-                return "Time Rule";    
+                return "Time rule";
             default:
                 return "Engine";
         }
@@ -89,7 +90,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         });
 
         const newNode = {
-            id: getId(),
+            id: `${ruleType}-${getId()}`,
             type,
             position,
             data: { label: getNodeLabel(type, ruleType) },
@@ -103,7 +104,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         onElementsRemove([selectedElement]);
     }, [setElements, selectedElement]);
 
-    const onElementClick = React.useCallback((event: React.MouseEvent<Element, MouseEvent>, element: FlowElement<any>) => {
+    const onElementClick = React.useCallback((event: React.MouseEvent<Element, MouseEvent>, element: FlowElement<any> & Edge) => {
         event.preventDefault();
         setSelectedElement(element);
     }, [setSelectedElement]);
@@ -137,7 +138,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         }
                     </ReactFlow>
                 </div>
-                <EventProperties />
+                <EventProperties element={selectedElement} />
             </ReactFlowProvider>
         </div>
     );

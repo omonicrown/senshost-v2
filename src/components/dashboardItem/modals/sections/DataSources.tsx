@@ -9,7 +9,7 @@ import { DeviceModel, SensorModel } from "../../../../interfaces/models";
 import { AuthState, DeviceState, States } from "../../../../interfaces/states";
 import { AddDashboardItemControls } from "../AddDashboardItem";
 
-const DEVICEDATASOURCES: Array<DropdownItem> = [
+export const DEVICEDATASOURCES: Array<DropdownItem> = [
     { label: 'Please select', value: null },
     {
         label: "Sensors",
@@ -21,7 +21,7 @@ const DEVICEDATASOURCES: Array<DropdownItem> = [
     }
 ];
 
-const DEVICEDATASOURCETYPE = [
+export const DEVICEDATASOURCETYPE = [
     { value: "device", label: "Device" },
     { value: "aggregateField", label: "Aggregate Field" }
 ];
