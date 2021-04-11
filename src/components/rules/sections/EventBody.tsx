@@ -1,4 +1,5 @@
 import { Button } from "@sebgroup/react-components/dist/Button";
+import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import React from "react";
 
 import ReactFlow, {
@@ -12,21 +13,13 @@ import ReactFlow, {
     FlowElement,
     Edge
 } from "react-flow-renderer";
+import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
 import EventControls from "./EventControls";
 import EventProperties from "./EventProperties";
 
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
-
-const initialElements = [
-    {
-        id: '1',
-        type: 'input',
-        data: { label: 'input node' },
-        position: { x: 250, y: 5 },
-    },
-];
 
 export type RuleTypes = "string" | "time" | "number";
 export type RuleActionTypes = "email" | "publish" | "actuator" | "expression";
@@ -93,7 +86,14 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             id: `${ruleType}-${getId()}`,
             type,
             position,
-            data: { label: getNodeLabel(type, ruleType) },
+            data: {
+                label: getNodeLabel(type, ruleType),
+                nodeControls: {
+                    engine: { eventName: "", triggerName: "" },
+                    rules: {},
+                    actions: {},
+                }
+            },
         };
 
         setElements((es) => es.concat(newNode));
@@ -112,6 +112,85 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     const onPanelClick = React.useCallback((event: React.MouseEvent<Element, MouseEvent>) => {
         setSelectedElement(null);
     }, [setSelectedElement]);
+
+
+    const handleEngineChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    // it's important that you create a new object here
+                    // in order to notify react flow about the change
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            engine: {
+                                ...el.data.nodeControls.engine,
+                                [event.target.name]: event.target.value
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [setElements, selectedElement]);
+
+    const handleEdgeChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    return {
+                        ...el,
+                        data: { ...el?.data, [event.target.name]: event.target.value as "AND" | "OR" },
+                        label: event.target.value
+                    };
+                }
+                return el;
+            })
+        );
+
+    }, [selectedElement, setElements]);
+
+    const handleRulesDropDownChange = React.useCallback((value: DropdownItem, field: "device" | "deviceSource" | "sensor") => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            rules: {
+                                ...el.data.nodeControls.rules,
+                                [field]: value
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
+
+    const handleDataSourceChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            rules: {
+                                ...el.data.nodeControls.rules,
+                                type: event.target.value as DatasourceType
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
 
     return (
         <div className="rule-engine-body d-flex">
@@ -138,7 +217,14 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         }
                     </ReactFlow>
                 </div>
-                <EventProperties element={selectedElement} />
+                <EventProperties
+                    element={selectedElement}
+                    handleEngineChange={handleEngineChange}
+                    elements={elements}
+                    handleEdgeChange={handleEdgeChange}
+                    handleRulesDropDownChange={handleRulesDropDownChange}
+                    handleDataSourceChange={handleDataSourceChange}
+                />
             </ReactFlowProvider>
         </div>
     );

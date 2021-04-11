@@ -1,8 +1,12 @@
 import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import React from "react";
+import { Edge, Elements, FlowElement } from "react-flow-renderer";
 
 interface EngineFormProps {
     loading: boolean;
+    handleEngineChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    selectedElement: FlowElement & Edge;
+    elements: Elements;
 }
 
 interface EngineFormModel {
@@ -12,9 +16,15 @@ interface EngineFormModel {
 
 const EngineForm: React.FC<EngineFormProps> = (props: EngineFormProps): React.ReactElement<void> => {
     const [fields, setFields] = React.useState<EngineFormModel>({ eventName: "", triggerName: "" })
-    const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setFields({ ...fields, [event.target.name]: event.target.value });
-    }, [fields, setFields]);
+
+    React.useEffect(() => {
+        const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
+        setFields({
+            ...fields,
+            eventName: element?.data?.nodeControls?.engine?.eventName,
+            triggerName: element?.data?.nodeControls?.engine?.triggerName
+        })
+    }, [props.selectedElement, props.elements, setFields]);
 
     return (
         <div className="rule-properties-holder">
@@ -26,7 +36,7 @@ const EngineForm: React.FC<EngineFormProps> = (props: EngineFormProps): React.Re
                     label="Event name"
                     placeholder="Event name"
                     value={fields?.eventName}
-                    onChange={handleChange}
+                    onChange={props.handleEngineChange}
                     disabled={props.loading}
                 />
             </div>
@@ -39,7 +49,7 @@ const EngineForm: React.FC<EngineFormProps> = (props: EngineFormProps): React.Re
                     className="col"
                     placeholder="Trigger name"
                     value={fields?.triggerName}
-                    onChange={handleChange}
+                    onChange={props.handleEngineChange}
                     disabled={props.loading}
                 />
             </div>
