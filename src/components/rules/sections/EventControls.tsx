@@ -1,8 +1,8 @@
 import React from "react";
-import { RuleActionTypes, RuleTypes } from "./EventBody";
+import { RuleActionTypes, RuleTypes, TriggerTypes } from "./EventBody";
 
 const EventBody: React.FC = (): React.ReactElement<void> => {
-    const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: "default" | "input" | "output",  ruleType: RuleActionTypes | RuleTypes | "engine") => {
+    const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: "default" | "input" | "output", ruleType: RuleActionTypes | RuleTypes | TriggerTypes) => {
         event.dataTransfer.setData('application/reactflow-node-type', nodeType);
         event.dataTransfer.setData('application/reactflow-rule-type', ruleType);
         event.dataTransfer.effectAllowed = 'move';
@@ -12,9 +12,13 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         <aside className="controls-holder">
             <div className="description">You can drag these nodes to the pane on the right.</div>
 
-            <h5 className="title">Engine</h5>
-            <div className="rule-node input" onDragStart={(event) => onDragStart(event, 'input', "engine")} draggable>
-                Rule Engine
+            <h5 className="title">Trigger</h5>
+            <div className="rule-node input" onDragStart={(event) => onDragStart(event, 'input', "dataReceived")} draggable>
+                OndataReceived
+            </div>
+
+            <div className="rule-node input" onDragStart={(event) => onDragStart(event, 'input', "schedule")} draggable>
+                Schedule
             </div>
 
             <h5 className="title">Rules</h5>

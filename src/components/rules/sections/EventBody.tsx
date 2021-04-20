@@ -22,6 +22,7 @@ let id = 0;
 const getId = () => `dndnode_${id++}`;
 
 export type RuleTypes = "string" | "time" | "number";
+export type TriggerTypes = "dataReceived" | "schedule";
 export type RuleActionTypes = "email" | "publish" | "actuator" | "expression";
 
 const EventBody: React.FC = (): React.ReactElement<void> => {
@@ -50,7 +51,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         event.dataTransfer.dropEffect = 'move';
     };
 
-    const getNodeLabel = (nodeType: "default" | "input" | "output", ruleType: RuleActionTypes | RuleTypes | "engine"): string => {
+    const getNodeLabel = (nodeType: "default" | "input" | "output", ruleType: RuleActionTypes | RuleTypes | TriggerTypes): string => {
         switch (ruleType) {
             case "actuator":
                 return `Actuator action`;
@@ -66,6 +67,10 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 return "Expression action";
             case "time":
                 return "Time rule";
+            case "dataReceived":
+                return "OndataReceived";
+            case "schedule":
+                return "Schedule";
             default:
                 return "Engine";
         }
@@ -89,7 +94,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             data: {
                 label: getNodeLabel(type, ruleType),
                 nodeControls: {
-                    engine: { eventName: "", triggerName: "" },
+                    trigger: { eventName: "", triggerName: "" },
                     rules: {},
                     actions: {},
                 }
@@ -114,7 +119,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     }, [setSelectedElement]);
 
 
-    const handleEngineChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTriggerTextChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setElements((els: Elements) =>
             els.map((el: FlowElement & Edge) => {
                 if (el.id === selectedElement.id) {
@@ -124,9 +129,54 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         ...el.data,
                         nodeControls: {
                             ...el.data.nodeControls,
-                            engine: {
-                                ...el.data.nodeControls.engine,
+                            trigger: {
+                                ...el.data.nodeControls.trigger,
                                 [event.target.name]: event.target.value
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [setElements, selectedElement]);
+
+    const handleTriggerStartDateChange = React.useCallback((event: Date) => {
+        console.log("Us who interview ", event)
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    // it's important that you create a new object here
+                    // in order to notify react flow about the change
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            trigger: {
+                                ...el.data.nodeControls.trigger,
+                                deviceId: event
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [setElements, selectedElement]);
+
+    const handleTriggerDropDownChange = React.useCallback((event: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    // it's important that you create a new object here
+                    // in order to notify react flow about the change
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            trigger: {
+                                ...el.data.nodeControls.trigger,
+                                [type]: event.value
                             }
                         }
                     };
@@ -219,11 +269,13 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 </div>
                 <EventProperties
                     element={selectedElement}
-                    handleEngineChange={handleEngineChange}
+                    handleTriggerTextChange={handleTriggerTextChange}
                     elements={elements}
                     handleEdgeChange={handleEdgeChange}
                     handleRulesDropDownChange={handleRulesDropDownChange}
                     handleDataSourceChange={handleDataSourceChange}
+                    handleTriggerDropDownChange={handleTriggerDropDownChange}
+                    handleTriggerStartDateChange={handleTriggerStartDateChange}
                 />
             </ReactFlowProvider>
         </div>
