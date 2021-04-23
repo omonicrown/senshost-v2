@@ -5,7 +5,7 @@
     > .rules-holder {
         width: 100%;
         border-top: 1px solid $gray-300;
-        height: calc(100% - (#{$footer-height} + 0.5rem));
+        height: calc(100% - 0.5rem);
         .rule-engine-body {
             flex-direction: row;
             flex-grow: 1;

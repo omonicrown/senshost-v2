@@ -193,6 +193,75 @@ export const HTTPREQUESTMETHODS: Array<DropdownItem> = [
     },
 ];
 
+export const TIMERULEOPERATORS: Array<DropdownItem> = [
+    {
+        label: "Last received is >",
+        value: ">"
+    },
+    {
+        label: "Last received is <",
+        value: "<"
+    },
+    {
+        label: "Last received is =",
+        value: "="
+    },
+    {
+        label: "Last received is <=",
+        value: "<="
+    },
+    {
+        label: "Last received is >=",
+        value: ">="
+    },
+];
+
+export const STRINGRULEOPRATORS: Array<DropdownItem> = [
+    {
+        label: "Contains",
+        value: "contains"
+    },
+    {
+        label: "Start with",
+        value: "startWith"
+    },
+    {
+        label: "End with",
+        value: "endWith"
+    },
+    {
+        label: "Length",
+        value: "length"
+    },
+];
+
+export const NUMBERRULEOPERATORS: Array<DropdownItem> = [
+    {
+        label: ">",
+        value: ">"
+    },
+    {
+        label: ">=",
+        value: ">="
+    },
+    {
+        label: "<",
+        value: "<"
+    },
+    {
+        label: "<=",
+        value: "<="
+    },
+    {
+        label: "=",
+        value: "="
+    },
+    {
+        label: "!=",
+        value: "!="
+    },
+]
+
 export const ACTIONTYPES: Array<DropdownItem> = [
     {
         label: "Rest service action",

@@ -70,14 +70,31 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
                 label: "Select",
                 value: null
             }, {
-                label: "OnTime",
-                value: "onTime"
+                label: "One time",
+                value: "oneTime"
             }, {
                 label: "Recurring",
                 value: "recurring"
             }];
         }
     }, [elementType]);
+
+
+    const candenceValues: Array<DropdownItem> = React.useMemo(() => {
+        return [{
+            label: "Select",
+            value: null
+        }, {
+            label: "Daily",
+            value: "daily"
+        }, {
+            label: "Weekly",
+            value: "wekkly"
+        }, {
+            label: "Monthly",
+            value: "monthly"
+        }];
+    }, []);
 
     React.useEffect(() => {
         if ((fields.deviceId as DropdownItem)?.value) {
@@ -106,13 +123,14 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
         const selctedDevice: DropdownItem = devices?.find((device: DropdownItem) => device?.value === element?.data?.nodeControls?.trigger?.deviceId);
         const sourceType: DropdownItem = triggerSouceTypes.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.trigger?.sourceType);
-        console.log("Undefeated champion ", sourceType)
         let sourceId: string | DropdownItem;
 
         if (sourceType?.value === "sensor") {
             sourceId = sensors.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.trigger?.sourceId);
         } else if (sourceType?.value === "actuator") {
             sourceId = actuators.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.trigger?.sourceId);
+        } else if (sourceType?.value === "recurring") {
+            sourceId = candenceValues?.find((cadence: DropdownItem) => cadence?.value === element?.data?.nodeControls?.trigger?.sourceId);
         }
         setFields({
             ...fields,
@@ -151,15 +169,16 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
                     disabled={props.loading}
                 />
             </div>
-            {elementType === "schedule" && 
-            <Schedule
-                trigger={fields} 
-                handleTriggerDropDownChange={props.handleTriggerDropDownChange}
-                loading={props.loading}
-                handleTriggerStartDateChange={props.handleTriggerStartDateChange}
-                sourceTypes={triggerSouceTypes}
-                handleTriggerTextChange={props.handleTriggerTextChange}
-            />}
+            {elementType === "schedule" &&
+                <Schedule
+                    trigger={fields}
+                    handleTriggerDropDownChange={props.handleTriggerDropDownChange}
+                    loading={props.loading}
+                    candenceValues={candenceValues}
+                    handleTriggerStartDateChange={props.handleTriggerStartDateChange}
+                    sourceTypes={triggerSouceTypes}
+                    handleTriggerTextChange={props.handleTriggerTextChange}
+                />}
             {elementType === "dataReceived" && <DataReceived
                 devices={devices}
                 trigger={fields}

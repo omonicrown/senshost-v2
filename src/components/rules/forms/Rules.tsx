@@ -1,10 +1,12 @@
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { RadioGroup } from "@sebgroup/react-components/dist/RadioGroup";
+import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { Edge, Elements, FlowElement } from "react-flow-renderer";
 import { useSelector } from "react-redux";
 import { SensorApis } from "../../../apis/sensorApis";
+import { NUMBERRULEOPERATORS, STRINGRULEOPRATORS, TIMERULEOPERATORS } from "../../../constants";
 import { DeviceModel, SensorModel } from "../../../interfaces/models";
 import { DeviceState, States } from "../../../interfaces/states";
 import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
@@ -13,10 +15,11 @@ import { DEVICEDATASOURCETYPE, DEVICEDATASOURCES } from "../../dashboardItem/mod
 
 interface RulesFormProps {
     loading: boolean;
-    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor") => void;
+    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor" | "operator") => void;
     selectedElement: FlowElement & Edge;
     elements: Elements;
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface DataSourceProps {
@@ -26,8 +29,15 @@ interface DataSourceProps {
     sensor?: DropdownItem;
     attribute?: string;
 }
+
+interface OperatorProps {
+    operator: DropdownItem;
+    value: string;
+}
+
 const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.ReactElement<void> => {
     const [dataSource, setDataSource] = React.useState<DataSourceProps>({ type: "device", });
+    const [operatorObj, setOperator] = React.useState<OperatorProps>({ operator: null, value: "" });
 
     const [sensors, setSensors] = React.useState<Array<DropdownItem>>([{ label: 'Please select', value: null }]);
 
@@ -36,6 +46,22 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
         const updatedDevices: Array<DropdownItem> = deviceState?.devices?.map((device: DeviceModel) => ({ label: device.name, value: device.id }));
         return [{ label: 'Please select', value: null }, ...updatedDevices];
     }, [deviceState?.devices]);
+
+    const operators: Array<DropdownItem> = React.useMemo(() => {
+        const firstWord: string = props.selectedElement?.id?.split("-")[0];
+        console.log("The number is ", firstWord)
+        switch (firstWord) {
+            case "time":
+                return [{ label: "Select", value: null }, ...TIMERULEOPERATORS];
+            case "string":
+                return [{ label: "Select", value: null }, ...STRINGRULEOPRATORS];
+            case "number":
+                return [{ label: "Select", value: null }, ...NUMBERRULEOPERATORS];
+            default:
+                return [{ label: "Select", value: null }]
+        }
+
+    }, [props.selectedElement]);
 
     React.useEffect(() => {
         if (dataSource?.device?.value) {
@@ -62,6 +88,15 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
             type: element?.data?.nodeControls?.rules?.type,
         })
     }, [props.selectedElement, props.elements, setDataSource]);
+
+    React.useEffect(() => {
+        const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
+        setOperator({
+            ...operatorObj,
+            value: element?.data?.nodeControls?.rules?.operatorValue,
+            operator: element?.data?.nodeControls?.rules?.operator
+        });
+    }, [props.selectedElement, props.elements, setOperator]);
 
     return (
         <div className="rule-properties-holder">
@@ -129,6 +164,35 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
                     }
                 </fieldset>
             }
+
+            <fieldset className="rule-operators border my-2 p-2">
+                <legend className="w-auto"><h6 className="custom-label"> Datasource Value </h6></legend>
+                <div className="row pt-2">
+                    <Dropdown
+                        label="Operator"
+                        name="operator"
+                        list={operators}
+                        className="col"
+                        disabled={props?.loading}
+                        selectedValue={operatorObj?.operator}
+                        error={null}
+                        onChange={(value: DropdownItem) => props.handleRulesDropDownChange(value, "operator")}
+                    />
+                </div>
+                <div className="row">
+                    <TextBoxGroup
+                        name="operatorValue"
+                        type="text"
+                        className="col"
+                        label="Value"
+                        placeholder="Operator value"
+                        value={operatorObj?.value || ""}
+                        onChange={props.handleRuleOperatorValueChange}
+                        disabled={props.loading}
+                    />
+                </div>
+
+            </fieldset>
 
         </div>
     )

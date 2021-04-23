@@ -1,6 +1,4 @@
-import React, { useContext } from "react";
-
-import { DeviceApis } from "../../../apis/deviceApis";
+import React from "react";
 
 import { StepTracker } from "@sebgroup/react-components/dist/StepTracker";
 import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";

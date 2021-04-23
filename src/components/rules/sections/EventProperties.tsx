@@ -12,9 +12,10 @@ interface EventPropertiesProps {
     handleTriggerTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleEdgeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerDropDownChange: (value: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => void;
-    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor") => void;
+    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor" | "operator") => void;
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerStartDateChange: (value: Date) => void;
+    handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesProps): React.ReactElement<void> => {
@@ -57,6 +58,7 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
             />}
             {isRuleEdge && <LineForm loading={false} elements={props.elements} handleEdgeChange={props.handleEdgeChange} selectedElement={props.element} />}
             {isRuleNode && <RuleForm
+                handleRuleOperatorValueChange={props.handleRuleOperatorValueChange}
                 loading={false}
                 handleRulesDropDownChange={props.handleRulesDropDownChange}
                 elements={props.elements}

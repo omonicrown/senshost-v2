@@ -9,6 +9,7 @@ interface ScheduledProps {
     loading: boolean;
     trigger: TriggerFormModel;
     sourceTypes: Array<DropdownItem>;
+    candenceValues: Array<DropdownItem>;
     handleTriggerDropDownChange: (value: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => void;
     handleTriggerTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerStartDateChange: (value: Date) => void;
@@ -32,14 +33,15 @@ const Schedule: React.FC<ScheduledProps> = (props: ScheduledProps): React.ReactE
             </div>
             {props.trigger?.sourceType?.value === "recurring" &&
                 <div className="row">
-                    <TextBoxGroup
+                    <Dropdown
                         label="Cadence"
-                        name="sourceId"
+                        name="cadence"
+                        list={props?.candenceValues}
                         className="col"
                         disabled={props?.loading}
-                        value={props.trigger?.sourceId as string || ""}
+                        selectedValue={props.trigger?.sourceId as DropdownItem}
                         error={null}
-                        onChange={props.handleTriggerTextChange}
+                        onChange={(value: DropdownItem) => props.handleTriggerDropDownChange(value, "sourceId")}
                     />
                 </div>
             }
@@ -52,7 +54,6 @@ const Schedule: React.FC<ScheduledProps> = (props: ScheduledProps): React.ReactE
                     disabled={props?.loading}
                     value={props.trigger?.deviceId as Date}
                     error={null}
-                    minDate={new Date()}
                     clearable
                     onChange={props.handleTriggerStartDateChange}
                 />

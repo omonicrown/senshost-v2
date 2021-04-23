@@ -202,7 +202,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
     }, [selectedElement, setElements]);
 
-    const handleRulesDropDownChange = React.useCallback((value: DropdownItem, field: "device" | "deviceSource" | "sensor") => {
+    const handleRulesDropDownChange = React.useCallback((value: DropdownItem, field: "device" | "deviceSource" | "sensor" | "operator") => {
         setElements((els: Elements) =>
             els.map((el: FlowElement & Edge) => {
                 if (el.id === selectedElement.id) {
@@ -213,6 +213,27 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                             rules: {
                                 ...el.data.nodeControls.rules,
                                 [field]: value
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
+
+
+    const handleRuleOperatorValueChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            rules: {
+                                ...el.data.nodeControls.rules,
+                                [event.target.name]: event.target.value as DatasourceType
                             }
                         }
                     };
@@ -270,6 +291,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 <EventProperties
                     element={selectedElement}
                     handleTriggerTextChange={handleTriggerTextChange}
+                    handleRuleOperatorValueChange={handleRuleOperatorValueChange}
                     elements={elements}
                     handleEdgeChange={handleEdgeChange}
                     handleRulesDropDownChange={handleRulesDropDownChange}

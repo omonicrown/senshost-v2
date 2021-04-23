@@ -14,7 +14,7 @@ import { States, AuthState } from "../../interfaces/states";
 import { useSelector, useDispatch } from "react-redux";
 import { AxiosResponse, AxiosError } from "axios";
 import { DeviceModel, ActuatorModel } from "../../interfaces/models";
-import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, FilterProps, FilterItem, ActionLinkItem } from "@sebgroup/react-components/dist/Table/Table";
+import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, FilterProps, FilterItem } from "@sebgroup/react-components/dist/Table/Table";
 import { DEVICETYPES, initialState } from "../../constants";
 import { DropdownItem, Dropdown } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import configs from "../../configs";
@@ -24,7 +24,7 @@ import { toggleNotification } from "../../actions";
 import { Dispatch } from "redux";
 import { useHistory } from "react-router";
 import { History } from "history";
-import { AppRoutes, HomeRoutes, ViewDeviceRoutes } from "../../enums/routes";
+import { AppRoutes, ViewDeviceRoutes } from "../../enums/routes";
 import PageTitle from "../shared/PageTitle";
 
 export interface DevicesProps extends SharedProps {

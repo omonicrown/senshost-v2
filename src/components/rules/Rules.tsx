@@ -2,7 +2,6 @@ import React from "react";
 import { SharedProps } from "../home/Home";
 import PageTitle from "../shared/PageTitle";
 
-import ReactFlow from "react-flow-renderer";
 
 import EventBody from "./sections/EventBody";
 import { Button } from "@sebgroup/react-components/dist/Button";

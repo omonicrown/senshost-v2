@@ -24,7 +24,6 @@ import AddDashboardItem from "./modals/AddDashboardItem";
 import CardAction from './modals/CardAction';
 import { Loader } from '@sebgroup/react-components/dist/Loader';
 
-import PageTitle from "../shared/PageTitle";
 
 const DashboardItem: React.FC = () => {
     const [dashboardItems, setDashboardItems] = React.useState<Array<DashboardItemModel>>([]);
