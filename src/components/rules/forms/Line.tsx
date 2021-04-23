@@ -27,16 +27,20 @@ const LineForm: React.FC<LineFormProps> = (props: LineFormProps): React.ReactEle
     }], []);
 
     return (
-        <RadioGroup
-            name="lineType"
-            disableAll={props.loading}
-            id="lineType"
-            label="Connection type"
-            value={value}
-            condensed
-            list={list}
-            onChange={props.handleEdgeChange}
-        />
+        <div className="line-properties-holder">
+            <div className="row">
+                <RadioGroup
+                    name="lineType"
+                    disableAll={props.loading}
+                    id="lineType"
+                    label="Connection type"
+                    value={value}
+                    condensed
+                    list={list}
+                    onChange={props.handleEdgeChange}
+                />
+            </div>
+        </div>
     );
 };
 

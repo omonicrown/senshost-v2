@@ -325,20 +325,6 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
                             : null
                     }
                 />
-                {/* <Modal
-                    {...groupDetailsModalProps}
-                    onDismiss={onDismissViewGroupDetail}
-                    header={groupDetailsModalProps?.toggle ? <h3>Group: {group?.name}'s Users</h3> : null}
-                    body={
-                        groupDetailsModalProps ?
-                            <GroupDetails
-                                onCancel={onCancelGroupDetailModal}
-                                group={group}
-                                toggle={groupDetailsModalProps?.toggle}
-                            />
-                            : null
-                    }
-                /> */}
                 <Modal
                     {...modalDeleteActionProps}
                     onDismiss={onDismissDeleteAction}

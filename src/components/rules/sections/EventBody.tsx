@@ -263,6 +263,27 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         );
     }, [selectedElement, setElements]);
 
+    const handleActionsDropDownChange = React.useCallback((value: DropdownItem, field: "action") => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            actions: {
+                                ...el.data.nodeControls.actions,
+                                action: value
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
+
+
     return (
         <div className="rule-engine-body d-flex">
             <ReactFlowProvider>
@@ -298,6 +319,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     handleDataSourceChange={handleDataSourceChange}
                     handleTriggerDropDownChange={handleTriggerDropDownChange}
                     handleTriggerStartDateChange={handleTriggerStartDateChange}
+                    handleActionsDropDownChange={handleActionsDropDownChange}
                 />
             </ReactFlowProvider>
         </div>

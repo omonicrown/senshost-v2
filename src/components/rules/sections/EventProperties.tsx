@@ -5,6 +5,7 @@ import { FlowElement, Edge, Elements } from "react-flow-renderer";
 import TriggerForm from "../forms/Trigger";
 import LineForm from "../forms/Line";
 import RuleForm from "../forms/Rules";
+import ActionsForm from "../forms/Actions";
 
 interface EventPropertiesProps {
     element: FlowElement & Edge;
@@ -16,6 +17,7 @@ interface EventPropertiesProps {
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerStartDateChange: (value: Date) => void;
     handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleActionsDropDownChange: (value: DropdownItem, field: "action") => void;
 }
 
 const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesProps): React.ReactElement<void> => {
@@ -37,12 +39,22 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
 
     const isRuleNode = React.useMemo(() => {
         const firstWord: string = props.element?.id?.split("-")[0];
-
-        console.log("Soldier come soldier come ", props.element);
         return (
             firstWord === "string" ||
             firstWord === "number" ||
             firstWord === "time"
+        )
+    }, [props.element]);
+
+
+    const isRuleAction = React.useMemo(() => {
+        const firstWord: string = props.element?.id?.split("-")[0];
+        console.log("The first word is ", firstWord)
+        return (
+            firstWord === "email" ||
+            firstWord === "publish" ||
+            firstWord === "actuator" ||
+            firstWord === "expression"
         )
     }, [props.element]);
 
@@ -64,6 +76,12 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
                 elements={props.elements}
                 selectedElement={props.element}
                 handleDataSourceChange={props.handleDataSourceChange}
+            />}
+            {isRuleAction && <ActionsForm
+                loading={false}
+                handleActionsDropDownChange={props.handleActionsDropDownChange}
+                elements={props.elements}
+                selectedElement={props.element}
             />}
         </aside>
     );
