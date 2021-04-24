@@ -263,7 +263,52 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         );
     }, [selectedElement, setElements]);
 
-    const handleActionsDropDownChange = React.useCallback((value: DropdownItem, field: "action") => {
+    const handleActionsDropDownChange = React.useCallback((value: DropdownItem, field: "action" | "actionType") => {
+        switch (field) {
+            case "action": {
+                setElements((els: Elements) =>
+                    els.map((el: FlowElement & Edge) => {
+                        if (el.id === selectedElement.id) {
+                            el.data = {
+                                ...el.data,
+                                nodeControls: {
+                                    ...el.data.nodeControls,
+                                    actions: {
+                                        ...el.data.nodeControls.actions,
+                                        action: value
+                                    }
+                                }
+                            };
+                        }
+                        return el;
+                    })
+                );
+                break;
+            }
+            case "actionType":
+                setElements((els: Elements) =>
+                    els.map((el: FlowElement & Edge) => {
+                        if (el.id === selectedElement.id) {
+                            el.data = {
+                                ...el.data,
+                                nodeControls: {
+                                    ...el.data.nodeControls,
+                                    actions: {
+                                        ...el.data.nodeControls.actions,
+                                        newAction: { ...el.data.nodeControls.actions.newAction, [field]: value }
+                                    }
+                                }
+                            };
+                        }
+                        return el;
+                    })
+                );
+                break;
+        }
+    }, [selectedElement, setElements]);
+
+
+    const handleActionsPropertyDropdownChange = React.useCallback((value: DropdownItem, type: "httpMethod") => {
         setElements((els: Elements) =>
             els.map((el: FlowElement & Edge) => {
                 if (el.id === selectedElement.id) {
@@ -273,7 +318,10 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                             ...el.data.nodeControls,
                             actions: {
                                 ...el.data.nodeControls.actions,
-                                action: value
+                                newAction: {
+                                    ...el.data.nodeControls.actions.newAction,
+                                    property: { ...el.data.nodeControls.actions.newAction.property, [type]: value }
+                                }
                             }
                         }
                     };
@@ -283,6 +331,52 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         );
     }, [selectedElement, setElements]);
 
+
+    const handleActionsTextChange = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            actions: {
+                                ...el.data.nodeControls.actions,
+                                newAction: { ...el.data.nodeControls.actions.newAction, [e.target.name]: e.target.value }
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
+
+    const handleActionsPropertyTextChange = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            actions: {
+                                ...el.data.nodeControls.actions,
+                                newAction: {
+                                    ...el.data.nodeControls.actions.newAction,
+                                    property: {
+                                        ...el.data.nodeControls?.actions?.newAction?.property,
+                                        [e.target.name]: e.target.value
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
 
     return (
         <div className="rule-engine-body d-flex">
@@ -319,7 +413,10 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     handleDataSourceChange={handleDataSourceChange}
                     handleTriggerDropDownChange={handleTriggerDropDownChange}
                     handleTriggerStartDateChange={handleTriggerStartDateChange}
-                    handleActionsDropDownChange={handleActionsDropDownChange}
+                    handleActionsPropertyDropdownChange={handleActionsPropertyDropdownChange}
+                    handleActionsDropdownChange={handleActionsDropDownChange}
+                    handleActionsPropertyTextChange={handleActionsPropertyTextChange}
+                    handleActionsTextChange={handleActionsTextChange}
                 />
             </ReactFlowProvider>
         </div>

@@ -17,7 +17,12 @@ interface EventPropertiesProps {
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerStartDateChange: (value: Date) => void;
     handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    handleActionsDropDownChange: (value: DropdownItem, field: "action") => void;
+
+
+    handleActionsDropdownChange: (value: DropdownItem, field: "action" | "actionType") => void;
+    handleActionsPropertyDropdownChange: (value: DropdownItem, type: "httpMethod") => void;
+    handleActionsTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
+    handleActionsPropertyTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
 }
 
 const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesProps): React.ReactElement<void> => {
@@ -79,9 +84,12 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
             />}
             {isRuleAction && <ActionsForm
                 loading={false}
-                handleActionsDropDownChange={props.handleActionsDropDownChange}
                 elements={props.elements}
                 selectedElement={props.element}
+                handleActionsDropDownChange={props.handleActionsDropdownChange}
+                handleActionsPropertyDropdownChange={props.handleActionsPropertyDropdownChange}
+                handleActionsTextChange={props.handleActionsTextChange}
+                handleActionsPropertyTextChange={props.handleActionsPropertyTextChange}
             />}
         </aside>
     );
