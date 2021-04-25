@@ -6,6 +6,7 @@ import TriggerForm from "../forms/Trigger";
 import LineForm from "../forms/Line";
 import RuleForm from "../forms/Rules";
 import ActionsForm from "../forms/Actions";
+import { ActionModel } from "../../../interfaces/models";
 
 interface EventPropertiesProps {
     element: FlowElement & Edge;
@@ -19,7 +20,7 @@ interface EventPropertiesProps {
     handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 
 
-    handleActionsDropdownChange: (value: DropdownItem, field: "action" | "actionType") => void;
+    handleActionsDropdownChange: (value: DropdownItem | ActionModel, field: "action" | "actionType") => void;
     handleActionsPropertyDropdownChange: (value: DropdownItem, type: "httpMethod") => void;
     handleActionsTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
     handleActionsPropertyTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
@@ -54,7 +55,7 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
 
     const isRuleAction = React.useMemo(() => {
         const firstWord: string = props.element?.id?.split("-")[0];
-        console.log("The first word is ", firstWord)
+
         return (
             firstWord === "email" ||
             firstWord === "publish" ||

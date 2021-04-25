@@ -14,6 +14,48 @@ export interface Account {
     name?: string;
 }
 
+export interface RuleModel {
+    triggerId?: string,
+    fieldId?: string,
+    deviceId?: string,
+    operator?: string,
+    ruleType?: 0,
+    dataField?: {
+        name: string;
+        deviceId: string;
+        dataType: number;
+        id: string;
+        creationDate: Date;
+    };
+    device?: DeviceModel;
+    value?: string,
+    isEntry?: true,
+    lastRun?: Date;
+    lastDataId?: string;
+    andId: string;
+    orId: string;
+    id: string;
+    creationDate: Date;
+}
+export interface TriggerModel {
+    name: string;
+    actionId?: string;
+    actions: Array<ActionModel>;
+    accountId: string;
+    status?: number
+    lastTriggered?: Date;
+    rule: RuleModel;
+    deviceId?: string,
+    sourceId?: string,
+    type?: 0,
+    sourceType?: 0,
+    groupId?: string,
+    action?: ActionModel;
+    eventName: string;
+    id?: string;
+    creationDate: Date;
+}
+
 export interface ActionModel {
     name: string;
     type: ActionType;

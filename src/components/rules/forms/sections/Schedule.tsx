@@ -3,7 +3,6 @@ import { Datepicker } from "@sebgroup/react-components/dist/Datepicker";
 
 import React from "react";
 import { TriggerFormModel } from "../Trigger";
-import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 
 interface ScheduledProps {
     loading: boolean;
@@ -16,7 +15,7 @@ interface ScheduledProps {
 }
 
 const Schedule: React.FC<ScheduledProps> = (props: ScheduledProps): React.ReactElement<void> => {
-    console.log("Recently is ", props.trigger)
+
     return (
         <React.Fragment>
             <div className="row">

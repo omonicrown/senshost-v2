@@ -33,6 +33,7 @@ const LineForm: React.FC<LineFormProps> = (props: LineFormProps): React.ReactEle
                     name="lineType"
                     disableAll={props.loading}
                     id="lineType"
+                    className="col"
                     label="Connection type"
                     value={value}
                     condensed

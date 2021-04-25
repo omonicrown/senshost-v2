@@ -15,7 +15,7 @@ interface ActionsFormProps {
     loading: boolean;
     selectedElement: FlowElement & Edge;
     elements: Elements;
-    handleActionsDropDownChange: (value: DropdownItem, field: "action" | "actionType") => void;
+    handleActionsDropDownChange: (value: DropdownItem | ActionModel, field: "action" | "actionType") => void;
     handleActionsPropertyDropdownChange: (value: DropdownItem, type: "httpMethod") => void;
     handleActionsTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
     handleActionsPropertyTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
@@ -23,7 +23,8 @@ interface ActionsFormProps {
 
 const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
     const authState: AuthState = useSelector((states: States) => states?.auth);
-    const [actions, setActions] = React.useState<Array<DropdownItem>>([{ label: "Select", value: null }, { label: "Create action", value: "action_create" }]);
+    const [actionsDropdownValue, setActionsDropdownValue] = React.useState<Array<DropdownItem>>([{ label: "Select", value: null }]);
+    const [actions, setActions] = React.useState<Array<ActionModel>>([]);
     const [selectedAction, setSelectedAction] = React.useState<DropdownItem>(null);
     const [actionType, setActionType] = React.useState<"NEW" | "EXISTING">("EXISTING");
 
@@ -44,6 +45,11 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
         setActionType(event?.target?.value as "NEW" | "EXISTING");
     }, [setActionType]);
 
+    const handleActionsDropDownChange = React.useCallback((value: DropdownItem) => {
+        const action: ActionModel = actions?.find((ruleAction: ActionModel) => ruleAction?.id === value?.value);
+
+        props.handleActionsDropDownChange(action, "action");
+    }, [actions]);
 
     const action: ActionModel = React.useMemo(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
@@ -70,14 +76,19 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
                             value: action.id
                         }
                     )
-                })
-                setActions([...actions, ...updatedData]);
+                });
+                setActions(response?.data);
+                setActionsDropdownValue([...actionsDropdownValue, ...updatedData]);
             });
     }, []);
 
     React.useEffect(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
-        setSelectedAction(element?.data?.nodeControls?.actions?.action);
+
+        setSelectedAction({
+            label: element?.data?.nodeControls?.actions?.action?.name,
+            value: element?.data?.nodeControls?.actions?.action?.id
+        } as DropdownItem);
     }, [props.selectedElement, props.elements]);
 
     return (
@@ -100,12 +111,12 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
                     <Dropdown
                         label="Action"
                         name="action"
-                        list={actions}
+                        list={actionsDropdownValue}
                         className="col"
                         disabled={props?.loading}
                         selectedValue={selectedAction}
                         error={null}
-                        onChange={(value: DropdownItem) => props.handleActionsDropDownChange(value, "action")}
+                        onChange={handleActionsDropDownChange}
                     />
                 </div>
             }

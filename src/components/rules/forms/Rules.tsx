@@ -49,7 +49,7 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
 
     const operators: Array<DropdownItem> = React.useMemo(() => {
         const firstWord: string = props.selectedElement?.id?.split("-")[0];
-        console.log("The number is ", firstWord)
+
         switch (firstWord) {
             case "time":
                 return [{ label: "Select", value: null }, ...TIMERULEOPERATORS];

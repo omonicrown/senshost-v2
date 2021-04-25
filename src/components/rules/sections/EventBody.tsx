@@ -13,7 +13,9 @@ import ReactFlow, {
     FlowElement,
     Edge
 } from "react-flow-renderer";
+import { ActionModel } from "../../../interfaces/models";
 import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
+import PageTitle from "../../shared/PageTitle";
 import EventControls from "./EventControls";
 import EventProperties from "./EventProperties";
 
@@ -142,7 +144,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     }, [setElements, selectedElement]);
 
     const handleTriggerStartDateChange = React.useCallback((event: Date) => {
-        console.log("Us who interview ", event)
         setElements((els: Elements) =>
             els.map((el: FlowElement & Edge) => {
                 if (el.id === selectedElement.id) {
@@ -263,7 +264,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         );
     }, [selectedElement, setElements]);
 
-    const handleActionsDropDownChange = React.useCallback((value: DropdownItem, field: "action" | "actionType") => {
+    const handleActionsDropDownChange = React.useCallback((value: DropdownItem | ActionModel, field: "action" | "actionType") => {
         switch (field) {
             case "action": {
                 setElements((els: Elements) =>
@@ -378,47 +379,58 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         );
     }, [selectedElement, setElements]);
 
-    return (
-        <div className="rule-engine-body d-flex">
-            <ReactFlowProvider>
-                <EventControls />
-                <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-                    <ReactFlow
-                        elements={elements}
-                        onConnect={onConnect}
-                        onElementsRemove={onElementsRemove}
-                        onLoad={onLoad}
-                        onDrop={onDrop}
-                        onDragOver={onDragOver}
-                        onEdgeUpdate={onEdgeUpdate}
-                        onPaneClick={onPanelClick}
-                        onElementClick={onElementClick}
-                    >
-                        <Controls />
-                        <Background color="#aaa" gap={16} />
+    const handleSave = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        console.log("Tough guy dialogue ", elements)
+    }, [elements])
 
-                        {selectedElement && <div className="controls-holder">
-                            <Button label="Delete" theme="danger" onClick={onRemoveNode} size="sm" id="signin" />
+    return (
+        <div className="rules-container">
+            <PageTitle title="Rules engine">
+                <Button label="Save" id="saveBtn" size="sm" theme="outline-primary" title="Add" onClick={handleSave} />
+            </PageTitle>
+            <div className="rules-holder">
+                <div className="rule-engine-body d-flex">
+                    <ReactFlowProvider>
+                        <EventControls />
+                        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+                            <ReactFlow
+                                elements={elements}
+                                onConnect={onConnect}
+                                onElementsRemove={onElementsRemove}
+                                onLoad={onLoad}
+                                onDrop={onDrop}
+                                onDragOver={onDragOver}
+                                onEdgeUpdate={onEdgeUpdate}
+                                onPaneClick={onPanelClick}
+                                onElementClick={onElementClick}
+                            >
+                                <Controls />
+                                <Background color="#aaa" gap={16} />
+
+                                {selectedElement && <div className="controls-holder">
+                                    <Button label="Delete" theme="danger" onClick={onRemoveNode} size="sm" id="signin" />
+                                </div>
+                                }
+                            </ReactFlow>
                         </div>
-                        }
-                    </ReactFlow>
+                        <EventProperties
+                            element={selectedElement}
+                            handleTriggerTextChange={handleTriggerTextChange}
+                            handleRuleOperatorValueChange={handleRuleOperatorValueChange}
+                            elements={elements}
+                            handleEdgeChange={handleEdgeChange}
+                            handleRulesDropDownChange={handleRulesDropDownChange}
+                            handleDataSourceChange={handleDataSourceChange}
+                            handleTriggerDropDownChange={handleTriggerDropDownChange}
+                            handleTriggerStartDateChange={handleTriggerStartDateChange}
+                            handleActionsPropertyDropdownChange={handleActionsPropertyDropdownChange}
+                            handleActionsDropdownChange={handleActionsDropDownChange}
+                            handleActionsPropertyTextChange={handleActionsPropertyTextChange}
+                            handleActionsTextChange={handleActionsTextChange}
+                        />
+                    </ReactFlowProvider>
                 </div>
-                <EventProperties
-                    element={selectedElement}
-                    handleTriggerTextChange={handleTriggerTextChange}
-                    handleRuleOperatorValueChange={handleRuleOperatorValueChange}
-                    elements={elements}
-                    handleEdgeChange={handleEdgeChange}
-                    handleRulesDropDownChange={handleRulesDropDownChange}
-                    handleDataSourceChange={handleDataSourceChange}
-                    handleTriggerDropDownChange={handleTriggerDropDownChange}
-                    handleTriggerStartDateChange={handleTriggerStartDateChange}
-                    handleActionsPropertyDropdownChange={handleActionsPropertyDropdownChange}
-                    handleActionsDropdownChange={handleActionsDropDownChange}
-                    handleActionsPropertyTextChange={handleActionsPropertyTextChange}
-                    handleActionsTextChange={handleActionsTextChange}
-                />
-            </ReactFlowProvider>
+            </div>
         </div>
     );
 };

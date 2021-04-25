@@ -5,7 +5,6 @@ import { TextArea } from "@sebgroup/react-components/dist/TextArea";
 import React from "react";
 import { ActionModel } from "../../../../interfaces/models";
 import { HTTPREQUESTMETHODS } from "../../../../constants";
-import { convertStringToJson } from "../../../../utils/functions";
 import { Edge, Elements, FlowElement } from "react-flow-renderer";
 
 
