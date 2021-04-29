@@ -16,30 +16,23 @@ export interface Account {
 
 export interface RuleModel {
     triggerId?: string,
+    title?: string;
     fieldId?: string,
     deviceId?: string,
     operator?: string,
     ruleType?: 0,
-    dataField?: {
-        name: string;
-        deviceId: string;
-        dataType: number;
-        id: string;
-        creationDate: Date;
-    };
-    device?: DeviceModel;
+    dataFieldSourceType: number;
     value?: string,
     isEntry?: true,
     lastRun?: Date;
-    lastDataId?: string;
-    andId: string;
-    orId: string;
-    id: string;
-    creationDate: Date;
+    position?: { x: number, y: number };
+    id?: string;
+    creationDate?: Date;
+    and?: RuleModel;
+    or?: RuleModel;
 }
 export interface TriggerModel {
     name: string;
-    actionId?: string;
     actions: Array<ActionModel>;
     accountId: string;
     status?: number
@@ -50,10 +43,9 @@ export interface TriggerModel {
     type?: 0,
     sourceType?: 0,
     groupId?: string,
-    action?: ActionModel;
-    eventName: string;
+    eventName?: string;
     id?: string;
-    creationDate: Date;
+    creationDate?: Date;
 }
 
 export interface ActionModel {

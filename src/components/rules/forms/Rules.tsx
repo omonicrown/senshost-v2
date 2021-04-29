@@ -7,6 +7,7 @@ import { Edge, Elements, FlowElement } from "react-flow-renderer";
 import { useSelector } from "react-redux";
 import { SensorApis } from "../../../apis/sensorApis";
 import { NUMBERRULEOPERATORS, STRINGRULEOPRATORS, TIMERULEOPERATORS } from "../../../constants";
+import { TimeRuleCadenceEnums } from "../../../enums";
 import { DeviceModel, SensorModel } from "../../../interfaces/models";
 import { DeviceState, States } from "../../../interfaces/states";
 import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
@@ -15,7 +16,7 @@ import { DEVICEDATASOURCETYPE, DEVICEDATASOURCES } from "../../dashboardItem/mod
 
 interface RulesFormProps {
     loading: boolean;
-    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor" | "operator") => void;
+    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor" | "operator" | "cadence") => void;
     selectedElement: FlowElement & Edge;
     elements: Elements;
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -24,6 +25,7 @@ interface RulesFormProps {
 
 interface DataSourceProps {
     type?: DatasourceType;
+    title?: string;
     deviceSource?: DropdownItem;
     device?: DropdownItem;
     sensor?: DropdownItem;
@@ -33,6 +35,7 @@ interface DataSourceProps {
 interface OperatorProps {
     operator: DropdownItem;
     value: string;
+    cadence?: DropdownItem;
 }
 
 const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.ReactElement<void> => {
@@ -63,6 +66,18 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
 
     }, [props.selectedElement]);
 
+    const timeRuleCadences: Array<DropdownItem> = React.useMemo((): Array<DropdownItem> => [
+        { label: "Select ", value: null },
+        { label: "Minutes", value: TimeRuleCadenceEnums.MINUTES },
+        { label: "Hours", value: TimeRuleCadenceEnums.HOURS },
+        { label: "Months", value: TimeRuleCadenceEnums.MONTHS },
+        { label: "Years", value: TimeRuleCadenceEnums.YEARS },
+    ], []);
+
+    const firstWord: string = React.useMemo(() => {
+        return props.selectedElement?.id?.split("-")[0];
+    }, [props.selectedElement]);
+
     React.useEffect(() => {
         if (dataSource?.device?.value) {
             SensorApis.getSensorsByDeviceId(dataSource?.device?.value)
@@ -77,11 +92,11 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
         }
     }, [dataSource?.device]);
 
-
     React.useEffect(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
         setDataSource({
             ...dataSource,
+            title: element?.data?.nodeControls?.rules?.title,
             sensor: element?.data?.nodeControls?.rules?.sensor,
             deviceSource: element?.data?.nodeControls?.rules?.deviceSource,
             device: element?.data?.nodeControls?.rules?.device,
@@ -94,12 +109,25 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
         setOperator({
             ...operatorObj,
             value: element?.data?.nodeControls?.rules?.operatorValue,
-            operator: element?.data?.nodeControls?.rules?.operator
+            operator: element?.data?.nodeControls?.rules?.operator,
+            cadence: element?.data?.nodeControls?.rules?.cadence
         });
     }, [props.selectedElement, props.elements, setOperator]);
 
     return (
         <div className="rule-properties-holder">
+            <div className="row">
+                <TextBoxGroup
+                    name="title"
+                    type="text"
+                    className="col"
+                    label="Title"
+                    placeholder="Title"
+                    value={dataSource?.title || ""}
+                    onChange={props.handleRuleOperatorValueChange}
+                    disabled={props.loading}
+                />
+            </div>
             <fieldset className="properties-holder border my-2 p-2">
                 <legend className="w-auto"><h6 className="custom-label"> Datasource Type </h6></legend>
                 <div className="row">
@@ -191,6 +219,20 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
                         disabled={props.loading}
                     />
                 </div>
+
+                {firstWord === "time" && <div className="row">
+                    <Dropdown
+                        label="Cadence"
+                        name="cadence"
+                        list={timeRuleCadences}
+                        className="col"
+                        disabled={props?.loading}
+                        selectedValue={operatorObj?.cadence}
+                        error={null}
+                        onChange={(value: DropdownItem) => props.handleRulesDropDownChange(value, "cadence")}
+                    />
+                </div>
+                }
 
             </fieldset>
 

@@ -14,11 +14,10 @@ interface EventPropertiesProps {
     handleTriggerTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleEdgeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerDropDownChange: (value: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => void;
-    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor" | "operator") => void;
+    handleRulesDropDownChange: (value: DropdownItem, field: "device" | "deviceSource" | "sensor" | "operator" | "cadence") => void;
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerStartDateChange: (value: Date) => void;
     handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-
 
     handleActionsDropdownChange: (value: DropdownItem | ActionModel, field: "action" | "actionType") => void;
     handleActionsPropertyDropdownChange: (value: DropdownItem, type: "httpMethod") => void;
@@ -28,11 +27,18 @@ interface EventPropertiesProps {
 
 const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesProps): React.ReactElement<void> => {
     const isRuleEdge: boolean = React.useMemo(() => {
-        const firstWord: string = props.element?.target?.split("-")[0];
+        const firstWord: string = props.element?.source?.split("-")[0];
+        console.log("The element is ", props.element?.target)
+        const targetWord: string = props.element?.target?.split("-")[0];
         return (
             firstWord === "string" ||
             firstWord === "time" ||
             firstWord === "number"
+        ) && !(
+            targetWord === "email" ||
+            targetWord === "publish" ||
+            targetWord === "actuator" ||
+            targetWord === "expression"
         )
     }, [props.element]);
 

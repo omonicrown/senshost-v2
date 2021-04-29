@@ -31,7 +31,6 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
 
     const actionTypes: Array<DropdownItem> = [{ label: "Please select", value: null }, ...ACTIONTYPES];
 
-
     const list: Array<RadioListModel> = React.useMemo(() => [{
         label: "Existing actions",
         value: "EXISTING",

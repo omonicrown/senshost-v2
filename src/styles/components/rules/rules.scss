@@ -63,6 +63,10 @@
                 cursor: grab;
                 &.input {
                     border-color: #0041d0;
+
+                    &.trigger-node {
+                        background-color: #eee;
+                    }
                 }
 
                 &.output {
