@@ -17,6 +17,7 @@ import { DashboardApis } from "../../../apis/dashboardApis";
 import { AxiosResponse } from "axios";
 import { convertStringToJson } from "../../../utils/functions";
 import { useSelector } from "react-redux";
+import { RuleDataSouceTypeEnums } from "../../../enums";
 
 export interface DashboardPropertiesOptions {
     type: number;
@@ -55,7 +56,7 @@ interface AddDashboardItemProps {
     dashboardId: string;
     dashboardItem?: DashboardItemModel;
 }
-export type DatasourceType = "device" | "aggregateField";
+export type DatasourceType = keyof typeof RuleDataSouceTypeEnums; // "device" | "aggregateField";
 
 const AddDashboardItem: React.FC<AddDashboardItemProps> = (props: AddDashboardItemProps): React.ReactElement<void> => {
     const [dashboardItemErrors, setDashboardItemErrors] = React.useState<AddDashboardItemControls>({} as AddDashboardItemControls);
