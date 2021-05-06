@@ -21,6 +21,7 @@ import ReactFlow, {
 import { useSelector } from "react-redux";
 import { TriggerApis } from "../../../apis/triggerApis";
 import { RuleDataSouceTypeEnums, RuleTriggerTypes, RuleTypeEnums, TriggerDataSourceTypeEnums } from "../../../enums";
+import { ActionType } from "../../../enums/status";
 import { ActionModel, RuleModel, TriggerModel } from "../../../interfaces/models";
 import { AuthState, States } from "../../../interfaces/states";
 import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
@@ -64,6 +65,33 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     const onDragOver = (event) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
+    };
+
+    const getActionNodeLabelByTypeEnum = (type: ActionType) => {
+        switch (type) {
+            case ActionType.Actuator:
+                return "Actuator action";
+            case ActionType.Email:
+                return "Email action";
+            case ActionType.expression:
+                return "Expression action";
+            case ActionType.Publish:
+                return "Publish action";
+        }
+    };
+
+
+    const getActionNodeIdByTypeEnum = (type: ActionType) => {
+        switch (type) {
+            case ActionType.Actuator:
+                return "actuator";
+            case ActionType.Email:
+                return "email";
+            case ActionType.expression:
+                return "expression";
+            case ActionType.Publish:
+                return "publish";
+        }
     };
 
     const getNodeLabel = (ruleType: RuleActionTypes | RuleTypes | TriggerTypes): string => {
@@ -315,7 +343,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                     ...el.data.nodeControls,
                                     actions: {
                                         ...el.data.nodeControls.actions,
-                                        newAction: { ...el.data.nodeControls.actions.newAction, [field]: value }
+                                        newAction: { ...el.data.nodeControls.actions.newAction, [field]: (value as DropdownItem)?.value }
                                     }
                                 }
                             };
@@ -439,7 +467,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 return {
                     id: null,
                     name: action?.data?.nodeControls?.actions?.newAction?.name,
-                    type: action?.data?.nodeControls?.actions?.newAction?.actionType?.value,
+                    type: action?.data?.nodeControls?.actions?.newAction?.actionType,
                     properties: JSON.stringify(action?.data?.nodeControls?.actions?.newAction?.property || ""),
                     accountId: authState?.auth?.account?.id,
                     creationDate: null
@@ -511,6 +539,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         }
         trigger = { ...trigger, rule: updatedRule };
 
+        console.log("How many people ", actionsNodes);
+
         setLoading(true);
         TriggerApis.createTrigger(trigger)
             .then((response: AxiosResponse<TriggerModel>) => {
@@ -519,7 +549,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 setLoading(false);
             });
 
-        console.log("Seizure ", trigger);
+        console.log("Seizure ", actionsNodes);
     }, [elements]);
 
     React.useEffect(() => {
@@ -578,11 +608,39 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 },
                 "or": null
             },
-            "actions": []
+            "actions": [{
+                "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
+                "creationDate": "2021-05-04T15:42:41.7477526",
+                "id": "23465d26-4251-449c-a0a2-11aab5c30742",
+                "isExectionSuccessful": false,
+                "name": "Action name",
+                "properties": "{\"url\":\"localhost:3000\",\"httpMethod\":\"GET\",\"body\":\"{value: 1}\"}",
+                "type": 4
+            }]
         };
 
+        // actions
+        const actions: Array<FlowElement> = response?.actions?.map((action: ActionModel) => {
+            return {
+                id: `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`,
+                type: "output",
+                position: response?.position,
+                data: {
+                    label: getActionNodeLabelByTypeEnum(action?.type),
+                    nodeType: "trigger",
+                    nodeControls: {
+                        trigger: {},
+                        rules: {},
+                        actions: {
+                            newAction: !action?.id ? action : null,
+                            action: action?.id ? action : null
+                        },
+                    }
+                },
+            } as FlowElement
+        })
         const node = {
-            id: `input-${getId()}`,
+            id: `${response?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule"}-${getId()}`,
             type: "input",
             position: response?.position,
             style: { backgroundColor: "#eee" },
@@ -592,17 +650,22 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 nodeControls: {
                     trigger: {
                         eventName: response?.eventName,
-                        triggerName: response?.name
+                        triggerName: response?.name,
+                        sourceType: response?.sourceType,
+                        deviceId: response?.deviceId
                     },
                     rules: {},
                     actions: {},
                 }
             },
         };
+        console.log("The actions is ", actions);
+        setElements((es) => es.concat([node, ...actions]));
+    }, []);
 
-        setElements((es) => es.concat(node));
-
-    }, [])
+    React.useEffect(() => {
+        console.log("The selected element is ", selectedElement);
+    }, [selectedElement]);
 
     return (
         <div className="rules-container">

@@ -39,7 +39,7 @@ const NewActionSection: React.FC<NewActionSectionProps> = (props: NewActionSecti
 
     React.useEffect(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
-        setAction(element?.data?.lineType)
+        const selectedActionType: DropdownItem = props.actionTypes?.find((type: DropdownItem) => type.value === element?.data?.nodeControls?.actions?.newAction?.actionType);
 
         setAction({
             ...action,
@@ -50,7 +50,7 @@ const NewActionSection: React.FC<NewActionSectionProps> = (props: NewActionSecti
                 url: element?.data?.nodeControls?.actions?.newAction?.property?.url || "",
             },
             name: element?.data?.nodeControls?.actions?.newAction?.name || "",
-            actionType: element?.data?.nodeControls?.actions?.newAction?.actionType,
+            actionType: selectedActionType,
         })
     }, [props.selectedElement, props.elements, setAction]);
 

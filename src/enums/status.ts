@@ -1,13 +1,16 @@
 
 
-export const enum Status {
-    Active = 0,
-    InActive = 1,
+export enum Status {
+    Active,
+    InActive,
 }
 
-export const enum ActionType {
-    RestServiceAction = 0,
-    MqttPublishAction = 1,
-    Email = 2,
-    SMS = 3
+export enum ActionType {
+    RestServiceAction,
+    MqttPublishAction,
+    Email,
+    SMS,
+    Actuator,
+    expression,
+    Publish
 }
