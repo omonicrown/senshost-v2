@@ -1,8 +1,8 @@
 import React from "react";
 import { RuleActionTypes, RuleTypes, TriggerTypes } from "./EventBody";
 
-const EventBody: React.FC = (): React.ReactElement<void> => {
-    const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: "default" | "input" | "output", ruleType: RuleActionTypes | RuleTypes | TriggerTypes, ruleCategory: "action" | "trigger" | "rule") => {
+const EventControls: React.FC = (): React.ReactElement<void> => {
+    const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: "default" | "input" | "output" | "selectorNode", ruleType: RuleActionTypes | RuleTypes | TriggerTypes, ruleCategory: "action" | "trigger" | "rule") => {
         event.dataTransfer.setData('application/reactflow-node-type', `${nodeType}-${ruleCategory}`);
         event.dataTransfer.setData('application/reactflow-rule-type', ruleType);
         event.dataTransfer.effectAllowed = 'move';
@@ -56,4 +56,4 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     );
 };
 
-export default EventBody;
+export default EventControls;

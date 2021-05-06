@@ -11,6 +11,8 @@ import { ActionModel } from "../../../interfaces/models";
 interface EventPropertiesProps {
     element: FlowElement & Edge;
     elements: Elements;
+    loading: boolean;
+
     handleTriggerTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleEdgeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerDropDownChange: (value: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => void;
@@ -74,23 +76,23 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
         <aside className="properties-holder">
             <div className="description">properties</div>
             {isEngineNode && <TriggerForm
-                loading={false}
+                loading={props.loading}
                 handleTriggerTextChange={props.handleTriggerTextChange}
                 handleTriggerStartDateChange={props.handleTriggerStartDateChange}
                 handleTriggerDropDownChange={props.handleTriggerDropDownChange}
                 selectedElement={props.element} elements={props.elements}
             />}
-            {isRuleEdge && <LineForm loading={false} elements={props.elements} handleEdgeChange={props.handleEdgeChange} selectedElement={props.element} />}
+            {isRuleEdge && <LineForm loading={props.loading} elements={props.elements} handleEdgeChange={props.handleEdgeChange} selectedElement={props.element} />}
             {isRuleNode && <RuleForm
                 handleRuleOperatorValueChange={props.handleRuleOperatorValueChange}
-                loading={false}
+                loading={props.loading}
                 handleRulesDropDownChange={props.handleRulesDropDownChange}
                 elements={props.elements}
                 selectedElement={props.element}
                 handleDataSourceChange={props.handleDataSourceChange}
             />}
             {isRuleAction && <ActionsForm
-                loading={false}
+                loading={props.loading}
                 elements={props.elements}
                 selectedElement={props.element}
                 handleActionsDropDownChange={props.handleActionsDropdownChange}

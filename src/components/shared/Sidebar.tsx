@@ -36,8 +36,8 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
             title: "Devices"
         },
         {
-            name: "rules",
-            iconType: icontypesEnum.RULES,
+            name: "triggers",
+            iconType: icontypesEnum.TRIGGERS,
             title: "Rules engine"
         },
         {

@@ -1,6 +1,6 @@
 import { Button } from "@sebgroup/react-components/dist/Button";
 import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
-import { name } from "dayjs/locale/*";
+import { AxiosResponse } from "axios";
 import React from "react";
 
 import ReactFlow, {
@@ -19,7 +19,8 @@ import ReactFlow, {
     getConnectedEdges
 } from "react-flow-renderer";
 import { useSelector } from "react-redux";
-import { RuleTriggerTYpes } from "../../../enums";
+import { TriggerApis } from "../../../apis/triggerApis";
+import { RuleDataSouceTypeEnums, RuleTriggerTypes, RuleTypeEnums, TriggerDataSourceTypeEnums } from "../../../enums";
 import { ActionModel, RuleModel, TriggerModel } from "../../../interfaces/models";
 import { AuthState, States } from "../../../interfaces/states";
 import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
@@ -44,7 +45,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
     const authState: AuthState = useSelector((states: States) => states?.auth);
 
-
+    const [loading, setLoading] = React.useState<boolean>(false);
     // gets called after end of edge gets dragged to another source or target
 
     const onEdgeUpdate = (oldEdge, newConnection) =>
@@ -65,7 +66,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         event.dataTransfer.dropEffect = 'move';
     };
 
-    const getNodeLabel = (nodeType: "default" | "input" | "output", ruleType: RuleActionTypes | RuleTypes | TriggerTypes): string => {
+    const getNodeLabel = (ruleType: RuleActionTypes | RuleTypes | TriggerTypes): string => {
         switch (ruleType) {
             case "actuator":
                 return `Actuator action`;
@@ -102,19 +103,20 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             x: event.clientX - reactFlowBounds.left,
             y: event.clientY - reactFlowBounds.top,
         });
-        console.log("Does it work here ", nodeCategory);
+
         const newNode = {
             id: `${ruleType}-${getId()}`,
             type,
             position,
             style: { backgroundColor: nodeCategory === "trigger" && "#eee" },
-            sourcePosition: nodeCategory === "trigger" ? Position.Right : Position.Bottom,
-            targetPosition: nodeCategory === "trigger" ? Position.Left : Position.Top,
             data: {
-                label: getNodeLabel(type, ruleType),
+                label: getNodeLabel(ruleType),
                 nodeType: nodeCategory,
                 nodeControls: {
-                    trigger: { eventName: "", triggerName: "" },
+                    trigger: {
+                        eventName: "",
+                        triggerName: ""
+                    },
                     rules: {},
                     actions: {},
                 }
@@ -398,8 +400,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
     const handleSave = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
-        let payLoad: TriggerModel;
-
         let rulesNodes: Array<FlowElement> = [];
         let actionsNodes: Array<FlowElement> = [];
         let triggersNodes: Array<FlowElement> = [];
@@ -434,14 +434,26 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
         const selectedTrigger: FlowElement = triggersNodes.find((trigger: FlowElement) => trigger?.id === firstRuleEdge?.source) || triggersNodes[0];
 
-        const actions: Array<ActionModel> = actionsNodes?.map((action: FlowElement) => action?.data?.nodeControls?.actions?.newAction || action?.data?.nodeControls?.actions?.action);
+        const actions: Array<ActionModel> = actionsNodes?.map((action: FlowElement) => {
+            if (action?.data?.nodeControls?.actions?.newAction) {
+                return {
+                    id: null,
+                    name: action?.data?.nodeControls?.actions?.newAction?.name,
+                    type: action?.data?.nodeControls?.actions?.newAction?.actionType?.value,
+                    properties: JSON.stringify(action?.data?.nodeControls?.actions?.newAction?.property || ""),
+                    accountId: authState?.auth?.account?.id,
+                    creationDate: null
+                } as ActionModel;
+            }
+            return action?.data?.nodeControls?.actions?.action
+        });
 
         const ruleType: string = selectedTrigger?.id?.split("-")[0];
         let trigger: TriggerModel = {
             id: null,
             name: selectedTrigger?.data?.nodeControls?.trigger?.eventName,
             eventName: selectedTrigger?.data?.nodeControls?.trigger?.triggerName,
-            type: RuleTriggerTYpes[ruleType],
+            type: RuleTriggerTypes[ruleType],
             sourceType: selectedTrigger?.data?.nodeControls?.trigger?.sourceType?.value || selectedTrigger?.data?.nodeControls?.trigger?.sourceType,
             sourceId: selectedTrigger?.data?.nodeControls?.trigger?.sourceId?.value || selectedTrigger?.data?.nodeControls?.trigger?.sourceId,
             accountId: authState?.auth?.account?.id,
@@ -450,39 +462,46 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             actions
         };
         const firstRuleNode: Node = getOutgoers(selectedTrigger as Node, elements)[0];
-        let updatedRule: RuleModel = {
-            title: firstRuleNode?.data.nodeControls.rules?.title,
-            fieldId: firstRuleNode?.data.nodeControls.rules.sensor?.value || firstRuleNode?.data.nodeControls.rules.sensor,
-            deviceId: firstRuleNode?.data.nodeControls.rules.deviceId?.value || firstRuleNode?.data.nodeControls.rules.deviceId,
-            operator: firstRuleNode?.data.nodeControls.rules.operator?.value || firstRuleNode?.data.nodeControls.rules.operator,
-            ruleType: 0,
-            dataFieldSourceType: firstRuleNode?.data.nodeControls.rules.operator,
-            value: firstRuleNode?.data.nodeControls.rules?.operatorValue,
-            position: firstRuleNode?.position,
-            and: null,
-            or: null
-        } as RuleModel;
+        let updatedRule: RuleModel;
+        const edges: Array<Edge> = getConnectedEdges(rulesNodes as Array<Node>, edgesNodes);
+
         for (let rule of rulesNodes) {
             const generateRule = (recursiveRuleRule?: RuleModel) => {
                 const nextNextRule: Node = getOutgoers(rule as Node, elements)[0];
+                const selectedEdge: Edge = edges?.find((edge: Edge) => edge?.target === rule?.id);
+                const firstWord: string = updatedRule ? nextNextRule?.id.split("-")[0] : firstRuleNode?.id.split("-")[0]
                 if (recursiveRuleRule?.and || recursiveRuleRule?.or) {
                     if (recursiveRuleRule?.and) {
                         generateRule(recursiveRuleRule?.and);
                     } else {
                         generateRule(recursiveRuleRule?.or);
                     }
-                } else if (nextNextRule) {
-                    const edges: Array<Edge> = getConnectedEdges(rulesNodes as Array<Node>, edgesNodes);
-                    const selectedEdge: Edge = edges?.find((edge: Edge) => edge?.target === nextNextRule?.id);
+                } else if (!updatedRule) {
+                    const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = firstRuleNode?.data.nodeControls.rules.type
+                    updatedRule = {
+                        title: firstRuleNode?.data.nodeControls.rules?.title,
+                        fieldId: firstRuleNode?.data.nodeControls.rules.sensor?.value || firstRuleNode?.data.nodeControls.rules.sensor,
+                        deviceId: firstRuleNode?.data.nodeControls.rules.device?.value || firstRuleNode?.data.nodeControls.rules.device,
+                        operator: firstRuleNode?.data.nodeControls.rules.operator?.value || firstRuleNode?.data.nodeControls.rules.operator,
+                        ruleType: RuleTypeEnums[firstWord],
+                        dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
+                        value: firstRuleNode?.data.nodeControls.rules?.operatorValue,
+                        position: firstRuleNode?.position,
+                        and: null,
+                        or: null
+                    } as RuleModel;
+                } else {
+                    const firstWordDefault: string = rule?.id.split("-")[0];
+                    const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = rule?.data.nodeControls.rules.type
                     recursiveRuleRule[`${selectedEdge?.label === 'OR' ? 'or' : 'and'}`] = {
-                        title: nextNextRule?.data.nodeControls.rules?.title,
-                        fieldId: nextNextRule?.data.nodeControls.rules.sensor?.value || nextNextRule?.data.nodeControls.rules.sensor,
-                        deviceId: nextNextRule?.data.nodeControls.rules.deviceId?.value || nextNextRule?.data.nodeControls.rules.deviceId,
-                        operator: nextNextRule?.data.nodeControls.rules.operator?.value || nextNextRule?.data.nodeControls.rules.operator,
-                        ruleType: 0,
-                        dataFieldSourceType: nextNextRule?.data.nodeControls.rules.operator,
-                        value: nextNextRule?.data.nodeControls.rules?.operatorValue,
-                        position: nextNextRule?.position,
+                        title: rule?.data.nodeControls.rules?.title,
+                        fieldId: rule?.data.nodeControls.rules.sensor?.value || rule?.data.nodeControls.rules.sensor,
+                        deviceId: rule?.data.nodeControls.rules.device?.value || rule?.data.nodeControls.rules.device,
+                        operator: rule?.data.nodeControls.rules.operator?.value || rule?.data.nodeControls.rules.operator,
+                        ruleType: RuleTypeEnums[firstWordDefault],
+                        dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
+                        value: rule?.data.nodeControls.rules?.operatorValue,
+                        position: (rule as Node)?.position,
                         and: null,
                         or: null
                     };
@@ -492,8 +511,98 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         }
         trigger = { ...trigger, rule: updatedRule };
 
-        console.log("Seizure ", actionsNodes);
+        setLoading(true);
+        TriggerApis.createTrigger(trigger)
+            .then((response: AxiosResponse<TriggerModel>) => {
+
+            }).finally(() => {
+                setLoading(false);
+            });
+
+        console.log("Seizure ", trigger);
     }, [elements]);
+
+    React.useEffect(() => {
+        const response = {
+            "id": null,
+            "name": "Event name",
+            "eventName": "trigger name",
+            "type": 0,
+            "sourceType": 0,
+            "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
+            "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+            "position": {
+                "x": 144.24062499764864,
+                "y": 171.0884724164569
+            },
+            "rule": {
+                "title": "String rule",
+                "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
+                "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+                "operator": "startWith",
+                "ruleType": 1,
+                "dataFieldSourceType": 0,
+                "value": "fff",
+                "position": {
+                    "x": 144.24062499764864,
+                    "y": 171.0884724164569
+                },
+                "and": {
+                    "title": "Time rule",
+                    "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
+                    "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+                    "operator": "<=",
+                    "ruleType": 0,
+                    "dataFieldSourceType": 0,
+                    "value": "rrr",
+                    "position": {
+                        "x": 89.33082293910957,
+                        "y": 305.17054721056394
+                    },
+                    "and": null,
+                    "or": {
+                        "title": "Number rule",
+                        "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
+                        "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+                        "operator": "<=",
+                        "ruleType": 2,
+                        "dataFieldSourceType": 0,
+                        "value": "444",
+                        "position": {
+                            "x": 57.406519416703134,
+                            "y": 430.3138170183972
+                        },
+                        "and": null,
+                        "or": null
+                    }
+                },
+                "or": null
+            },
+            "actions": []
+        };
+
+        const newNode = {
+            id: `${ruleType}-${getId()}`,
+            type: "input",
+            position: response?.position,
+            style: { backgroundColor: "#eee" },
+            data: {
+                label: getNodeLabel(type, ruleType),
+                nodeType: nodeCategory,
+                nodeControls: {
+                    trigger: {
+                        eventName: response?.eventName,
+                        triggerName: response?.name
+                    },
+                    rules: {},
+                    actions: {},
+                }
+            },
+        };
+
+        setElements((es) => es.concat(newNode));
+
+    }, [])
 
     return (
         <div className="rules-container">
@@ -528,6 +637,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         <EventProperties
                             element={selectedElement}
                             handleTriggerTextChange={handleTriggerTextChange}
+                            loading={loading}
                             handleRuleOperatorValueChange={handleRuleOperatorValueChange}
                             elements={elements}
                             handleEdgeChange={handleEdgeChange}

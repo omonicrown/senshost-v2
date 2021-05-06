@@ -46,15 +46,15 @@ class SignupForm extends React.Component<SignupFormProps, SignupFormStates> {
 
         this.state = {
             auth: {
-                username: "",
+                name: "",
                 password: "",
                 email: "",
-                id: "",
+                id: null,
                 creationDate: null,
                 cpassword: ""
             },
             errors: {
-                username: "",
+                name: "",
                 password: "",
                 email: "",
                 id: "",
@@ -71,9 +71,9 @@ class SignupForm extends React.Component<SignupFormProps, SignupFormStates> {
 
     onSignUp = (e: React.FormEvent<HTMLFormElement>) => {
         let errors: Account & { cpassword: string };
-        this.setState({ errors: { ...this.state.errors, username: "", password: "", cpassword: "" }, loading: true }, () => {
-            if (!this.state?.auth?.username) {
-                errors = { ...errors, username: "username cannot be empty" }
+        this.setState({ errors: { ...this.state.errors, name: "", password: "", cpassword: "" }, loading: true }, () => {
+            if (!this.state?.auth?.name) {
+                errors = { ...errors, name: "username cannot be empty" }
             }
             if (!this.state?.auth?.email) {
                 errors = { ...errors, email: "email cannot be empty" };
@@ -84,8 +84,14 @@ class SignupForm extends React.Component<SignupFormProps, SignupFormStates> {
             if (this.state.auth.password !== this.state.auth.cpassword) {
                 errors = { ...errors, cpassword: "passwords do not match" }
             }
+            console.log("The state is ", this.state.auth)
             if (!errors) {
-                AuthApis.signup(this.state.auth).then((response: AxiosResponse<PositiveResponse>) => {
+                AuthApis.signup({
+                    id: null,
+                    name: this.state.auth?.name,
+                    email: this.state.auth?.email,
+                    password: this.state.auth.password
+                }).then((response: AxiosResponse<PositiveResponse>) => {
                     const notification: NotificationProps = {
                         theme: "success",
                         title: "Registration success",
@@ -116,13 +122,13 @@ class SignupForm extends React.Component<SignupFormProps, SignupFormStates> {
                 </div>
                 <div className="row">
                     <TextBoxGroup
-                        name="username"
+                        name="name"
                         className="col"
                         placeholder="username"
-                        value={this.state?.auth?.username}
+                        value={this.state?.auth?.name}
                         onChange={this.onChange}
                         rightIcon={userIcon}
-                        error={this.state.errors.username}
+                        error={this.state.errors.name}
                     />
                 </div>
                 <div className="row">

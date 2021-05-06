@@ -8,13 +8,13 @@ export class AuthLiveApis extends AxiosGlobal {
     loginUser(auth: HttpBasicAuth): AxiosPromise<AuthResponseModel> {
         let axiosConfig: AxiosRequestConfig = {
             auth,
-            headers: { callerType: 'web'}
+            headers: { callerType: 'web' }
         };
         return this.axios.get(`${configs.context}/${configs.apiList.AUTH}/login`, axiosConfig);
     }
 
     signupUser(user: Account): AxiosPromise<PositiveResponse> {
-        return this.axios.post(`${configs.context}/${configs.apiList.AUTH}/signup`, user);
+        return this.axios.post(`${configs.context}/${configs.apiList.AUTH}/signup`, null, { params: { ...user } });
     }
 
-} 
+}

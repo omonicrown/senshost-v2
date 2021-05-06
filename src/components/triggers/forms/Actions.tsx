@@ -48,7 +48,7 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
         const action: ActionModel = actions?.find((ruleAction: ActionModel) => ruleAction?.id === value?.value);
 
         props.handleActionsDropDownChange(action, "action");
-    }, [actions]);
+    }, [actions, props.handleActionsDropDownChange]);
 
     const action: ActionModel = React.useMemo(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
@@ -83,7 +83,6 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
 
     React.useEffect(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
-
         setSelectedAction({
             label: element?.data?.nodeControls?.actions?.action?.name,
             value: element?.data?.nodeControls?.actions?.action?.id

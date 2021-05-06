@@ -6,13 +6,13 @@ export interface AuthResponseModel {
 }
 
 export interface Account {
-    username: string;
-    email: string;
+    name: string;
+    email: string
     password: string;
+    cpassword?: string;
     id: string;
-    creationDate: Date;
-    name?: string;
-}
+    creationDate?: Date;
+};
 
 export interface RuleModel {
     triggerId?: string,
@@ -46,6 +46,7 @@ export interface TriggerModel {
     eventName?: string;
     id?: string;
     creationDate?: Date;
+    position?: { x: number, y: number };
 }
 
 export interface ActionModel {

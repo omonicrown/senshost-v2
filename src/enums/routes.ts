@@ -13,7 +13,13 @@ export enum HomeRoutes {
     Groups = AppRoutes.Home + "/groups",
     Users = AppRoutes.Home + "/users",
     Actions = AppRoutes.Home + "/Actions",
-    Rules = AppRoutes.Home + "/Rules"
+    Rules = AppRoutes.Home + "/Rules",
+    Triggers = AppRoutes.Home + "/triggers",
+}
+
+export enum TriggerRoutes {
+    EditTrigger = HomeRoutes.Triggers + "/:triggerId",
+    CreateTrigger = HomeRoutes.Triggers + "/create"
 }
 
 export enum ViewDeviceRoutes {

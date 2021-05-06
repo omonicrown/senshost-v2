@@ -5,7 +5,7 @@ const TYPE_LOCAL = "LOCAL";
 const TYPE_REST = "REST";
 
 //resources
-const SOCKET_URL = process.env.NODE_ENV === "production" ? "" : "http://senshost.com:8002/api";
+const SOCKET_URL = process.env.NODE_ENV === "production" ? "" : "http://senshost.com:8015/api";
 //API contexts
 //We will pass this to swagger class constractor if we need different base urls
 const DEFAULT = '';
@@ -22,7 +22,8 @@ export enum APILIST {
     Action = 'Action',
     User = 'User',
     Dashboard = 'dashboard',
-    DashboardItem = 'dashboardItem'
+    DashboardItem = 'dashboardItem',
+    Trigger = 'Trigger'
 }
 
 //CONFIG DATA (Please change here only)

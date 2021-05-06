@@ -5,7 +5,7 @@ export enum TimeRuleCadenceEnums {
     MONTHS,
     YEARS
 }
-export enum RuleTriggerTYpes {
+export enum RuleTriggerTypes {
     dataReceived,
     schedule,
 }
@@ -13,4 +13,18 @@ export enum RuleTriggerTYpes {
 export enum RuleDataSouceTypeEnums {
     device,
     aggregateField
+}
+export enum TriggerDataSourceTypeEnums {
+    device,
+    sensor,
+    attribute,
+    actuator,
+    recurring,
+    onetime,
+}
+
+export enum RuleTypeEnums {
+  time,
+  string,
+  number
 }

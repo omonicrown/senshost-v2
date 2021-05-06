@@ -1,7 +1,7 @@
 import React from "react";
 import { RouteComponentProps, Switch, Redirect } from "react-router";
 import { AppRoute } from "../../utils/functions";
-import { HomeRoutes, AppRoutes, ViewDeviceRoutes } from "../../enums/routes";
+import { HomeRoutes, AppRoutes, ViewDeviceRoutes, TriggerRoutes } from "../../enums/routes";
 import { History } from "history";
 
 import SidebarComponent from "../shared/Sidebar";
@@ -15,7 +15,7 @@ import { DevicesProps } from "../devices/Devices";
 import { GroupsProps } from "../groups/Groups";
 import { UsersProps } from "../users/Users";
 import { ViewDeviceProps } from "../viewDevice/ViewDevice";
-import { RulesHolderProps } from "../rules/Rules";
+import { TriggersProps } from "../triggers/Triggers";
 
 import { useSelector, useDispatch } from "react-redux";
 import { getGroupsByAccount } from "../../actions/groupActions";
@@ -31,7 +31,8 @@ const DashbaordItem: React.LazyExoticComponent<React.FC<DashboardProps>> = React
 const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
 const Users: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../users/Users"));
 const Actions: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../actions/Actions"));
-const Rules: React.LazyExoticComponent<React.FC<RulesHolderProps>> = React.lazy(() => import("../rules/Rules"));
+const Triggers: React.LazyExoticComponent<React.FC<TriggersProps>> = React.lazy(() => import("../triggers/Triggers"));
+const ManageTrigger: React.LazyExoticComponent<React.FC> = React.lazy(() => import("../triggers/sections/EventBody"));
 
 const ViewDevice: React.LazyExoticComponent<React.FC<ViewDeviceProps>> = React.lazy(() => import("../viewDevice/ViewDevice"));
 const NotFound: React.LazyExoticComponent<React.FC<RouteComponentProps>> = React.lazy(() => import("../notFound/404"));
@@ -51,6 +52,8 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
   const [toggleMenu, setMenuToggle] = React.useState<boolean>(false);
   const authState = useSelector((states: States) => states.auth);
   const dispatch = useDispatch();
+
+  const fullYear = React.useMemo(() => new Date().getFullYear(), []);
 
   const onToggle = React.useCallback((e: React.MouseEvent<SVGElement, MouseEvent>, value?: boolean) => {
     setMenuToggle(!toggleMenu);
@@ -107,9 +110,21 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                 />
 
                 <AppRoute
-                  path={HomeRoutes.Rules.toString()}
+                  path={HomeRoutes.Triggers.toString()}
                   exact={true}
-                  component={Rules}
+                  component={Triggers}
+                />
+
+                <AppRoute
+                  path={TriggerRoutes.EditTrigger.toString()}
+                  exact={true}
+                  component={ManageTrigger}
+                />
+
+                <AppRoute
+                  path={TriggerRoutes.CreateTrigger.toString()}
+                  exact={true}
+                  component={ManageTrigger}
                 />
 
                 <AppRoute
@@ -125,7 +140,7 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
             </div>
 
             <footer className="footer-container">
-              Copyright © 2019 Senshost. All rights reserved.
+              Copyright © {fullYear} Senshost. All rights reserved.
               </footer>
           </div>
         </main>

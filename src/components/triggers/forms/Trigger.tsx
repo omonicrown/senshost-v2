@@ -12,6 +12,7 @@ import { DeviceState, States } from "../../../interfaces/states";
 
 import DataReceived from "./sections/DataReceive";
 import Schedule from "./sections/Schedule";
+import { TriggerDataSourceTypeEnums } from "../../../enums";
 
 interface TriggerFormProps {
     loading: boolean;
@@ -54,16 +55,16 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
                 value: null
             }, {
                 label: "Device",
-                value: "device"
+                value: TriggerDataSourceTypeEnums.device
             }, {
                 label: "Sensor",
-                value: 'sensor'
+                value: TriggerDataSourceTypeEnums.sensor
             }, {
                 label: "Attribute",
-                value: "attribute"
+                value: TriggerDataSourceTypeEnums.attribute
             }, {
                 label: "Actuator",
-                value: "actuator"
+                value: TriggerDataSourceTypeEnums.actuator
             }];
         } else if (elementType === "schedule") {
             return [{
@@ -71,10 +72,10 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
                 value: null
             }, {
                 label: "One time",
-                value: "oneTime"
+                value: TriggerDataSourceTypeEnums.onetime
             }, {
                 label: "Recurring",
-                value: "recurring"
+                value: TriggerDataSourceTypeEnums.recurring
             }];
         }
     }, [elementType]);
