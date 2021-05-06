@@ -581,14 +581,14 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             "actions": []
         };
 
-        const newNode = {
-            id: `${ruleType}-${getId()}`,
+        const node = {
+            id: `input-${getId()}`,
             type: "input",
             position: response?.position,
             style: { backgroundColor: "#eee" },
             data: {
-                label: getNodeLabel(type, ruleType),
-                nodeType: nodeCategory,
+                label: response?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule",
+                nodeType: "trigger",
                 nodeControls: {
                     trigger: {
                         eventName: response?.eventName,
@@ -600,7 +600,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             },
         };
 
-        setElements((es) => es.concat(newNode));
+        setElements((es) => es.concat(node));
 
     }, [])
 
