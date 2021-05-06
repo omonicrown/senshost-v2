@@ -20,7 +20,7 @@ export interface RuleModel {
     fieldId?: string,
     deviceId?: string,
     operator?: string,
-    ruleType?: 0,
+    ruleType?: number,
     dataFieldSourceType: number;
     value?: string,
     isEntry?: true,
