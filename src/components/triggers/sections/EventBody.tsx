@@ -261,7 +261,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                             ...el.data.nodeControls,
                             rules: {
                                 ...el.data.nodeControls.rules,
-                                [field]: value
+                                [field]: value?.value
                             }
                         }
                     };
@@ -482,10 +482,10 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             name: selectedTrigger?.data?.nodeControls?.trigger?.eventName,
             eventName: selectedTrigger?.data?.nodeControls?.trigger?.triggerName,
             type: RuleTriggerTypes[ruleType],
-            sourceType: selectedTrigger?.data?.nodeControls?.trigger?.sourceType?.value || selectedTrigger?.data?.nodeControls?.trigger?.sourceType,
-            sourceId: selectedTrigger?.data?.nodeControls?.trigger?.sourceId?.value || selectedTrigger?.data?.nodeControls?.trigger?.sourceId,
+            sourceType: selectedTrigger?.data?.nodeControls?.trigger?.sourceType,
+            sourceId: selectedTrigger?.data?.nodeControls?.trigger?.sourceId,
             accountId: authState?.auth?.account?.id,
-            deviceId: selectedTrigger?.data?.nodeControls?.trigger?.deviceId?.value || selectedTrigger?.data?.nodeControls?.trigger?.deviceId,
+            deviceId: selectedTrigger?.data?.nodeControls?.trigger?.deviceId,
             rule: null,
             actions
         };
@@ -508,9 +508,9 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = firstRuleNode?.data.nodeControls.rules.type
                     updatedRule = {
                         title: firstRuleNode?.data.nodeControls.rules?.title,
-                        fieldId: firstRuleNode?.data.nodeControls.rules.sensor?.value || firstRuleNode?.data.nodeControls.rules.sensor,
-                        deviceId: firstRuleNode?.data.nodeControls.rules.device?.value || firstRuleNode?.data.nodeControls.rules.device,
-                        operator: firstRuleNode?.data.nodeControls.rules.operator?.value || firstRuleNode?.data.nodeControls.rules.operator,
+                        fieldId: firstRuleNode?.data.nodeControls.rules.sensor,
+                        deviceId: firstRuleNode?.data.nodeControls.rules.device,
+                        operator: firstRuleNode?.data.nodeControls.rules.operator,
                         ruleType: RuleTypeEnums[firstWord],
                         dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                         value: firstRuleNode?.data.nodeControls.rules?.operatorValue,
@@ -523,9 +523,9 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = rule?.data.nodeControls.rules.type
                     recursiveRuleRule[`${selectedEdge?.label === 'OR' ? 'or' : 'and'}`] = {
                         title: rule?.data.nodeControls.rules?.title,
-                        fieldId: rule?.data.nodeControls.rules.sensor?.value || rule?.data.nodeControls.rules.sensor,
-                        deviceId: rule?.data.nodeControls.rules.device?.value || rule?.data.nodeControls.rules.device,
-                        operator: rule?.data.nodeControls.rules.operator?.value || rule?.data.nodeControls.rules.operator,
+                        fieldId: rule?.data.nodeControls.rules.sensor,
+                        deviceId: rule?.data.nodeControls.rules.device,
+                        operator: rule?.data.nodeControls.rules.operator,
                         ruleType: RuleTypeEnums[firstWordDefault],
                         dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                         value: rule?.data.nodeControls.rules?.operatorValue,
@@ -549,7 +549,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 setLoading(false);
             });
 
-        console.log("Seizure ", actionsNodes);
+        console.log("Seizure ", rulesNodes);
     }, [elements]);
 
     React.useEffect(() => {
@@ -567,6 +567,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             },
             "rule": {
                 "title": "String rule",
+                "id": "8f8f-205e66841f05-09090998",
                 "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
                 "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
                 "operator": "startWith",
@@ -615,19 +616,57 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 "isExectionSuccessful": false,
                 "name": "Action name",
                 "properties": "{\"url\":\"localhost:3000\",\"httpMethod\":\"GET\",\"body\":\"{value: 1}\"}",
-                "type": 4
+                "type": 4,
+                "position": {
+                    x: 200.24062499764864,
+                    y: 270.0884724164569
+                }
             }]
         };
 
+        // Edges and rules
+        let edges: Array<Edge>;
+        let ruleNodes: Array<FlowElement> = [];
+
+        const generateRulesrecursively = (recursiveRule: RuleModel) => {
+            if (ruleNodes?.length) {
+                if (recursiveRule?.and || recursiveRule?.or) {
+                    if (recursiveRule?.and) {
+                        generateRulesrecursively(recursiveRule?.and);
+                    } else {
+                        generateRulesrecursively(recursiveRule?.or);
+                    }
+                }
+            } else {
+                ruleNodes = [{
+                    id: response?.rule.id,
+                    position: response?.rule?.position,
+                    type: "default",
+                    data: {
+                        label: getActionNodeLabelByTypeEnum(recursiveRule?.ruleType),
+                        nodeType: "rule",
+                        nodeControls: {
+                            trigger: {},
+                            rules: {
+                                device: response?.rule?.deviceId,
+                                deviceSource: response?.rule?.dataFieldSourceType,
+                                sensor: response?.rule?.fieldId,
+                            },
+                            actions: {},
+                        }
+                    }
+                }];
+            }
+        };
         // actions
-        const actions: Array<FlowElement> = response?.actions?.map((action: ActionModel) => {
+        const actionNodes: Array<FlowElement> = response?.actions?.map((action: ActionModel) => {
             return {
                 id: `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`,
                 type: "output",
-                position: response?.position,
+                position: action["position"],
                 data: {
                     label: getActionNodeLabelByTypeEnum(action?.type),
-                    nodeType: "trigger",
+                    nodeType: "action",
                     nodeControls: {
                         trigger: {},
                         rules: {},
@@ -639,7 +678,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 },
             } as FlowElement
         })
-        const node = {
+        const triggerNodes = {
             id: `${response?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule"}-${getId()}`,
             type: "input",
             position: response?.position,
@@ -659,8 +698,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 }
             },
         };
-        console.log("The actions is ", actions);
-        setElements((es) => es.concat([node, ...actions]));
+        console.log("The actions is ", actionNodes);
+        setElements((es) => es.concat([triggerNodes, ...actionNodes]));
     }, []);
 
     React.useEffect(() => {

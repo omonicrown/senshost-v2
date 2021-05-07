@@ -94,23 +94,30 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
 
     React.useEffect(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
+        const selectedSensor: DropdownItem = sensors?.find((sensor: DropdownItem) => sensor?.value === element?.data?.nodeControls?.rules?.sensor);
+        const deviceSource: DropdownItem = DEVICEDATASOURCES?.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.rules?.deviceSource);
+        const selectedDevice: DropdownItem = devices?.find((device: DropdownItem) => device?.value === element?.data?.nodeControls?.rules?.device);
+
         setDataSource({
             ...dataSource,
             title: element?.data?.nodeControls?.rules?.title,
-            sensor: element?.data?.nodeControls?.rules?.sensor,
-            deviceSource: element?.data?.nodeControls?.rules?.deviceSource,
-            device: element?.data?.nodeControls?.rules?.device,
+            sensor: selectedSensor,
+            deviceSource: deviceSource,
+            device: selectedDevice,
             type: element?.data?.nodeControls?.rules?.type,
         })
     }, [props.selectedElement, props.elements, setDataSource]);
 
     React.useEffect(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
+        const selectedOperator: DropdownItem = operators?.find((operator: DropdownItem) => operator?.value === element?.data?.nodeControls?.rules?.operator);
+        const selectedCadence: DropdownItem = timeRuleCadences?.find((cadence: DropdownItem) => cadence?.value === element?.data?.nodeControls?.rules?.cadence);
+
         setOperator({
             ...operatorObj,
             value: element?.data?.nodeControls?.rules?.operatorValue,
-            operator: element?.data?.nodeControls?.rules?.operator,
-            cadence: element?.data?.nodeControls?.rules?.cadence
+            operator: selectedOperator,
+            cadence: selectedCadence
         });
     }, [props.selectedElement, props.elements, setOperator]);
 
