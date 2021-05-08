@@ -14,6 +14,12 @@ export enum RuleDataSouceTypeEnums {
     device,
     aggregateField
 }
+
+export enum DeviceDataSourceEnums {
+    sensor,
+    attribute
+}
+
 export enum TriggerDataSourceTypeEnums {
     device,
     sensor,

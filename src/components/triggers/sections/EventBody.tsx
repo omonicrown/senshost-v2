@@ -94,6 +94,28 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         }
     };
 
+    const getNodeLabelById = (type: RuleTypeEnums) => {
+        switch (type) {
+            case RuleTypeEnums.number:
+                return "Number rule";
+            case RuleTypeEnums.string:
+                return "String rule";
+            case RuleTypeEnums.time:
+                return "Time rule";
+        }
+    };
+
+    const getRuleNodeLabelNameById = (type: RuleTypeEnums) => {
+        switch (type) {
+            case RuleTypeEnums.number:
+                return "number";
+            case RuleTypeEnums.string:
+                return "string";
+            case RuleTypeEnums.time:
+                return "time";
+        }
+    };
+
     const getNodeLabel = (ruleType: RuleActionTypes | RuleTypes | TriggerTypes): string => {
         switch (ruleType) {
             case "actuator":
@@ -549,7 +571,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 setLoading(false);
             });
 
-        console.log("Seizure ", rulesNodes);
+        console.log("Seizure ", edgesNodes);
     }, [elements]);
 
     React.useEffect(() => {
@@ -575,11 +597,12 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 "dataFieldSourceType": 0,
                 "value": "fff",
                 "position": {
-                    "x": 144.24062499764864,
-                    "y": 171.0884724164569
+                    "x": 44.24062499764864,
+                    "y": 271.0884724164569
                 },
                 "and": {
                     "title": "Time rule",
+                    "id": "95b4539-b2fe-46577sd-abd0-91d0696dfe6b",
                     "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
                     "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
                     "operator": "<=",
@@ -593,6 +616,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     "and": null,
                     "or": {
                         "title": "Number rule",
+                        "id": "95b4539-b2fe-465a-abd0-91d0696dfe6b",
                         "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
                         "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
                         "operator": "<=",
@@ -625,43 +649,146 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         };
 
         // Edges and rules
-        let edges: Array<Edge>;
+        const triggerRuleId: string = `${response?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule"}-${getId()}`;
+
+        let edgeNodes: Array<Edge> = [];
         let ruleNodes: Array<FlowElement> = [];
 
-        const generateRulesrecursively = (recursiveRule: RuleModel) => {
+        let rulesCounter = -1;
+        const generateRulesrecursively = (recursiveRule?: RuleModel) => {
+            rulesCounter += 1;
             if (ruleNodes?.length) {
                 if (recursiveRule?.and || recursiveRule?.or) {
                     if (recursiveRule?.and) {
+                        const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.and?.ruleType)}-${recursiveRule?.and.id}`;
+
+                        edgeNodes.push({
+                            id: `edge-${getId()}`,
+                            source: edgeNodes[rulesCounter - 1].target,
+                            sourceHandle: null,
+                            target: ruleId,
+                            targetHandle: null,
+                            data: { lineType: "AND" }
+                        });
+
+                        ruleNodes.push({
+                            id: ruleId,
+                            position: recursiveRule?.and.position,
+                            type: "default",
+                            data: {
+                                label: getNodeLabelById(recursiveRule?.and.ruleType),
+                                nodeType: "rule",
+                                nodeControls: {
+                                    trigger: {},
+                                    rules: {
+                                        device: recursiveRule?.and.deviceId,
+                                        dataFieldSourceType: (RuleDataSouceTypeEnums[recursiveRule?.and.dataFieldSourceType].toString() === RuleDataSouceTypeEnums.device.toString()) ? "device" : "aggregatedField",
+                                        sensor: recursiveRule?.and.fieldId,
+                                        deviceSource: recursiveRule?.and.fieldId ? "sensor" : "attribute",
+                                        operator: recursiveRule?.and.operator,
+                                        operatorValue: recursiveRule?.and.value,
+                                        title: recursiveRule?.and.title,
+                                        ruleType: RuleTypeEnums[recursiveRule?.and.ruleType]
+                                    },
+                                    actions: {},
+                                }
+                            }
+                        });
                         generateRulesrecursively(recursiveRule?.and);
                     } else {
+                        const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.or?.ruleType)}-${recursiveRule?.or.id}`;
+
+                        edgeNodes.push({
+                            id: `edge-${getId()}`,
+                            source: edgeNodes[rulesCounter - 1]?.target,
+                            sourceHandle: null,
+                            target: ruleId,
+                            targetHandle: null,
+                            data: { lineType: "OR" }
+                        });
+
+                        ruleNodes.push({
+                            id: ruleId,
+                            position: recursiveRule?.or?.position,
+                            type: "default",
+                            data: {
+                                label: getNodeLabelById(recursiveRule?.or?.ruleType),
+                                nodeType: "rule",
+                                nodeControls: {
+                                    trigger: {},
+                                    rules: {
+                                        device: recursiveRule?.or?.deviceId,
+                                        type: (RuleDataSouceTypeEnums[recursiveRule?.or.dataFieldSourceType] === "device") ? "device" : "aggregatedField",
+                                        sensor: recursiveRule?.or?.fieldId,
+                                        deviceSource: recursiveRule?.or?.fieldId ? "sensor" : "attribute",
+                                        operator: recursiveRule?.or?.operator,
+                                        operatorValue: recursiveRule?.or?.value,
+                                        title: recursiveRule?.or?.title,
+                                        ruleType: RuleTypeEnums[recursiveRule?.or?.ruleType]
+                                    },
+                                    actions: {},
+                                }
+                            }
+                        });
                         generateRulesrecursively(recursiveRule?.or);
                     }
                 }
             } else {
-                ruleNodes = [{
-                    id: response?.rule.id,
+                const ruleId: string = `${getRuleNodeLabelNameById(response?.rule?.ruleType)}-${response?.rule?.id}`;
+                edgeNodes.push({
+                    id: `edge-${getId()}`,
+                    source: triggerRuleId,
+                    sourceHandle: null,
+                    target: ruleId,
+                    targetHandle: null,
+                    data: { lineType: "AND" }
+                });
+
+                ruleNodes.push({
+                    id: ruleId,
                     position: response?.rule?.position,
                     type: "default",
                     data: {
-                        label: getActionNodeLabelByTypeEnum(recursiveRule?.ruleType),
+                        label: getNodeLabelById(response?.rule?.ruleType),
                         nodeType: "rule",
                         nodeControls: {
                             trigger: {},
                             rules: {
                                 device: response?.rule?.deviceId,
-                                deviceSource: response?.rule?.dataFieldSourceType,
+                                dataFieldSourceType: RuleDataSouceTypeEnums[response?.rule?.dataFieldSourceType],
+                                type: (RuleDataSouceTypeEnums[response?.rule.dataFieldSourceType] === "device") ? "device" : "aggregatedField",
                                 sensor: response?.rule?.fieldId,
+                                deviceSource: response?.rule?.fieldId ? "sensor" : "attribute",
+                                operator: response?.rule?.operator,
+                                operatorValue: response?.rule?.value,
+                                title: response?.rule?.title,
+                                ruleType: RuleTypeEnums[response?.rule?.ruleType]
                             },
                             actions: {},
                         }
                     }
-                }];
+                });
+
+                if (response?.rule?.and || response?.rule?.or) {
+                    generateRulesrecursively(response?.rule?.and || response?.rule?.or);
+                }
             }
         };
+        generateRulesrecursively();
+        rulesCounter = -1;
         // actions
         const actionNodes: Array<FlowElement> = response?.actions?.map((action: ActionModel) => {
+            const actionNodeId: string = `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`;
+            edgeNodes.push({
+                id: `edge-${getId()}`,
+                source: triggerRuleId,
+                sourceHandle: null,
+                target: actionNodeId,
+                targetHandle: null,
+            });
+            
             return {
-                id: `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`,
+                id: actionNodeId,
                 type: "output",
                 position: action["position"],
                 data: {
@@ -678,8 +805,9 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 },
             } as FlowElement
         })
+
         const triggerNodes = {
-            id: `${response?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule"}-${getId()}`,
+            id: triggerRuleId,
             type: "input",
             position: response?.position,
             style: { backgroundColor: "#eee" },
@@ -698,13 +826,9 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 }
             },
         };
-        console.log("The actions is ", actionNodes);
-        setElements((es) => es.concat([triggerNodes, ...actionNodes]));
+        console.log("The actions is ", edgeNodes);
+        setElements((es) => es.concat([triggerNodes, ...actionNodes, ...ruleNodes, ...edgeNodes]));
     }, []);
-
-    React.useEffect(() => {
-        console.log("The selected element is ", selectedElement);
-    }, [selectedElement]);
 
     return (
         <div className="rules-container">

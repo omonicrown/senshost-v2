@@ -5,6 +5,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { DeviceApis } from "../../../../apis/deviceApis";
 import { SensorApis } from "../../../../apis/sensorApis";
+import { DeviceDataSourceEnums } from "../../../../enums";
 import { DeviceModel, SensorModel } from "../../../../interfaces/models";
 import { AuthState, DeviceState, States } from "../../../../interfaces/states";
 import { AddDashboardItemControls } from "../AddDashboardItem";
@@ -13,11 +14,11 @@ export const DEVICEDATASOURCES: Array<DropdownItem> = [
     { label: 'Please select', value: null },
     {
         label: "Sensors",
-        value: "sensor"
+        value: "sensor" as (keyof typeof DeviceDataSourceEnums)
     },
     {
         label: "Attributes",
-        value: "attribute"
+        value: "attribute" as (keyof typeof DeviceDataSourceEnums)
     }
 ];
 
