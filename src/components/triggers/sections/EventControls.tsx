@@ -36,20 +36,20 @@ const EventControls: React.FC = (): React.ReactElement<void> => {
 
             <h5 className="title">Actions</h5>
 
-            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "email", "action")} draggable>
-                Email Action
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "Email", "action")} draggable>
+                Email action
             </div>
 
-            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "publish", "action")} draggable>
-                Publish Action
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "SMS", "action")} draggable>
+                SMS action
             </div>
 
-            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "actuator", "action")} draggable>
-                Actuator Action
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "MqttPublishAction", "action")} draggable>
+                Mqtt publish action
             </div>
 
-            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "expression", "action")} draggable>
-                Expression Action
+            <div className="rule-node output" onDragStart={(event: React.DragEvent<HTMLDivElement>) => onDragStart(event, 'output', "RestServiceAction", "action")} draggable>
+                Rest service action
             </div>
 
         </aside>

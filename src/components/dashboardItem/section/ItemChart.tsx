@@ -16,6 +16,7 @@ import PieChart from "../../shared/PieChart";
 import Doughnut from "../../shared/Doughnut";
 import { ChartType, DashboardItemStatus } from "../../../constants";
 import { AxiosResponse } from "axios";
+import configs from "../../../configs";
 
 
 export interface ItemChartProps extends DashboardItemModel {
@@ -32,9 +33,9 @@ export interface ItemChartProps extends DashboardItemModel {
 const ItemChart: React.FC<ItemChartProps> = (props: ItemChartProps): React.ReactElement<void> => {
 
     const [chartItem, setChartItem] = React.useState<ItemChartProps>({} as ItemChartProps);
-    const client: mqtt.Client = mqtt.connect('mqtt://senshost.com',
+    const client: mqtt.Client = mqtt.connect(configs.socket,
         {
-            port: 8002,
+            port: configs.port,
             path: "/mqtt",
             username: props?.deviceId,
             password: "",

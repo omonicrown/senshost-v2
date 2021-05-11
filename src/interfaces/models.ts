@@ -1,4 +1,4 @@
-import { ActionType, Status } from "../enums/status"
+import { TriggerActionType, Status } from "../enums/status"
 
 export interface AuthResponseModel {
     identityToken: string;
@@ -25,7 +25,7 @@ export interface RuleModel {
     value?: string,
     isEntry?: true,
     lastRun?: Date;
-    position?: { x: number, y: number };
+    properties?: string;
     id?: string;
     creationDate?: Date;
     and?: RuleModel;
@@ -46,12 +46,12 @@ export interface TriggerModel {
     eventName?: string;
     id?: string;
     creationDate?: Date;
-    position?: { x: number, y: number };
+    properties?: string;
 }
 
 export interface ActionModel {
     name: string;
-    type: ActionType;
+    type: TriggerActionType;
     properties: string
     accountId: string;
     id: string;

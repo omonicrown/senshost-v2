@@ -7,6 +7,7 @@ import LineForm from "../forms/Line";
 import RuleForm from "../forms/Rules";
 import ActionsForm from "../forms/Actions";
 import { ActionModel } from "../../../interfaces/models";
+import { RuleActionTypes } from "./EventBody";
 
 interface EventPropertiesProps {
     element: FlowElement & Edge;
@@ -37,10 +38,10 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
             firstWord === "time" ||
             firstWord === "number"
         ) && !(
-            targetWord === "email" ||
-            targetWord === "publish" ||
-            targetWord === "actuator" ||
-            targetWord === "expression"
+            targetWord === "Email" as RuleActionTypes ||
+            targetWord === "MqttPublishAction" as RuleActionTypes ||
+            targetWord === "SMS" as RuleActionTypes ||
+            targetWord === "RestServiceAction" as RuleActionTypes
         )
     }, [props.element]);
 
@@ -65,10 +66,10 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
         const firstWord: string = props.element?.id?.split("-")[0];
 
         return (
-            firstWord === "email" ||
-            firstWord === "publish" ||
-            firstWord === "actuator" ||
-            firstWord === "expression"
+            firstWord === "Email" as RuleActionTypes ||
+            firstWord === "MqttPublishAction" as RuleActionTypes ||
+            firstWord === "SMS" as RuleActionTypes ||
+            firstWord === "RestServiceAction" as RuleActionTypes
         )
     }, [props.element]);
 

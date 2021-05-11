@@ -11,11 +11,11 @@ interface LineFormProps {
 }
 
 const LineForm: React.FC<LineFormProps> = (props: LineFormProps): React.ReactElement<void> => {
-    const [value, setValue] = React.useState<"AND" | "OR">("OR");
+    const [value, setValue] = React.useState<"AND" | "OR">("AND");
 
     React.useEffect(() => {
         const element: FlowElement = props.elements?.find((el: FlowElement) => el.id === props.selectedElement?.id);
-        setValue(element?.data?.lineType)
+        setValue(element?.data?.lineType || value)
     }, [props.selectedElement, props.elements, setValue]);
 
     const list: Array<RadioListModel> = React.useMemo(() => [{

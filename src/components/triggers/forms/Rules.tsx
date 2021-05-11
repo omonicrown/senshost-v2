@@ -97,14 +97,13 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
         const selectedSensor: DropdownItem = sensors?.find((sensor: DropdownItem) => sensor?.value === element?.data?.nodeControls?.rules?.sensor);
         const deviceSource: DropdownItem = DEVICEDATASOURCES?.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.rules?.deviceSource);
         const selectedDevice: DropdownItem = devices?.find((device: DropdownItem) => device?.value === element?.data?.nodeControls?.rules?.device);
-
         setDataSource({
             ...dataSource,
             title: element?.data?.nodeControls?.rules?.title,
             sensor: selectedSensor,
             deviceSource: deviceSource,
             device: selectedDevice,
-            type: element?.data?.nodeControls?.rules?.type,
+            type: element?.data?.nodeControls?.rules?.type || dataSource?.type,
         })
     }, [props.selectedElement, props.elements, setDataSource]);
 

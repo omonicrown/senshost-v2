@@ -30,4 +30,12 @@ export class TriggerApis {
             return this.triggerApis.createTrigger(trigger);
         }
     }
+
+    static updateTriggerById(trigger: TriggerModel): AxiosPromise<TriggerModel> {        
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.triggerApis.updateTriggerById(trigger);
+        }
+    }
 }

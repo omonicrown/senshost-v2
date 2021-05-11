@@ -5,12 +5,9 @@ export enum Status {
     InActive,
 }
 
-export enum ActionType {
+export enum TriggerActionType {
     RestServiceAction,
     MqttPublishAction,
     Email,
-    SMS,
-    Actuator,
-    expression,
-    Publish
+    SMS
 }

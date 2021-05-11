@@ -121,7 +121,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
         dispatch(toggleNotification(notification));
 
-        setDevices([device, response.data]);
+        setDevices([...devices, response.data]);
 
         setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
       }

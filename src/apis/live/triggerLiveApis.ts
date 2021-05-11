@@ -17,4 +17,8 @@ export class TriggerLiveApis extends AxiosGlobal {
     createTrigger(trigger: TriggerModel): AxiosPromise<TriggerModel> {
         return this.axios.post(`${configs.context}/${configs.apiList.Trigger}`, trigger);
     }
+
+    updateTriggerById(trigger: TriggerModel): AxiosPromise<TriggerModel> {
+        return this.axios.put(`${configs.context}/${configs.apiList.Trigger}/${trigger?.id}`, trigger);
+    }
 } 

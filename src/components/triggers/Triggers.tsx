@@ -16,6 +16,7 @@ import { TriggerModel } from "../../interfaces/models";
 import configs from "../../configs";
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import { initialState } from "../../constants";
+import { RuleTriggerTypes } from "../../enums";
 
 export interface TriggersProps extends SharedProps {
 
@@ -42,7 +43,7 @@ const Triggers: React.FunctionComponent<TriggersProps> = (props: TriggersProps):
         },
         {
             label: "Event name",
-            accessor: "EventName"
+            accessor: "eventName"
         },
         {
             label: "Trigger type",
@@ -79,13 +80,12 @@ const Triggers: React.FunctionComponent<TriggersProps> = (props: TriggersProps):
         setLoading(true);
         TriggerApis.getTriggersByAccountId(authState?.auth?.account?.id)
             .then((response: AxiosResponse<Array<TriggerModel>>) => {
-                console.log("The response ares ", response);
                 if (response?.data) {
                     const updatedData = response.data?.map((trigger: TriggerModel) => ({
                         id: trigger?.id,
                         name: trigger.name,
                         eventName: trigger.eventName,
-                        triggerType: trigger.type
+                        triggerType: trigger.type  === RuleTriggerTypes.dataReceived ? "onDataReceived" : "schedule"
                     }))
                     setData(updatedData);
                 }

@@ -1,7 +1,9 @@
 import { Button } from "@sebgroup/react-components/dist/Button";
 import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
+import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 import { AxiosResponse } from "axios";
 import React from "react";
+
 
 import ReactFlow, {
     ReactFlowProvider,
@@ -18,12 +20,16 @@ import ReactFlow, {
     Node,
     getConnectedEdges
 } from "react-flow-renderer";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { match, useHistory, useRouteMatch } from "react-router";
+import { Dispatch } from "redux";
+import { toggleNotification } from "../../../actions";
 import { TriggerApis } from "../../../apis/triggerApis";
 import { RuleDataSouceTypeEnums, RuleTriggerTypes, RuleTypeEnums, TriggerDataSourceTypeEnums } from "../../../enums";
-import { ActionType } from "../../../enums/status";
+import { TriggerActionType } from "../../../enums/status";
 import { ActionModel, RuleModel, TriggerModel } from "../../../interfaces/models";
 import { AuthState, States } from "../../../interfaces/states";
+import { convertStringToJson } from "../../../utils/functions";
 import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
 import PageTitle from "../../shared/PageTitle";
 import { TriggerFormModel } from "../forms/Trigger";
@@ -36,7 +42,7 @@ const getId = () => `dndnode_${id++}`;
 
 export type RuleTypes = "string" | "time" | "number";
 export type TriggerTypes = "dataReceived" | "schedule";
-export type RuleActionTypes = "email" | "publish" | "actuator" | "expression";
+export type RuleActionTypes = keyof typeof TriggerActionType;
 
 const EventBody: React.FC = (): React.ReactElement<void> => {
     const reactFlowWrapper = React.useRef<HTMLDivElement>(null);
@@ -44,7 +50,12 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     const [elements, setElements] = React.useState<Elements>([]);
     const [selectedElement, setSelectedElement] = React.useState<FlowElement & Edge>();
 
+    const [currenTrigger, setCurrentTrigger] = React.useState<TriggerModel>({} as TriggerModel)
+
     const authState: AuthState = useSelector((states: States) => states?.auth);
+    const match: match<{ triggerId: string }> = useRouteMatch();
+    // actions
+    const dispatch: Dispatch = useDispatch();
 
     const [loading, setLoading] = React.useState<boolean>(false);
     // gets called after end of edge gets dragged to another source or target
@@ -67,30 +78,30 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         event.dataTransfer.dropEffect = 'move';
     };
 
-    const getActionNodeLabelByTypeEnum = (type: ActionType) => {
+    const getActionNodeLabelByTypeEnum = (type: TriggerActionType) => {
         switch (type) {
-            case ActionType.Actuator:
-                return "Actuator action";
-            case ActionType.Email:
+            case TriggerActionType.MqttPublishAction:
+                return "Mqqt publish action";
+            case TriggerActionType.Email:
                 return "Email action";
-            case ActionType.expression:
-                return "Expression action";
-            case ActionType.Publish:
-                return "Publish action";
+            case TriggerActionType.RestServiceAction:
+                return "Rest service action";
+            case TriggerActionType.SMS:
+                return "SMS action";
         }
     };
 
 
-    const getActionNodeIdByTypeEnum = (type: ActionType) => {
+    const getActionNodeIdByTypeEnum = (type: TriggerActionType): RuleActionTypes => {
         switch (type) {
-            case ActionType.Actuator:
-                return "actuator";
-            case ActionType.Email:
-                return "email";
-            case ActionType.expression:
-                return "expression";
-            case ActionType.Publish:
-                return "publish";
+            case TriggerActionType.MqttPublishAction:
+                return "MqttPublishAction";
+            case TriggerActionType.Email:
+                return "Email";
+            case TriggerActionType.RestServiceAction:
+                return "RestServiceAction";
+            case TriggerActionType.SMS:
+                return "SMS";
         }
     };
 
@@ -118,18 +129,18 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
     const getNodeLabel = (ruleType: RuleActionTypes | RuleTypes | TriggerTypes): string => {
         switch (ruleType) {
-            case "actuator":
-                return `Actuator action`;
-            case "email":
+            case "SMS":
+                return `SMS action`;
+            case "Email":
                 return "Email action";
             case "number":
                 return "Number rule";
             case "string":
                 return "String rule";
-            case "publish":
-                return "Publish action";
-            case "expression":
-                return "Expression action";
+            case "MqttPublishAction":
+                return "Mqtt pubslish action";
+            case "RestServiceAction":
+                return "Rest service action";
             case "time":
                 return "Time rule";
             case "dataReceived":
@@ -536,7 +547,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         ruleType: RuleTypeEnums[firstWord],
                         dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                         value: firstRuleNode?.data.nodeControls.rules?.operatorValue,
-                        position: firstRuleNode?.position,
+                        properties: JSON.stringify({ position: (firstRuleNode as Node)?.position }),
                         and: null,
                         or: null
                     } as RuleModel;
@@ -551,7 +562,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         ruleType: RuleTypeEnums[firstWordDefault],
                         dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                         value: rule?.data.nodeControls.rules?.operatorValue,
-                        position: (rule as Node)?.position,
+                        properties: JSON.stringify({ position: (rule as Node)?.position }),
                         and: null,
                         or: null
                     };
@@ -564,271 +575,318 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         console.log("How many people ", actionsNodes);
 
         setLoading(true);
-        TriggerApis.createTrigger(trigger)
-            .then((response: AxiosResponse<TriggerModel>) => {
+        if (trigger?.id) {
+            TriggerApis.updateTriggerById(trigger)
+                .then((response: AxiosResponse<TriggerModel>) => {
+                    const notification: NotificationProps = {
+                        theme: "success",
+                        title: "Trigger created",
+                        message: `Trigger updated successfully`,
+                        toggle: true,
+                        onDismiss: () => { }
+                    };
 
-            }).finally(() => {
-                setLoading(false);
-            });
+                    dispatch(toggleNotification(notification));
 
+                }).finally(() => {
+                    setLoading(false);
+                });
+        } else {
+            TriggerApis.createTrigger(trigger)
+                .then((response: AxiosResponse<TriggerModel>) => {
+                    const notification: NotificationProps = {
+                        theme: "success",
+                        title: "Trigger created",
+                        message: `Trigger created successfully`,
+                        toggle: true,
+                        onDismiss: () => { }
+                    };
+
+                    dispatch(toggleNotification(notification));
+
+                }).finally(() => {
+                    setLoading(false);
+                });
+        }
         console.log("Seizure ", edgesNodes);
     }, [elements]);
 
     React.useEffect(() => {
-        const response = {
-            "id": null,
-            "name": "Event name",
-            "eventName": "trigger name",
-            "type": 0,
-            "sourceType": 0,
-            "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
-            "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-            "position": {
-                "x": 144.24062499764864,
-                "y": 171.0884724164569
-            },
-            "rule": {
-                "title": "String rule",
-                "id": "8f8f-205e66841f05-09090998",
-                "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
-                "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-                "operator": "startWith",
-                "ruleType": 1,
-                "dataFieldSourceType": 0,
-                "value": "fff",
-                "position": {
-                    "x": 44.24062499764864,
-                    "y": 271.0884724164569
-                },
-                "and": {
-                    "title": "Time rule",
-                    "id": "95b4539-b2fe-46577sd-abd0-91d0696dfe6b",
-                    "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
-                    "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-                    "operator": "<=",
-                    "ruleType": 0,
-                    "dataFieldSourceType": 0,
-                    "value": "rrr",
-                    "position": {
-                        "x": 89.33082293910957,
-                        "y": 305.17054721056394
-                    },
-                    "and": null,
-                    "or": {
-                        "title": "Number rule",
-                        "id": "95b4539-b2fe-465a-abd0-91d0696dfe6b",
-                        "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
-                        "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-                        "operator": "<=",
-                        "ruleType": 2,
-                        "dataFieldSourceType": 0,
-                        "value": "444",
-                        "position": {
-                            "x": 57.406519416703134,
-                            "y": 430.3138170183972
-                        },
-                        "and": null,
-                        "or": null
+
+        setLoading(true);
+
+        console.log("The history is ", match)
+        if (match?.params?.triggerId) {
+            TriggerApis.getTriggerById(match?.params?.triggerId)
+                .then((response: AxiosResponse<TriggerModel>) => {
+                    if (response.data) {
+                        setCurrentTrigger(response?.data);
                     }
-                },
-                "or": null
-            },
-            "actions": [{
-                "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
-                "creationDate": "2021-05-04T15:42:41.7477526",
-                "id": "23465d26-4251-449c-a0a2-11aab5c30742",
-                "isExectionSuccessful": false,
-                "name": "Action name",
-                "properties": "{\"url\":\"localhost:3000\",\"httpMethod\":\"GET\",\"body\":\"{value: 1}\"}",
-                "type": 4,
-                "position": {
-                    x: 200.24062499764864,
-                    y: 270.0884724164569
-                }
-            }]
-        };
+                }).finally(() => {
+                    setLoading(false);
+                });
 
-        // Edges and rules
-        const triggerRuleId: string = `${response?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule"}-${getId()}`;
+        }
 
-        let edgeNodes: Array<Edge> = [];
-        let ruleNodes: Array<FlowElement> = [];
+    }, [match?.params?.triggerId]);
 
-        let rulesCounter = -1;
-        const generateRulesrecursively = (recursiveRule?: RuleModel) => {
-            rulesCounter += 1;
-            if (ruleNodes?.length) {
-                if (recursiveRule?.and || recursiveRule?.or) {
-                    if (recursiveRule?.and) {
-                        const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.and?.ruleType)}-${recursiveRule?.and.id}`;
+    React.useEffect(() => {
+        // const response = {
+        //     "id": null,
+        //     "name": "Event name",
+        //     "eventName": "trigger name",
+        //     "type": 0,
+        //     "sourceType": 0,
+        //     "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
+        //     "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+        //     "properties": "{\"position\":{\"x\":144.24062499764864,\"y\":171.0884724164569}}",
+        //     "rule": {
+        //         "title": "String rule",
+        //         "id": "8f8f-205e66841f05-09090998",
+        //         "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
+        //         "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+        //         "operator": "startWith",
+        //         "ruleType": 1,
+        //         "dataFieldSourceType": 0,
+        //         "value": "fff",
+        //         "properties": "{\"position\":{\"x\":44.24062499764864,\"y\":271.0884724164569}}",
+        //         "and": {
+        //             "title": "Time rule",
+        //             "id": "95b4539-b2fe-46577sd-abd0-91d0696dfe6b",
+        //             "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
+        //             "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+        //             "operator": "<=",
+        //             "ruleType": 0,
+        //             "dataFieldSourceType": 0,
+        //             "value": "rrr",
+        //             "properties": "{\"position\":{\"x\":89.33082293910957,\"y\":305.17054721056394}}",
+        //             "and": null,
+        //             "or": {
+        //                 "title": "Number rule",
+        //                 "id": "95b4539-b2fe-465a-abd0-91d0696dfe6b",
+        //                 "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
+        //                 "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
+        //                 "operator": "<=",
+        //                 "ruleType": 2,
+        //                 "dataFieldSourceType": 0,
+        //                 "value": "444",
+        //                 "properties": "{\"position\":{\"x\":57.406519416703134,\"y\":430.3138170183972}}",
+        //                 "and": null,
+        //                 "or": null
+        //             }
+        //         },
+        //         "or": null
+        //     },
+        //     "actions": [{
+        //         "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
+        //         "creationDate": "2021-05-04T15:42:41.7477526",
+        //         "id": "23465d26-4251-449c-a0a2-11aab5c30742",
+        //         "isExectionSuccessful": false,
+        //         "name": "Action name",
+        //         "properties": "{\"url\":\"localhost:3000\",\"httpMethod\":\"GET\",\"body\":\"{value: 1}\", \"position\":{\"x\":200.24062499764864,\"y\":270.0884724164569}}",
+        //         "type": 4
+        //     }]
+        // };
 
-                        edgeNodes.push({
-                            id: `edge-${getId()}`,
-                            source: edgeNodes[rulesCounter - 1].target,
-                            sourceHandle: null,
-                            target: ruleId,
-                            targetHandle: null,
-                            data: { lineType: "AND" }
-                        });
+        const defaultPosition = reactFlowInstance?.project({
+            x: 100,
+            y: 100,
+        });
+        if (currenTrigger?.id) {
+            // Edges and rules
+            const triggerRuleId: string = `${currenTrigger?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule"}-${getId()}`;
 
-                        ruleNodes.push({
-                            id: ruleId,
-                            position: recursiveRule?.and.position,
-                            type: "default",
-                            data: {
-                                label: getNodeLabelById(recursiveRule?.and.ruleType),
-                                nodeType: "rule",
-                                nodeControls: {
-                                    trigger: {},
-                                    rules: {
-                                        device: recursiveRule?.and.deviceId,
-                                        dataFieldSourceType: (RuleDataSouceTypeEnums[recursiveRule?.and.dataFieldSourceType].toString() === RuleDataSouceTypeEnums.device.toString()) ? "device" : "aggregatedField",
-                                        sensor: recursiveRule?.and.fieldId,
-                                        deviceSource: recursiveRule?.and.fieldId ? "sensor" : "attribute",
-                                        operator: recursiveRule?.and.operator,
-                                        operatorValue: recursiveRule?.and.value,
-                                        title: recursiveRule?.and.title,
-                                        ruleType: RuleTypeEnums[recursiveRule?.and.ruleType]
-                                    },
-                                    actions: {},
+            let edgeNodes: Array<Edge> = [];
+            let ruleNodes: Array<FlowElement> = [];
+
+            let rulesCounter = -1;
+            const generateRulesrecursively = (recursiveRule?: RuleModel) => {
+                rulesCounter += 1;
+                if (ruleNodes?.length) {
+                    if (recursiveRule?.and || recursiveRule?.or) {
+                        if (recursiveRule?.and) {
+                            const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.and.properties || "");
+                            const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.and?.ruleType)}-${recursiveRule?.and.id}`;
+                            console.log("The posiitons are ", properties)
+                            edgeNodes.push({
+                                id: `edge-${getId()}`,
+                                source: edgeNodes[rulesCounter - 1].target,
+                                sourceHandle: null,
+                                target: ruleId,
+                                targetHandle: null,
+                                data: { lineType: "AND" },
+                                label: "AND"
+                            });
+
+                            ruleNodes.push({
+                                id: ruleId,
+                                position: properties?.position || defaultPosition,
+                                type: "default",
+                                data: {
+                                    label: getNodeLabelById(recursiveRule?.and.ruleType),
+                                    nodeType: "rule",
+                                    nodeControls: {
+                                        trigger: {},
+                                        rules: {
+                                            device: recursiveRule?.and.deviceId,
+                                            dataFieldSourceType: (RuleDataSouceTypeEnums[recursiveRule?.and.dataFieldSourceType].toString() === RuleDataSouceTypeEnums.device.toString()) ? "device" : "aggregatedField",
+                                            sensor: recursiveRule?.and.fieldId,
+                                            deviceSource: recursiveRule?.and.fieldId ? "sensor" : "attribute",
+                                            operator: recursiveRule?.and.operator,
+                                            operatorValue: recursiveRule?.and.value,
+                                            title: recursiveRule?.and.title,
+                                            ruleType: RuleTypeEnums[recursiveRule?.and.ruleType]
+                                        },
+                                        actions: {},
+                                    }
                                 }
-                            }
-                        });
-                        generateRulesrecursively(recursiveRule?.and);
-                    } else {
-                        const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.or?.ruleType)}-${recursiveRule?.or.id}`;
-
-                        edgeNodes.push({
-                            id: `edge-${getId()}`,
-                            source: edgeNodes[rulesCounter - 1]?.target,
-                            sourceHandle: null,
-                            target: ruleId,
-                            targetHandle: null,
-                            data: { lineType: "OR" }
-                        });
-
-                        ruleNodes.push({
-                            id: ruleId,
-                            position: recursiveRule?.or?.position,
-                            type: "default",
-                            data: {
-                                label: getNodeLabelById(recursiveRule?.or?.ruleType),
-                                nodeType: "rule",
-                                nodeControls: {
-                                    trigger: {},
-                                    rules: {
-                                        device: recursiveRule?.or?.deviceId,
-                                        type: (RuleDataSouceTypeEnums[recursiveRule?.or.dataFieldSourceType] === "device") ? "device" : "aggregatedField",
-                                        sensor: recursiveRule?.or?.fieldId,
-                                        deviceSource: recursiveRule?.or?.fieldId ? "sensor" : "attribute",
-                                        operator: recursiveRule?.or?.operator,
-                                        operatorValue: recursiveRule?.or?.value,
-                                        title: recursiveRule?.or?.title,
-                                        ruleType: RuleTypeEnums[recursiveRule?.or?.ruleType]
-                                    },
-                                    actions: {},
+                            });
+                            generateRulesrecursively(recursiveRule?.and);
+                        } else {
+                            const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.or?.ruleType)}-${recursiveRule?.or.id}`;
+                            const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.or.properties || "");
+                            console.log("It sure comes")
+                            edgeNodes.push({
+                                id: `edge-${getId()}`,
+                                source: edgeNodes[rulesCounter - 1]?.target,
+                                sourceHandle: null,
+                                target: ruleId,
+                                targetHandle: null,
+                                data: { lineType: "OR" },
+                                label: "OR"
+                            });
+                            console.log("Does it come here with that ?", recursiveRule)
+                            ruleNodes.push({
+                                id: ruleId,
+                                position: properties?.position || defaultPosition,
+                                type: "default",
+                                data: {
+                                    label: getNodeLabelById(recursiveRule?.or?.ruleType),
+                                    nodeType: "rule",
+                                    nodeControls: {
+                                        trigger: {},
+                                        rules: {
+                                            device: recursiveRule?.or?.deviceId,
+                                            type: (RuleDataSouceTypeEnums[recursiveRule?.or.dataFieldSourceType] === "device") ? "device" : "aggregatedField",
+                                            sensor: recursiveRule?.or?.fieldId,
+                                            deviceSource: recursiveRule?.or?.fieldId ? "sensor" : "attribute",
+                                            operator: recursiveRule?.or?.operator,
+                                            operatorValue: recursiveRule?.or?.value,
+                                            title: recursiveRule?.or?.title,
+                                            ruleType: RuleTypeEnums[recursiveRule?.or?.ruleType]
+                                        },
+                                        actions: {},
+                                    }
                                 }
+                            });
+                            generateRulesrecursively(recursiveRule?.or);
+                        }
+                    }
+                } else {
+                    const properties: { position: { x: number, y: number } } = convertStringToJson(currenTrigger?.rule?.properties || "");
+                    const ruleId: string = `${getRuleNodeLabelNameById(currenTrigger?.rule?.ruleType)}-${currenTrigger?.rule?.id}`;
+
+                    console.log("The posiitons are 1234", properties)
+
+                    edgeNodes.push({
+                        id: `edge-${getId()}`,
+                        source: triggerRuleId,
+                        sourceHandle: null,
+                        target: ruleId,
+                        targetHandle: null,
+                        data: { lineType: "AND" },
+                    });
+
+                    ruleNodes.push({
+                        id: ruleId,
+                        position: properties?.position || defaultPosition,
+                        type: "default",
+                        data: {
+                            label: getNodeLabelById(currenTrigger?.rule?.ruleType),
+                            nodeType: "rule",
+                            nodeControls: {
+                                trigger: {},
+                                rules: {
+                                    device: currenTrigger?.rule?.deviceId,
+                                    dataFieldSourceType: RuleDataSouceTypeEnums[currenTrigger?.rule?.dataFieldSourceType],
+                                    type: (RuleDataSouceTypeEnums[currenTrigger?.rule.dataFieldSourceType] === "device") ? "device" : "aggregatedField",
+                                    sensor: currenTrigger?.rule?.fieldId,
+                                    deviceSource: currenTrigger?.rule?.fieldId ? "sensor" : "attribute",
+                                    operator: currenTrigger?.rule?.operator,
+                                    operatorValue: currenTrigger?.rule?.value,
+                                    title: currenTrigger?.rule?.title,
+                                    ruleType: RuleTypeEnums[currenTrigger?.rule?.ruleType]
+                                },
+                                actions: {},
                             }
-                        });
-                        generateRulesrecursively(recursiveRule?.or);
+                        }
+                    });
+
+                    if (currenTrigger?.rule?.and || currenTrigger?.rule?.or) {
+                        console.log("Why not here in fact ?", currenTrigger.rule)
+                        generateRulesrecursively(currenTrigger?.rule);
                     }
                 }
-            } else {
-                const ruleId: string = `${getRuleNodeLabelNameById(response?.rule?.ruleType)}-${response?.rule?.id}`;
+            };
+            generateRulesrecursively();
+            rulesCounter = -1;
+            // actions
+            console.log("The current trigger is ", currenTrigger)
+            const actionNodes: Array<FlowElement> = currenTrigger?.actions?.map((action: ActionModel) => {
+                const actionNodeId: string = `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`;
+                const properties: { position: { x: number, y: number } } = convertStringToJson(action.properties || "")
                 edgeNodes.push({
                     id: `edge-${getId()}`,
                     source: triggerRuleId,
                     sourceHandle: null,
-                    target: ruleId,
+                    target: actionNodeId,
                     targetHandle: null,
-                    data: { lineType: "AND" }
                 });
 
-                ruleNodes.push({
-                    id: ruleId,
-                    position: response?.rule?.position,
-                    type: "default",
+                return {
+                    id: actionNodeId,
+                    type: "output",
+                    position: properties?.position || defaultPosition,
                     data: {
-                        label: getNodeLabelById(response?.rule?.ruleType),
-                        nodeType: "rule",
+                        label: getActionNodeLabelByTypeEnum(action?.type),
+                        nodeType: "action",
                         nodeControls: {
                             trigger: {},
-                            rules: {
-                                device: response?.rule?.deviceId,
-                                dataFieldSourceType: RuleDataSouceTypeEnums[response?.rule?.dataFieldSourceType],
-                                type: (RuleDataSouceTypeEnums[response?.rule.dataFieldSourceType] === "device") ? "device" : "aggregatedField",
-                                sensor: response?.rule?.fieldId,
-                                deviceSource: response?.rule?.fieldId ? "sensor" : "attribute",
-                                operator: response?.rule?.operator,
-                                operatorValue: response?.rule?.value,
-                                title: response?.rule?.title,
-                                ruleType: RuleTypeEnums[response?.rule?.ruleType]
+                            rules: {},
+                            actions: {
+                                newAction: !action?.id ? action : null,
+                                action: action?.id ? action : null
                             },
-                            actions: {},
                         }
-                    }
-                });
+                    },
+                } as FlowElement
+            }) || [];
 
-                if (response?.rule?.and || response?.rule?.or) {
-                    generateRulesrecursively(response?.rule?.and || response?.rule?.or);
-                }
-            }
-        };
-        generateRulesrecursively();
-        rulesCounter = -1;
-        // actions
-        const actionNodes: Array<FlowElement> = response?.actions?.map((action: ActionModel) => {
-            const actionNodeId: string = `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`;
-            edgeNodes.push({
-                id: `edge-${getId()}`,
-                source: triggerRuleId,
-                sourceHandle: null,
-                target: actionNodeId,
-                targetHandle: null,
-            });
-            
-            return {
-                id: actionNodeId,
-                type: "output",
-                position: action["position"],
+            const triggerProperties: { position: { x: number, y: number } } = convertStringToJson(currenTrigger?.properties || "");
+            const triggerNodes = {
+                id: triggerRuleId,
+                type: "input",
+                position: triggerProperties?.position || defaultPosition,
+                style: { backgroundColor: "#eee" },
                 data: {
-                    label: getActionNodeLabelByTypeEnum(action?.type),
-                    nodeType: "action",
+                    label: currenTrigger?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule",
+                    nodeType: "trigger",
                     nodeControls: {
-                        trigger: {},
-                        rules: {},
-                        actions: {
-                            newAction: !action?.id ? action : null,
-                            action: action?.id ? action : null
+                        trigger: {
+                            eventName: currenTrigger?.eventName,
+                            triggerName: currenTrigger?.name,
+                            sourceType: currenTrigger?.sourceType,
+                            deviceId: currenTrigger?.deviceId
                         },
+                        rules: {},
+                        actions: {},
                     }
                 },
-            } as FlowElement
-        })
-
-        const triggerNodes = {
-            id: triggerRuleId,
-            type: "input",
-            position: response?.position,
-            style: { backgroundColor: "#eee" },
-            data: {
-                label: response?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule",
-                nodeType: "trigger",
-                nodeControls: {
-                    trigger: {
-                        eventName: response?.eventName,
-                        triggerName: response?.name,
-                        sourceType: response?.sourceType,
-                        deviceId: response?.deviceId
-                    },
-                    rules: {},
-                    actions: {},
-                }
-            },
-        };
-        console.log("The actions is ", edgeNodes);
-        setElements((es) => es.concat([triggerNodes, ...actionNodes, ...ruleNodes, ...edgeNodes]));
-    }, []);
+            };
+            console.log("The actions is ", triggerProperties);
+            setElements((es) => es.concat([triggerNodes, ...actionNodes, ...ruleNodes, ...edgeNodes]));
+        }
+    }, [currenTrigger])
 
     return (
         <div className="rules-container">
@@ -855,7 +913,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 <Background color="#aaa" gap={16} />
 
                                 {selectedElement && <div className="controls-holder">
-                                    <Button label="Delete" theme="danger" onClick={onRemoveNode} size="sm" id="signin" />
+                                    <Button label="Delete" theme="danger" onClick={onRemoveNode} size="sm" id="btnDelete" />
                                 </div>
                                 }
                             </ReactFlow>

@@ -1,5 +1,6 @@
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import React from "react";
+import { TriggerDataSourceTypeEnums } from "../../../../enums";
 import { TriggerFormModel } from "../Trigger";
 
 interface DataReceivedProps {
@@ -12,6 +13,7 @@ interface DataReceivedProps {
     handleTriggerDropDownChange: (value: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => void;
 }
 const DataReceived: React.FC<DataReceivedProps> = (props: DataReceivedProps): React.ReactElement<void> => {
+    console.log("The coming values are ", props.trigger)
     return (
         <React.Fragment>
             <div className="row">
@@ -40,7 +42,7 @@ const DataReceived: React.FC<DataReceivedProps> = (props: DataReceivedProps): Re
                 />
             </div>
 
-            {props?.trigger?.sourceType?.value === "sensor" && <div className="row">
+            {props?.trigger?.sourceType?.value === TriggerDataSourceTypeEnums.sensor && <div className="row">
                 <Dropdown
                     label="Sensor"
                     name="sourceId"
@@ -53,7 +55,7 @@ const DataReceived: React.FC<DataReceivedProps> = (props: DataReceivedProps): Re
                 />
             </div>}
 
-            {props?.trigger?.sourceType?.value === "actuator" && <div className="row">
+            {props?.trigger?.sourceType?.value === TriggerDataSourceTypeEnums.actuator && <div className="row">
                 <Dropdown
                     label="Actuator"
                     name="sourceId"

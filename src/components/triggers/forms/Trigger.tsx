@@ -126,13 +126,14 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
         const sourceType: DropdownItem = triggerSouceTypes.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.trigger?.sourceType);
         let sourceId: string | DropdownItem;
 
-        if (sourceType?.value === "sensor") {
+        if (sourceType?.value === TriggerDataSourceTypeEnums.sensor) {
             sourceId = sensors.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.trigger?.sourceId);
-        } else if (sourceType?.value === "actuator") {
+        } else if (sourceType?.value === TriggerDataSourceTypeEnums.actuator) {
             sourceId = actuators.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.trigger?.sourceId);
-        } else if (sourceType?.value === "recurring") {
+        } else if (sourceType?.value === TriggerDataSourceTypeEnums.recurring) {
             sourceId = candenceValues?.find((cadence: DropdownItem) => cadence?.value === element?.data?.nodeControls?.trigger?.sourceId);
         }
+        
         setFields({
             ...fields,
             eventName: element?.data?.nodeControls?.trigger?.eventName,
@@ -141,6 +142,7 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
             sourceType: sourceType,
             sourceId: sourceId || element?.data?.nodeControls?.trigger?.sourceId
         });
+        
     }, [props.selectedElement, props.elements, setFields, devices]);
 
     return (
