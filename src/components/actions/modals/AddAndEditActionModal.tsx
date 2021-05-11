@@ -8,6 +8,7 @@ import React from "react";
 import { ActionModel } from "../../../interfaces/models";
 import { HTTPREQUESTMETHODS } from "../../../constants";
 import { convertStringToJson } from "../../../utils/functions";
+import { TriggerActionType } from "../../../enums/status";
 
 
 interface AddAndEditActionModalProps {
@@ -20,6 +21,12 @@ interface AddAndEditActionModalProps {
 
 interface PropertyProps {
     url?: string;
+    mobileNo?: string;
+    message?: string;
+    subject?: string;
+    emailId?: string;
+    topic?: string;
+    payload?: string;
     body?: string;
     httpMethod?: string;
 }
@@ -31,7 +38,17 @@ interface ActionErrorModel extends PropertyProps, ActionModel {
 const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddAndEditActionModalProps): React.ReactElement<void> => {
     const [action, setAction] = React.useState<ActionModel>({ name: "" } as ActionModel);
     const [actionError, setActionError] = React.useState<ActionErrorModel>({ name: "" } as ActionErrorModel);
-    const [property, setProperty] = React.useState<PropertyProps>({ url: "", httpMethod: "", body: "" });
+    const [property, setProperty] = React.useState<PropertyProps>({
+        url: "",
+        httpMethod: "",
+        body: "",
+        mobileNo: "",
+        message: "",
+        subject: "",
+        emailId: "",
+        topic: "",
+        payload: "",
+    });
 
     const httpMethods: Array<DropdownItem> = [{ label: "Please select", value: null }, ...HTTPREQUESTMETHODS];
 
@@ -53,28 +70,61 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
         if (!action?.name) {
             error = { ...error, name: "Action name is required" };
         }
-
-        if (!property?.body) {
-            error = { ...error, body: "Body is required" };
-        }
-
-        if (selectedType?.value < 0) {
+        if (!selectedType) {
             error = { ...error, actionType: "Action type is required" };
         }
 
-        if (!property?.httpMethod) {
-            error = { ...error, httpMethod: "Action method is required" };
-        }
+        console.log("Its doing Mqtt Publish " + selectedType?.value, action)
+        switch (action?.type) {
+            case TriggerActionType.RestServiceAction: {
+                if (!property?.body) {
+                    error = { ...error, body: "Body is required" };
+                }
 
-        if (!property?.url) {
-            error = { ...error, url: "Action url is required" };
-        }
+                if (!property?.httpMethod) {
+                    error = { ...error, httpMethod: "Action method is required" };
+                }
 
+                if (!property?.url) {
+                    error = { ...error, url: "Action url is required" };
+                }
+                break;
+            }
+            case TriggerActionType.MqttPublishAction: {
+                if (!property?.topic) {
+                    error = { ...error, topic: "topic is required" };
+                }
+
+                if (!property?.payload) {
+                    error = { ...error, payload: "payload method is required" };
+                }
+                break;
+            }
+            case TriggerActionType.SMS: {
+                if (!property?.mobileNo) {
+                    error = { ...error, mobileNo: "mobileNo is required" };
+                }
+
+                if (!property?.message) {
+                    error = { ...error, message: "Message method is required" };
+                }
+                break;
+            }
+            case TriggerActionType.Email: {
+                if (!property?.subject) {
+                    error = { ...error, subject: "Subject is required" };
+                }
+
+                if (!property?.body) {
+                    error = { ...error, body: "body method is required" };
+                }
+                break;
+            }
+        }
         if (!error) {
             const updatedProperty: string = JSON.stringify(property)
-            props?.onSave(e, { ...action, properties: updatedProperty });
+          //  props?.onSave(e, { ...action, properties: updatedProperty });
         }
-
         setActionError(error);
 
         e.preventDefault();
@@ -102,10 +152,148 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
 
             setSelectedHttpMethod(selectedMethod);
             setSelectedType(type);
-            setProperty({ ...property, body: updatedProperty?.body, httpMethod: updatedProperty?.httpMethod, url: updatedProperty?.url });
+            setProperty({
+                ...property,
+                body: updatedProperty?.body || property?.body,
+                httpMethod: updatedProperty?.httpMethod || property?.httpMethod,
+                url: updatedProperty?.url || property?.url,
+                mobileNo: updatedProperty?.mobileNo || property?.mobileNo,
+                message: updatedProperty?.message || property?.message,
+                subject: updatedProperty.subject || property?.subject,
+                emailId: updatedProperty?.emailId || property?.emailId,
+                topic: updatedProperty?.topic || property?.topic,
+                payload: updatedProperty?.payload || property?.payload
+            });
             setAction(props?.action);
         }
     }, [props.action]);
+
+    const renderSMSTypeAction = () => {
+        return (
+            <React.Fragment>
+                <div className="row">
+                    <div className="col">
+                        <TextBoxGroup
+                            name="mobileNo"
+                            type="number"
+                            label="Mobile No."
+                            placeholder="Mobile number"
+                            value={property?.mobileNo}
+                            disabled={props?.loading}
+                            error={actionError?.mobileNo}
+                            onChange={handlePropertyChange}
+                        />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <TextArea id="message" name="message" cols={2} onChange={handlePropertyChange} error={actionError?.message} value={property?.message} placeholder="Message" />
+                    </div>
+                </div>
+            </React.Fragment>
+        )
+    };
+
+    const renderEmailTypeAction = () => {
+        return (
+            <React.Fragment>
+                <div className="row">
+                    <div className="col">
+                        <TextBoxGroup
+                            name="emailId"
+                            label="Email ID."
+                            placeholder="email Id."
+                            value={property?.emailId}
+                            disabled={props?.loading}
+                            error={actionError?.emailId}
+                            onChange={handlePropertyChange}
+                        />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <TextBoxGroup
+                            name="subject"
+                            label="Email subject"
+                            placeholder="email subject"
+                            value={property?.subject}
+                            disabled={props?.loading}
+                            error={actionError?.subject}
+                            onChange={handlePropertyChange}
+                        />
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col">
+                        <TextArea id="body" name="body" cols={2} onChange={handlePropertyChange} error={actionError?.body} value={property?.body} placeholder="Message body" />
+                    </div>
+                </div>
+            </React.Fragment>
+        )
+    };
+
+    const renderMqttActionType = () => {
+        return (
+            <React.Fragment>
+                <div className="row">
+                    <div className="col">
+                        <TextBoxGroup
+                            name="topic"
+                            label="Topic"
+                            placeholder="Topic "
+                            value={property?.topic}
+                            disabled={props?.loading}
+                            error={actionError?.topic}
+                            onChange={handlePropertyChange}
+                        />
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col">
+                        <TextArea id="payload" name="payload" cols={2} onChange={handlePropertyChange} error={actionError?.payload} value={property?.payload} placeholder="Message payload" />
+                    </div>
+                </div>
+
+            </React.Fragment>
+        )
+    }
+    const renderRestTypeAction = () => {
+        return (
+            <React.Fragment>
+                <div className="row">
+                    <div className="col">
+                        <TextBoxGroup
+                            name="url"
+                            label="Url"
+                            placeholder="Url Path"
+                            value={property?.url}
+                            disabled={props?.loading}
+                            error={actionError?.url}
+                            onChange={handlePropertyChange}
+                        />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <Dropdown
+                            label="Http Method"
+                            list={httpMethods}
+                            error={actionError?.httpMethod}
+                            selectedValue={selectedHttpMethod}
+                            onChange={handleActionHttpChange}
+                        />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <TextArea id="body" name="body" cols={3} onChange={handlePropertyChange} error={actionError?.body} value={property?.body} placeholder="Action body" />
+                    </div>
+                </div>
+            </React.Fragment>
+        )
+    }
 
     return (
         <form className="add-and-edit-actio" onSubmit={onSave}>
@@ -131,35 +319,11 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
                     />
                 </div>
             </div>
-            <div className="row">
-                <div className="col">
-                    <TextBoxGroup
-                        name="url"
-                        label="Url"
-                        placeholder="Url Path"
-                        value={property?.url}
-                        disabled={props?.loading}
-                        error={actionError?.name}
-                        onChange={handlePropertyChange}
-                    />
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <Dropdown
-                        label="Http Method"
-                        list={httpMethods}
-                        error={actionError?.httpMethod}
-                        selectedValue={selectedHttpMethod}
-                        onChange={handleActionHttpChange}
-                    />
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <TextArea id="body" name="body" cols={3} onChange={handlePropertyChange} error={actionError?.body} value={property?.body} placeholder="Action body" />
-                </div>
-            </div>
+            {selectedType?.value === TriggerActionType.RestServiceAction && renderRestTypeAction()}
+            {selectedType?.value === TriggerActionType.SMS && renderSMSTypeAction()}
+            {selectedType?.value === TriggerActionType.Email && renderEmailTypeAction()}
+            {selectedType?.value === TriggerActionType.MqttPublishAction && renderMqttActionType()}
+
             <div className="row controls-holder">
                 <div className="col-12 col-sm-6">
                     <Button label="Cancel" size="sm" disabled={props.loading} theme="outline-primary" onClick={onCancel} />
