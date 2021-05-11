@@ -252,7 +252,7 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
 
                 <div className="row">
                     <div className="col">
-                        <TextArea id="payload" name="payload" cols={2} onChange={handlePropertyChange} error={actionError?.payload} value={property?.payload} placeholder="Message payload" />
+                        <TextArea id="payload" label="Payload" name="payload" cols={2} onChange={handlePropertyChange} error={actionError?.payload} value={property?.payload} placeholder="Message payload" />
                     </div>
                 </div>
 
@@ -288,7 +288,7 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
                 </div>
                 <div className="row">
                     <div className="col">
-                        <TextArea id="body" name="body" cols={3} onChange={handlePropertyChange} error={actionError?.body} value={property?.body} placeholder="Action body" />
+                        <TextArea id="body" label="Body" name="body" cols={3} onChange={handlePropertyChange} error={actionError?.body} value={property?.body} placeholder="Action body" />
                     </div>
                 </div>
             </React.Fragment>
