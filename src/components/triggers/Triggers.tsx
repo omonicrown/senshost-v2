@@ -85,7 +85,7 @@ const Triggers: React.FunctionComponent<TriggersProps> = (props: TriggersProps):
                         id: trigger?.id,
                         name: trigger.name,
                         eventName: trigger.eventName,
-                        triggerType: trigger.type  === RuleTriggerTypes.dataReceived ? "onDataReceived" : "schedule"
+                        triggerType: trigger.type === RuleTriggerTypes.dataReceived ? "onDataReceived" : "schedule"
                     }))
                     setData(updatedData);
                 }
@@ -100,15 +100,8 @@ const Triggers: React.FunctionComponent<TriggersProps> = (props: TriggersProps):
 
             <div className="triggers-holder">
                 <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
-                    {/* <Dropdown
-                        placeholder="Filter By Group"
-                        list={groupOptions}
-                        selectedValue={selectedGroup}
-                        onChange={(value: DropdownItem) => setSelectedGroup(value)}
-                    /> */}
-
+                    <div />
                     <Button label="Add" size="sm" id="addTriggerBtn" theme="outline-primary" title="Add" onClick={handleAddTrigger} />
-
                 </div>
                 <div className="row">
                     <div className="col">

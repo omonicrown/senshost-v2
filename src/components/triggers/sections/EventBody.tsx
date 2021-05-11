@@ -3,7 +3,7 @@ import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown"
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 import { AxiosResponse } from "axios";
 import React from "react";
-
+import { History } from "history";
 
 import ReactFlow, {
     ReactFlowProvider,
@@ -32,9 +32,9 @@ import { AuthState, States } from "../../../interfaces/states";
 import { convertStringToJson } from "../../../utils/functions";
 import { DatasourceType } from "../../dashboardItem/modals/AddDashboardItem";
 import PageTitle from "../../shared/PageTitle";
-import { TriggerFormModel } from "../forms/Trigger";
 import EventControls from "./EventControls";
 import EventProperties from "./EventProperties";
+import { HomeRoutes } from "../../../enums/routes";
 
 
 let id = 0;
@@ -54,6 +54,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
     const authState: AuthState = useSelector((states: States) => states?.auth);
     const match: match<{ triggerId: string }> = useRouteMatch();
+    const history: History = useHistory();
     // actions
     const dispatch: Dispatch = useDispatch();
 
@@ -572,21 +573,23 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         }
         trigger = { ...trigger, rule: updatedRule };
 
-        console.log("How many people ", actionsNodes);
-
         setLoading(true);
         if (trigger?.id) {
             TriggerApis.updateTriggerById(trigger)
                 .then((response: AxiosResponse<TriggerModel>) => {
-                    const notification: NotificationProps = {
-                        theme: "success",
-                        title: "Trigger created",
-                        message: `Trigger updated successfully`,
-                        toggle: true,
-                        onDismiss: () => { }
-                    };
+                    if (response?.data) {
+                        const notification: NotificationProps = {
+                            theme: "success",
+                            title: "Trigger updated",
+                            message: `Trigger updated successfully`,
+                            toggle: true,
+                            onDismiss: () => { }
+                        };
 
-                    dispatch(toggleNotification(notification));
+                        dispatch(toggleNotification(notification));
+
+                        setCurrentTrigger(response.data);
+                    }
 
                 }).finally(() => {
                     setLoading(false);
@@ -604,18 +607,18 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
                     dispatch(toggleNotification(notification));
 
+                    history.push(HomeRoutes.Triggers.toString());
+
                 }).finally(() => {
                     setLoading(false);
                 });
         }
-        console.log("Seizure ", edgesNodes);
     }, [elements]);
 
     React.useEffect(() => {
 
         setLoading(true);
 
-        console.log("The history is ", match)
         if (match?.params?.triggerId) {
             TriggerApis.getTriggerById(match?.params?.triggerId)
                 .then((response: AxiosResponse<TriggerModel>) => {
@@ -625,68 +628,11 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 }).finally(() => {
                     setLoading(false);
                 });
-
         }
 
     }, [match?.params?.triggerId]);
 
     React.useEffect(() => {
-        // const response = {
-        //     "id": null,
-        //     "name": "Event name",
-        //     "eventName": "trigger name",
-        //     "type": 0,
-        //     "sourceType": 0,
-        //     "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
-        //     "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-        //     "properties": "{\"position\":{\"x\":144.24062499764864,\"y\":171.0884724164569}}",
-        //     "rule": {
-        //         "title": "String rule",
-        //         "id": "8f8f-205e66841f05-09090998",
-        //         "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
-        //         "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-        //         "operator": "startWith",
-        //         "ruleType": 1,
-        //         "dataFieldSourceType": 0,
-        //         "value": "fff",
-        //         "properties": "{\"position\":{\"x\":44.24062499764864,\"y\":271.0884724164569}}",
-        //         "and": {
-        //             "title": "Time rule",
-        //             "id": "95b4539-b2fe-46577sd-abd0-91d0696dfe6b",
-        //             "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
-        //             "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-        //             "operator": "<=",
-        //             "ruleType": 0,
-        //             "dataFieldSourceType": 0,
-        //             "value": "rrr",
-        //             "properties": "{\"position\":{\"x\":89.33082293910957,\"y\":305.17054721056394}}",
-        //             "and": null,
-        //             "or": {
-        //                 "title": "Number rule",
-        //                 "id": "95b4539-b2fe-465a-abd0-91d0696dfe6b",
-        //                 "fieldId": "638063a5-121f-47d7-8f8f-205e66841f05",
-        //                 "deviceId": "b95b4539-b2fe-465a-abd0-91d0696dfe6b",
-        //                 "operator": "<=",
-        //                 "ruleType": 2,
-        //                 "dataFieldSourceType": 0,
-        //                 "value": "444",
-        //                 "properties": "{\"position\":{\"x\":57.406519416703134,\"y\":430.3138170183972}}",
-        //                 "and": null,
-        //                 "or": null
-        //             }
-        //         },
-        //         "or": null
-        //     },
-        //     "actions": [{
-        //         "accountId": "a4c91ef7-8feb-42a9-96f5-b13fca3c22dc",
-        //         "creationDate": "2021-05-04T15:42:41.7477526",
-        //         "id": "23465d26-4251-449c-a0a2-11aab5c30742",
-        //         "isExectionSuccessful": false,
-        //         "name": "Action name",
-        //         "properties": "{\"url\":\"localhost:3000\",\"httpMethod\":\"GET\",\"body\":\"{value: 1}\", \"position\":{\"x\":200.24062499764864,\"y\":270.0884724164569}}",
-        //         "type": 4
-        //     }]
-        // };
 
         const defaultPosition = reactFlowInstance?.project({
             x: 100,
@@ -707,7 +653,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         if (recursiveRule?.and) {
                             const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.and.properties || "");
                             const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.and?.ruleType)}-${recursiveRule?.and.id}`;
-                            console.log("The posiitons are ", properties)
                             edgeNodes.push({
                                 id: `edge-${getId()}`,
                                 source: edgeNodes[rulesCounter - 1].target,
@@ -745,7 +690,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         } else {
                             const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.or?.ruleType)}-${recursiveRule?.or.id}`;
                             const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.or.properties || "");
-                            console.log("It sure comes")
                             edgeNodes.push({
                                 id: `edge-${getId()}`,
                                 source: edgeNodes[rulesCounter - 1]?.target,
@@ -755,7 +699,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 data: { lineType: "OR" },
                                 label: "OR"
                             });
-                            console.log("Does it come here with that ?", recursiveRule)
                             ruleNodes.push({
                                 id: ruleId,
                                 position: properties?.position || defaultPosition,
@@ -785,8 +728,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 } else {
                     const properties: { position: { x: number, y: number } } = convertStringToJson(currenTrigger?.rule?.properties || "");
                     const ruleId: string = `${getRuleNodeLabelNameById(currenTrigger?.rule?.ruleType)}-${currenTrigger?.rule?.id}`;
-
-                    console.log("The posiitons are 1234", properties)
 
                     edgeNodes.push({
                         id: `edge-${getId()}`,
@@ -823,7 +764,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     });
 
                     if (currenTrigger?.rule?.and || currenTrigger?.rule?.or) {
-                        console.log("Why not here in fact ?", currenTrigger.rule)
                         generateRulesrecursively(currenTrigger?.rule);
                     }
                 }
@@ -831,7 +771,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             generateRulesrecursively();
             rulesCounter = -1;
             // actions
-            console.log("The current trigger is ", currenTrigger)
             const actionNodes: Array<FlowElement> = currenTrigger?.actions?.map((action: ActionModel) => {
                 const actionNodeId: string = `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`;
                 const properties: { position: { x: number, y: number } } = convertStringToJson(action.properties || "")
@@ -883,7 +822,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     }
                 },
             };
-            console.log("The actions is ", triggerProperties);
             setElements((es) => es.concat([triggerNodes, ...actionNodes, ...ruleNodes, ...edgeNodes]));
         }
     }, [currenTrigger])

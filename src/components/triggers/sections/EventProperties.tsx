@@ -31,7 +31,6 @@ interface EventPropertiesProps {
 const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesProps): React.ReactElement<void> => {
     const isRuleEdge: boolean = React.useMemo(() => {
         const firstWord: string = props.element?.source?.split("-")[0];
-        console.log("The element is ", props.element?.target)
         const targetWord: string = props.element?.target?.split("-")[0];
         return (
             firstWord === "string" ||
