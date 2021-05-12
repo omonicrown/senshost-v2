@@ -98,23 +98,6 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
         filterItems: filters,
     }), [filters]);
 
-    const primaryButton: PrimaryActionButton = React.useMemo(() => ({
-        label: "View",
-        onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, selectedRow: TableRow) => {
-            setAction({
-                accountId: selectedRow['accountId'],
-                name: selectedRow["name"],
-                type: selectedRow["type"],
-                id: selectedRow["id"],
-                creationDate: selectedRow["creationDate"],
-                properties: selectedRow["properties"]
-            });
-
-            setActionViewModalProps({ ...actionViewModalProps, toggle: true })
-        },
-    }), [actionViewModalProps]);
-
-
     const actionLinks: Array<ActionLinkItem> = React.useMemo(() => [
         {
             label: "Edit", onClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, selectedRow: TableRow) => {
@@ -267,7 +250,6 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
             }
             return { ...filterItem, filters: [] };
         });
-        console.log("Tabe kwari ", updatedFilterItems)
         setFilters(updatedFilterItems);
     }, [selectedType, setFilters]);
 
@@ -294,7 +276,6 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
                                     data={data}
                                     offset={configs.tablePageSize}
                                     currentpage={paginationValue}
-                                    primaryActionButton={primaryButton}
                                     filterProps={filterProps}
                                     actionLinks={actionLinks}
                                     footer={data?.length ?
