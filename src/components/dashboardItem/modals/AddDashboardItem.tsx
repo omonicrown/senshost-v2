@@ -6,8 +6,8 @@ import { StepTracker } from "@sebgroup/react-components/dist/StepTracker";
 
 import React from "react";
 import { ChartType, DASHBOARDITEMTYPES } from "../../../constants";
-import { DashboardItemModel, DeviceModel } from "../../../interfaces/models";
-import { AuthState, DeviceState, States } from "../../../interfaces/states";
+import { DashboardItemModel } from "../../../interfaces/models";
+import { AuthState } from "../../../interfaces/states";
 import { icontypesEnum, SvgElement } from "../../../utils/svgElement";
 
 import DataSourcesSection from "./sections/DataSources";
@@ -16,7 +16,6 @@ import DashabordItemSummarySection from "./sections/DashboardItemSummary";
 import { DashboardApis } from "../../../apis/dashboardApis";
 import { AxiosResponse } from "axios";
 import { convertStringToJson } from "../../../utils/functions";
-import { useSelector } from "react-redux";
 import { RuleDataSouceTypeEnums } from "../../../enums";
 
 export interface DashboardPropertiesOptions {

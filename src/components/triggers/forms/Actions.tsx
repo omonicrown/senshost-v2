@@ -40,11 +40,6 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
         value: "NEW",
     }], []);
 
-
-    const handleActionTypeChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setActionType(event?.target?.value as "NEW" | "EXISTING");
-    }, [setActionType]);
-
     const handleActionsDropDownChange = React.useCallback((value: DropdownItem) => {
         const action: ActionModel = actions?.find((ruleAction: ActionModel) => ruleAction?.id === value?.value);
 
