@@ -414,6 +414,26 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     }, [selectedElement, setElements]);
 
 
+    const handleActionStatusChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            actions: {
+                                ...el.data.nodeControls.actions,
+                                actionStatus: event?.target?.value as "NEW" | "EXISTING"
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
+
     const handleActionsTextChange = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setElements((els: Elements) =>
             els.map((el: FlowElement & Edge) => {
@@ -871,6 +891,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                             handleActionsDropdownChange={handleActionsDropDownChange}
                             handleActionsPropertyTextChange={handleActionsPropertyTextChange}
                             handleActionsTextChange={handleActionsTextChange}
+                            handleActionStatusChange={handleActionStatusChange}
                         />
                     </ReactFlowProvider>
                 </div>

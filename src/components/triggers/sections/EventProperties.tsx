@@ -26,6 +26,7 @@ interface EventPropertiesProps {
     handleActionsPropertyDropdownChange: (value: DropdownItem, type: "httpMethod") => void;
     handleActionsTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
     handleActionsPropertyTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
+    handleActionStatusChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesProps): React.ReactElement<void> => {
@@ -99,6 +100,7 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
                 handleActionsPropertyDropdownChange={props.handleActionsPropertyDropdownChange}
                 handleActionsTextChange={props.handleActionsTextChange}
                 handleActionsPropertyTextChange={props.handleActionsPropertyTextChange}
+                handleActionStatusChange={props.handleActionStatusChange}
             />}
         </aside>
     );

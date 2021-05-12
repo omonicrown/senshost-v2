@@ -19,6 +19,7 @@ interface ActionsFormProps {
     handleActionsPropertyDropdownChange: (value: DropdownItem, type: "httpMethod") => void;
     handleActionsTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
     handleActionsPropertyTextChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
+    handleActionStatusChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
@@ -87,6 +88,8 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
             label: element?.data?.nodeControls?.actions?.action?.name,
             value: element?.data?.nodeControls?.actions?.action?.id
         } as DropdownItem);
+
+        setActionType(element?.data?.nodeControls?.actions?.actionStatus || actionType);
     }, [props.selectedElement, props.elements]);
 
     return (
@@ -101,7 +104,7 @@ const ActionsForm: React.FC<ActionsFormProps> = (props: ActionsFormProps) => {
                     value={actionType}
                     condensed
                     list={list}
-                    onChange={handleActionTypeChange}
+                    onChange={props.handleActionStatusChange}
                 />
             </div>
             {actionType === "EXISTING" &&
