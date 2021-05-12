@@ -16,6 +16,14 @@ export function covertDateTimeField(date: Date | string): string {
   return date as string;
 }
 
+export function formatDateTime(date: Date | string, format?: string) {
+  if(date) {
+    return dayjs(date).format(format || "DD/MM/YYYY");
+  }
+
+  return date;
+}
+
 export function convertStringToJson<T>(strValue: string): T {
   try {
     return JSON.parse(strValue);

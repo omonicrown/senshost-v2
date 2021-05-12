@@ -27,6 +27,7 @@ import { History, Location } from "history";
 import { icontypesEnum, SvgElement } from "../../utils/svgElement";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
 import PageTitle from "../shared/PageTitle";
+import { formatDateTime } from "../../utils/functions";
 
 
 export interface DashboardProps extends SharedProps {
@@ -259,7 +260,7 @@ const Dashboard: React.FunctionComponent<DashboardProps> = React.memo((props: Da
                                     </div>
                                 </div>
                                 <div className="card-footer text-muted">
-                                    Last received date: {localDashboard.creationDate}
+                                    Last received date: {formatDateTime(localDashboard.creationDate)}
                                 </div>
                             </div>
                         ) :

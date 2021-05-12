@@ -276,7 +276,7 @@ export const ACTIONTYPES: Array<DropdownItem> = [
         value: 2
     },
     {
-        label: "Sms",
+        label: "SMS",
         value: 3
     }
 ];

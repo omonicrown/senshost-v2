@@ -30,6 +30,7 @@ import { History } from "history";
 import { AppRoutes } from "../../enums/routes";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
 import PageTitle from "../shared/PageTitle";
+import { formatDateTime } from "../../utils/functions";
 
 export interface GroupsProps extends SharedProps {
 }
@@ -105,7 +106,7 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
   // memos
   const data: Array<DataItem> = React.useMemo(() => groups?.map((group: GroupModel) => {
     const newGroup: string = statuses?.find((item: DropdownItem) => item?.value === group.status)?.label;
-    return ({ ...group, statusType: newGroup, account: authState?.auth?.account?.name });
+    return ({ ...group, statusType: newGroup, account: authState?.auth?.account?.name, creationDate: formatDateTime(group.creationDate) });
   }), [groups, statuses]);
 
   const columns: Array<Column> = React.useMemo((): Array<Column> => [

@@ -345,7 +345,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         );
     }, [selectedElement, setElements]);
 
-    const handleActionsDropDownChange = React.useCallback((value: DropdownItem | ActionModel, field: "action" | "actionType") => {
+    const handleActionsDropDownChange = React.useCallback((value: DropdownItem & ActionModel, field: "action" | "actionType") => {
         switch (field) {
             case "action": {
                 setElements((els: Elements) =>
@@ -357,7 +357,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                     ...el.data.nodeControls,
                                     actions: {
                                         ...el.data.nodeControls.actions,
-                                        action: value
+                                        action: value?.id ? value : value?.value
                                     }
                                 }
                             };
@@ -402,7 +402,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 ...el.data.nodeControls.actions,
                                 newAction: {
                                     ...el.data.nodeControls.actions.newAction,
-                                    property: { ...el.data.nodeControls.actions.newAction.property, [type]: value }
+                                    property: { ...el.data.nodeControls.actions.newAction.property, [type]: value?.value }
                                 }
                             }
                         }
@@ -824,11 +824,11 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             };
             setElements((es) => es.concat([triggerNodes, ...actionNodes, ...ruleNodes, ...edgeNodes]));
         }
-    }, [currenTrigger])
+    }, [currenTrigger]);
 
     return (
         <div className="rules-container">
-            <PageTitle title="Rules engine">
+            <PageTitle title={`${currenTrigger?.name ? currenTrigger?.name : ''} Rules engine`}>
                 <Button label="Save" id="saveBtn" size="sm" theme="outline-primary" title="Add" onClick={handleSave} />
             </PageTitle>
             <div className="rules-holder">

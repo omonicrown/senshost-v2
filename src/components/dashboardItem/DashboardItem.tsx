@@ -23,6 +23,7 @@ import AddDashboardItem from "./modals/AddDashboardItem";
 
 import CardAction from './modals/CardAction';
 import { Loader } from '@sebgroup/react-components/dist/Loader';
+import { formatDateTime } from '../../utils/functions';
 
 
 const DashboardItem: React.FC = () => {
@@ -199,7 +200,7 @@ const DashboardItem: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="card-footer text-muted">
-                                            Last received date: {dashboardItem?.creationDate}
+                                            Last received date: {formatDateTime(dashboardItem?.creationDate)}
                                         </div>
                                     </div>
                                 ) :
