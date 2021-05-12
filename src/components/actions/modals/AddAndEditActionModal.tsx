@@ -145,11 +145,10 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
     }, [property]);
 
     React.useEffect(() => {
-        if (props?.action) {
+        if (props?.action?.id) {
             const updatedProperty: PropertyProps = convertStringToJson(props?.action?.properties);
             const selectedMethod: DropdownItem = httpMethods?.find((method: DropdownItem) => method?.value === updatedProperty?.httpMethod);
             const type: DropdownItem = props.actionTypes?.find((type: DropdownItem) => type?.value === props?.action?.type);
-
             setSelectedHttpMethod(selectedMethod);
             setSelectedType(type);
             setProperty({
