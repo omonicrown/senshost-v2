@@ -74,7 +74,6 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
             error = { ...error, actionType: "Action type is required" };
         }
 
-        console.log("Its doing Mqtt Publish " + selectedType?.value, action)
         switch (action?.type) {
             case TriggerActionType.RestServiceAction: {
                 if (!property?.body) {
@@ -123,7 +122,7 @@ const AddAndEditActionModal: React.FC<AddAndEditActionModalProps> = (props: AddA
         }
         if (!error) {
             const updatedProperty: string = JSON.stringify(property)
-          //  props?.onSave(e, { ...action, properties: updatedProperty });
+            props?.onSave(e, { ...action, properties: updatedProperty });
         }
         setActionError(error);
 
