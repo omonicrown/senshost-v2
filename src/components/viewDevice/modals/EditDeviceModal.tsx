@@ -1,8 +1,7 @@
 import { Button } from "@sebgroup/react-components/dist/Button";
 import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
-import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import React from "react";
 import { DeviceApis } from "../../../apis/deviceApis";
 import { DEVICETYPES } from "../../../constants";
@@ -13,6 +12,7 @@ export interface DeviceError {
     name?: string;
     type: string;
 }
+
 interface EditDeviceModalProps {
     device: DeviceModel;
     handleSubmitUpdateDevice: (device: DeviceModel) => void;

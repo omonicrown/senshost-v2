@@ -9,9 +9,9 @@ import { Modal, ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 
 import { States, AuthState } from "../../interfaces/states";
 import { useSelector, useDispatch } from "react-redux";
-import { AxiosResponse, AxiosError } from "axios";
+import { AxiosResponse } from "axios";
 import { ActionModel } from "../../interfaces/models";
-import { Column, Table, DataItem, TableRow, TableHeader, PrimaryActionButton, FilterProps, FilterItem, ActionLinkItem } from "@sebgroup/react-components/dist/Table/Table";
+import { Column, Table, DataItem, TableRow, TableHeader, FilterProps, FilterItem, ActionLinkItem } from "@sebgroup/react-components/dist/Table/Table";
 import { DropdownItem, Dropdown } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import configs from "../../configs";
 import { Button } from "@sebgroup/react-components/dist/Button";
@@ -21,9 +21,7 @@ import { ACTIONTYPES, initialState } from "../../constants";
 import { toggleNotification } from "../../actions";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 
-import { useHistory } from "react-router";
 import { Dispatch } from "redux";
-import { History } from "history";
 import PageTitle from "../shared/PageTitle";
 import { ActionApis } from "../../apis/actionApis";
 

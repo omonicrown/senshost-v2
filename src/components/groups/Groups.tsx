@@ -23,11 +23,11 @@ import { initialState } from "../../constants";
 import { toggleNotification } from "../../actions";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 
-import GroupDetails from "./modals/GroupDetails";
+import GroupDetails from "./GroupDetails";
 import { useHistory } from "react-router";
 import { Dispatch } from "redux";
 import { History } from "history";
-import { AppRoutes } from "../../enums/routes";
+import { AppRoutes, GroupRoutes } from "../../enums/routes";
 import { Loader } from "@sebgroup/react-components/dist/Loader";
 import PageTitle from "../shared/PageTitle";
 import { formatDateTime } from "../../utils/functions";
@@ -61,17 +61,9 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
   const primaryButton: PrimaryActionButton = React.useMemo(() => ({
     label: "View",
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, selectedRow: TableRow) => {
-      setGroup({
-        accountId: selectedRow['accountId'],
-        name: selectedRow["name"],
-        status: selectedRow["status"],
-        id: selectedRow["id"],
-        creationDate: selectedRow["creationDate"]
-      });
-
-      setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: true })
+      history.push(GroupRoutes.ViewGroupdetails.toString().replace(":groupId", selectedRow["id"]));
     },
-  }), [setGroup, setGroupDetailsModalProps]);
+  }), []);
 
 
   const actionLinks: Array<ActionLinkItem> = React.useMemo(() => [
@@ -232,15 +224,6 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
     setGroup({ name: "", id: null } as GroupModel);
   }, [modalProps, setGroup]);
 
-  const onCancelGroupDetailModal = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: false });
-  }, [groupDetailsModalProps]);
-
-  const onDismissViewGroupDetail = React.useCallback(() => {
-    setGroup({ name: "", id: null } as GroupModel);
-    setGroupDetailsModalProps({ ...groupDetailsModalProps, toggle: false });
-  }, [setGroupDetailsModalProps, setGroup]);
-
   const onDismissGroupModal = React.useCallback(() => {
     setGroup({ name: "", id: null } as GroupModel);
     setModalProps({ ...modalProps, toggle: false });
@@ -346,20 +329,6 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
                 onCancel={onCancel}
                 loading={loading}
                 group={group} />
-              : null
-          }
-        />
-        <Modal
-          {...groupDetailsModalProps}
-          onDismiss={onDismissViewGroupDetail}
-          header={groupDetailsModalProps?.toggle ? <h3>Group: {group?.name}'s Users</h3> : null}
-          body={
-            groupDetailsModalProps ?
-              <GroupDetails
-                onCancel={onCancelGroupDetailModal}
-                group={group}
-                toggle={groupDetailsModalProps?.toggle}
-              />
               : null
           }
         />

@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React from "react";
 import { Image } from "@sebgroup/react-components/dist/Image";
 import { AppRoutes } from "../../enums/routes";
 import { SharedProps } from "../home/Home";

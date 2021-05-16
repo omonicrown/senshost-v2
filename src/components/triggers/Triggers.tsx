@@ -4,14 +4,14 @@ import { useHistory } from "react-router";
 import { History } from "history";
 import { SharedProps } from "../home/Home";
 import PageTitle from "../shared/PageTitle";
-import { HomeRoutes, TriggerRoutes } from "../../enums/routes";
+import { TriggerRoutes } from "../../enums/routes";
 import { Table } from "@sebgroup/react-components/dist/Table";
 import { ActionLinkItem, Column, DataItem, TableHeader, TableRow } from "@sebgroup/react-components/dist/Table/Table";
 import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 import { TriggerApis } from "../../apis/triggerApis";
 import { AuthState, States } from "../../interfaces/states";
 import { useSelector } from "react-redux";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { TriggerModel } from "../../interfaces/models";
 import configs from "../../configs";
 import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
@@ -101,7 +101,7 @@ const Triggers: React.FunctionComponent<TriggersProps> = (props: TriggersProps):
             <div className="triggers-holder">
                 <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
                     <div />
-                    <Button label="Add" size="sm" id="addTriggerBtn" theme="outline-primary" title="Add" onClick={handleAddTrigger} />
+                    <Button label="Add" size="sm" id="addTriggerBtn" disabled={loading} theme="outline-primary" title="Add" onClick={handleAddTrigger} />
                 </div>
                 <div className="row">
                     <div className="col">

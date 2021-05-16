@@ -103,7 +103,7 @@ const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Rea
     if (option) {
       setSelectedOption(option?.properties)
     }
-  }, [options]);
+  }, [options, props.type]);
 
   React.useEffect(() => {
     const updatedOptions: Array<ChartOption> = options.map((option: ChartOption) => {
@@ -115,7 +115,7 @@ const Tank: React.FunctionComponent<GaugeProps> = (props: GaugeProps): React.Rea
       }
 
       return option;
-    }, [props.type]);
+    }, [props.type, options]);
 
     setOptions(updatedOptions);
   }, [props.type, props.data]);

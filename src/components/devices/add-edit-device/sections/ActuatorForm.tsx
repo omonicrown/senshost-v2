@@ -1,11 +1,9 @@
 import React from "react";
-import { TextBoxGroup } from "@sebgroup/react-components/dist/TextBoxGroup";
 import { DeviceModel, ActuatorModel } from "../../../../interfaces/models";
-import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
-import { ACTUATORS, ACTUATORCOLUMNS } from "../../../../constants";
-import { Button } from "@sebgroup/react-components/dist/Button";
+import { DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
+import { ACTUATORCOLUMNS } from "../../../../constants";
 import { Table } from "@sebgroup/react-components/dist/Table";
-import { TableHeader, PrimaryActionButton, TableRow, DataItem } from "@sebgroup/react-components/dist/Table/Table";
+import { TableHeader, PrimaryActionButton, TableRow } from "@sebgroup/react-components/dist/Table/Table";
 import ActuatorFormAddAndEditForm from "../../../shared/ActuatorAddAndEditForm";
 
 interface ActuatorFormProps {

@@ -463,7 +463,7 @@ export const initialState: ModalProps = {
     toggle: false,
     fullscreen: false,
     position: null,
-    centered: true,
+    centered: false,
     size: null,
     disableBackdropDismiss: true,
     onDismiss: null

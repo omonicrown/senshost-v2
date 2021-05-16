@@ -1,7 +1,7 @@
 import React from "react";
 import { RouteComponentProps, Switch, Redirect } from "react-router";
 import { AppRoute } from "../../utils/functions";
-import { HomeRoutes, AppRoutes, ViewDeviceRoutes, TriggerRoutes } from "../../enums/routes";
+import { HomeRoutes, AppRoutes, ViewDeviceRoutes, TriggerRoutes, GroupRoutes } from "../../enums/routes";
 import { History } from "history";
 
 import SidebarComponent from "../shared/Sidebar";
@@ -29,6 +29,8 @@ const Dashbaord: React.LazyExoticComponent<React.FC<DashboardProps>> = React.laz
 const DashbaordItem: React.LazyExoticComponent<React.FC<DashboardProps>> = React.lazy(() => import("../dashboardItem/DashboardItem"));
 
 const Groups: React.LazyExoticComponent<React.FC<GroupsProps>> = React.lazy(() => import("../groups/Groups"));
+const GroupDetails: React.LazyExoticComponent<React.FC> = React.lazy(() => import("../groups/GroupDetails"));
+
 const Users: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../users/Users"));
 const Actions: React.LazyExoticComponent<React.FC<UsersProps>> = React.lazy(() => import("../actions/Actions"));
 const Triggers: React.LazyExoticComponent<React.FC<TriggersProps>> = React.lazy(() => import("../triggers/Triggers"));
@@ -129,9 +131,14 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
 
                 <AppRoute
                   path={HomeRoutes.Groups.toString()}
+                  exact={true}
                   component={Groups}
                 />
-
+                <AppRoute
+                  path={GroupRoutes.ViewGroupdetails.toString()}
+                  exact={true}
+                  component={GroupDetails}
+                />
                 <AppRoute path={HomeRoutes.Users.toString()} component={Users} />
 
                 <AppRoute path="*" component={NotFound} props={props} />

@@ -1,9 +1,8 @@
 import { Dropdown, DropdownItem } from "@sebgroup/react-components/dist/Dropdown/Dropdown";
 import { RadioGroup } from "@sebgroup/react-components/dist/RadioGroup";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import React from "react";
 import { useSelector } from "react-redux";
-import { DeviceApis } from "../../../../apis/deviceApis";
 import { SensorApis } from "../../../../apis/sensorApis";
 import { DeviceDataSourceEnums } from "../../../../enums";
 import { DeviceModel, SensorModel } from "../../../../interfaces/models";

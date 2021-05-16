@@ -22,6 +22,10 @@ export enum TriggerRoutes {
     CreateTrigger = HomeRoutes.Triggers + "/create"
 }
 
+export enum GroupRoutes {
+    ViewGroupdetails = HomeRoutes.Groups + "/:groupId"
+}
+
 export enum ViewDeviceRoutes {
     ViewDevice = HomeRoutes.Devices + "/:deviceId",
 }

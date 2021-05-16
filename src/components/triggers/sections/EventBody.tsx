@@ -15,7 +15,6 @@ import ReactFlow, {
     updateEdge,
     FlowElement,
     Edge,
-    Position,
     getOutgoers,
     Node,
     getConnectedEdges
@@ -25,7 +24,7 @@ import { match, useHistory, useRouteMatch } from "react-router";
 import { Dispatch } from "redux";
 import { toggleNotification } from "../../../actions";
 import { TriggerApis } from "../../../apis/triggerApis";
-import { RuleDataSouceTypeEnums, RuleTriggerTypes, RuleTypeEnums, TriggerDataSourceTypeEnums } from "../../../enums";
+import { RuleDataSouceTypeEnums, RuleTriggerTypes, RuleTypeEnums } from "../../../enums";
 import { TriggerActionType } from "../../../enums/status";
 import { ActionModel, RuleModel, TriggerModel } from "../../../interfaces/models";
 import { AuthState, States } from "../../../interfaces/states";

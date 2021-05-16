@@ -55,7 +55,7 @@ const ViewDevice: React.FunctionComponent<ViewDeviceProps> = (props: ViewDeviceP
 
     const history: History = useHistory();
 
-    const match: match = useRouteMatch();
+    const match: match<{ deviceId: string }> = useRouteMatch();
 
     // immutable props --------------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ const ViewDevice: React.FunctionComponent<ViewDeviceProps> = (props: ViewDeviceP
                 setModalDeleteSensorProps({ ...modalDeleteActuatorProps, toggle: true });
             }
         },
-    ], [sensor, modalDeleteSensorProps, modalEditSensorModalProps]);
+    ], [sensor, modalDeleteSensorProps, modalEditSensorModalProps, modalDeleteActuatorProps, modalEditActuatorModalProps]);
 
     const actuatorsActionLinks: Array<ActionLinkItem> = React.useMemo(() => [
         {
@@ -292,7 +292,7 @@ const ViewDevice: React.FunctionComponent<ViewDeviceProps> = (props: ViewDeviceP
     // effects
 
     React.useEffect(() => {
-        const deviceId: string = match?.params["deviceId"];
+        const deviceId: string = match?.params.deviceId;
         DeviceApis.getDeviceById(deviceId)
             .then((response: AxiosResponse<DeviceModel>) => {
                 if (response?.data) {
