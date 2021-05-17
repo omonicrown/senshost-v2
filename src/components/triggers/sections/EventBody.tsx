@@ -693,7 +693,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                         trigger: {},
                                         rules: {
                                             device: recursiveRule?.and.deviceId,
-                                            dataFieldSourceType: (RuleDataSouceTypeEnums[recursiveRule?.and.dataFieldSourceType].toString() === RuleDataSouceTypeEnums.device.toString()) ? "device" : "aggregatedField",
+                                            dataFieldSourceType: (RuleDataSouceTypeEnums[recursiveRule?.and.dataFieldSourceType]?.toString() === RuleDataSouceTypeEnums.device.toString()) ? "device" : "aggregatedField",
                                             sensor: recursiveRule?.and.fieldId,
                                             deviceSource: recursiveRule?.and.fieldId ? "sensor" : "attribute",
                                             operator: recursiveRule?.and.operator,
