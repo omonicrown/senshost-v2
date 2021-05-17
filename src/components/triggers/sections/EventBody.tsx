@@ -60,10 +60,30 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
     const [loading, setLoading] = React.useState<boolean>(false);
     // gets called after end of edge gets dragged to another source or target
 
-    const onEdgeUpdate = (oldEdge, newConnection) =>
-        setElements((els) => updateEdge(oldEdge, newConnection, els));
+    const onEdgeUpdate = (oldEdge, newConnection) => {
+        return setElements((els) => updateEdge(oldEdge, newConnection, els));
+    }
 
-    const onConnect = (params) => setElements((els: Elements) => addEdge(params, els));
+    const onConnect = (params: Edge) => setElements((els: Elements) => {
+        const target: string = params?.target?.split("-")[0];
+        const source: string = params?.source?.split("-")[0];
+
+        const isRuleEdgeTarget = (
+            target === "string" ||
+            target === "number" ||
+            target === "time"
+        );
+        const isRuleEdgeSource = (
+            source === "string" ||
+            source === "number" ||
+            source === "time"
+        )
+        return addEdge((isRuleEdgeTarget && isRuleEdgeSource) ? {
+            ...params,
+            data: { lineType: "AND" },
+            label: "AND"
+        } : params, els);
+    });
 
     const onElementsRemove = React.useCallback((elementsToRemove: Elements) => {
         setSelectedElement(null);
@@ -304,6 +324,28 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
         );
     }, [selectedElement, setElements]);
 
+    const handleRuleTitleValueChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setElements((els: Elements) =>
+            els.map((el: FlowElement & Edge) => {
+                if (el.id === selectedElement.id) {
+                    el.data = {
+                        ...el.data,
+                        label: event.target.value,
+                        nodeControls: {
+                            ...el.data.nodeControls,
+                            rules: {
+                                ...el.data.nodeControls.rules,
+                                [event.target.name]: event.target.value
+                            }
+                        }
+                    };
+                }
+                return el;
+            })
+        );
+    }, [selectedElement, setElements]);
+
+
     const handleRuleOperatorValueChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setElements((els: Elements) =>
             els.map((el: FlowElement & Edge) => {
@@ -542,54 +584,134 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             rule: null,
             actions
         };
-        const firstRuleNode: Node = getOutgoers(selectedTrigger as Node, elements)[0];
+        const firstRuleNode: Node = getOutgoers((selectedTrigger || {}) as Node, elements)[0];
         let updatedRule: RuleModel;
+
         const edges: Array<Edge> = getConnectedEdges(rulesNodes as Array<Node>, edgesNodes);
 
         for (let rule of rulesNodes) {
-            const generateRule = (recursiveRuleRule?: RuleModel) => {
-                const nextNextRule: Node = getOutgoers(rule as Node, elements)[0];
-                const selectedEdge: Edge = edges?.find((edge: Edge) => edge?.target === rule?.id);
-                const firstWord: string = updatedRule ? nextNextRule?.id.split("-")[0] : firstRuleNode?.id.split("-")[0]
+            const outgoingRules: Array<Node> = getOutgoers(rule as Node, elements);
+
+            const generateRule = (recursiveRuleRule?: RuleModel, sourceId?: string) => {
                 if (recursiveRuleRule?.and || recursiveRuleRule?.or) {
                     if (recursiveRuleRule?.and) {
                         generateRule(recursiveRuleRule?.and);
-                    } else {
+                    }
+                    if (recursiveRuleRule?.or) {
                         generateRule(recursiveRuleRule?.or);
                     }
                 } else if (!updatedRule) {
-                    const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = firstRuleNode?.data.nodeControls.rules.type
+                    const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = firstRuleNode?.data.nodeControls.rules.type;
+                    const nextNextRule: Node = outgoingRules[0];
+                    const firstWord: string = updatedRule ? nextNextRule?.id.split("-")[0] : firstRuleNode?.id.split("-")[0]
+
                     updatedRule = {
+                        nodeId: firstRuleNode?.id,
                         title: firstRuleNode?.data.nodeControls.rules?.title,
                         fieldId: firstRuleNode?.data.nodeControls.rules.sensor,
                         deviceId: firstRuleNode?.data.nodeControls.rules.device,
                         operator: firstRuleNode?.data.nodeControls.rules.operator,
                         ruleType: RuleTypeEnums[firstWord],
                         dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
-                        value: firstRuleNode?.data.nodeControls.rules?.operatorValue,
+                        value: JSON.stringify({
+                            candence: firstRuleNode?.data.nodeControls.rules?.cadence,
+                            value: firstRuleNode?.data.nodeControls.rules?.operatorValue
+                        }),
                         properties: JSON.stringify({ position: (firstRuleNode as Node)?.position }),
                         and: null,
                         or: null
                     } as RuleModel;
+
+                    for (let outgoingRule of outgoingRules) {
+                        const selectedEdge: Edge = edges?.find((edge: Edge) => edge?.target === outgoingRule?.id);
+                        const firstWordDefault: string = outgoingRule?.id.split("-")[0];
+                        const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = outgoingRule?.data.nodeControls.rules.type;
+                        if (selectedEdge?.data?.lineType === "OR") {
+                            updatedRule['or'] = {
+                                nodeId: outgoingRule?.id,
+                                title: outgoingRule?.data.nodeControls.rules?.title,
+                                fieldId: outgoingRule?.data.nodeControls.rules.sensor,
+                                deviceId: outgoingRule?.data.nodeControls.rules.device,
+                                operator: outgoingRule?.data.nodeControls.rules.operator,
+                                ruleType: RuleTypeEnums[firstWordDefault],
+                                dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
+                                value: JSON.stringify({
+                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    value: outgoingRule?.data.nodeControls.rules?.operatorValue
+                                }),
+                                properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
+                                and: null,
+                                or: null
+                            };
+                        } else if (selectedEdge?.data?.lineType === "AND") {
+                            updatedRule['and'] = {
+                                nodeId: outgoingRule?.id,
+                                title: outgoingRule?.data.nodeControls.rules?.title,
+                                fieldId: outgoingRule?.data.nodeControls.rules.sensor,
+                                deviceId: outgoingRule?.data.nodeControls.rules.device,
+                                operator: outgoingRule?.data.nodeControls.rules.operator,
+                                ruleType: RuleTypeEnums[firstWordDefault],
+                                dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
+                                value: JSON.stringify({
+                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    value: outgoingRule?.data.nodeControls.rules?.operatorValue
+                                }),
+                                properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
+                                and: null,
+                                or: null
+                            };
+                        }
+                    }
+
                 } else {
-                    const firstWordDefault: string = rule?.id.split("-")[0];
-                    const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = rule?.data.nodeControls.rules.type
-                    recursiveRuleRule[`${selectedEdge?.label === 'OR' ? 'or' : 'and'}`] = {
-                        title: rule?.data.nodeControls.rules?.title,
-                        fieldId: rule?.data.nodeControls.rules.sensor,
-                        deviceId: rule?.data.nodeControls.rules.device,
-                        operator: rule?.data.nodeControls.rules.operator,
-                        ruleType: RuleTypeEnums[firstWordDefault],
-                        dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
-                        value: rule?.data.nodeControls.rules?.operatorValue,
-                        properties: JSON.stringify({ position: (rule as Node)?.position }),
-                        and: null,
-                        or: null
-                    };
+                    for (let outgoingRule of outgoingRules) {
+                        const selectedEdge: Edge = edges?.find((edge: Edge) => edge?.target === outgoingRule?.id && edge?.source === recursiveRuleRule?.nodeId);
+
+                        const firstWordDefault: string = outgoingRule?.id.split("-")[0];
+                        const nodeDatasourceType: keyof typeof RuleDataSouceTypeEnums = outgoingRule?.data.nodeControls.rules.type
+                        if (selectedEdge?.data?.lineType === "OR") {
+                            recursiveRuleRule['or'] = {
+                                nodeId: outgoingRule?.id,
+                                title: outgoingRule?.data.nodeControls.rules?.title,
+                                fieldId: outgoingRule?.data.nodeControls.rules.sensor,
+                                deviceId: outgoingRule?.data.nodeControls.rules.device,
+                                operator: outgoingRule?.data.nodeControls.rules.operator,
+                                ruleType: RuleTypeEnums[firstWordDefault],
+                                dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
+                                value: JSON.stringify({
+                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    value: outgoingRule?.data.nodeControls.rules?.operatorValue
+                                }),
+                                properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
+                                and: null,
+                                or: null
+                            };
+                        } else if (selectedEdge?.data?.lineType === "AND") {
+                            recursiveRuleRule['and'] = {
+                                nodeId: outgoingRule?.id,
+                                title: outgoingRule?.data.nodeControls.rules?.title,
+                                fieldId: outgoingRule?.data.nodeControls.rules.sensor,
+                                deviceId: outgoingRule?.data.nodeControls.rules.device,
+                                operator: outgoingRule?.data.nodeControls.rules.operator,
+                                ruleType: RuleTypeEnums[firstWordDefault],
+                                dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
+                                value: JSON.stringify({
+                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    value: outgoingRule?.data.nodeControls.rules?.operatorValue
+                                }),
+                                properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
+                                and: null,
+                                or: null
+                            };
+                        }
+                    }
+
                 }
-            };
+            }
+
             generateRule(updatedRule);
         }
+
         trigger = { ...trigger, rule: updatedRule };
 
         setLoading(true);
@@ -706,7 +828,9 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 }
                             });
                             generateRulesrecursively(recursiveRule?.and);
-                        } else {
+                        }
+
+                        if (recursiveRule?.or) {
                             const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.or?.ruleType)}-${recursiveRule?.or.id}`;
                             const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.or.properties || "");
                             edgeNodes.push({
@@ -880,6 +1004,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                             handleTriggerTextChange={handleTriggerTextChange}
                             loading={loading}
                             handleRuleOperatorValueChange={handleRuleOperatorValueChange}
+                            handleRuleTitleValueChange={handleRuleTitleValueChange}
                             elements={elements}
                             handleEdgeChange={handleEdgeChange}
                             handleRulesDropDownChange={handleRulesDropDownChange}

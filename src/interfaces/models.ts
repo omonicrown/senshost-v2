@@ -30,6 +30,7 @@ export interface RuleModel {
     creationDate?: Date;
     and?: RuleModel;
     or?: RuleModel;
+    nodeId?: string;
 }
 export interface TriggerModel {
     name: string;

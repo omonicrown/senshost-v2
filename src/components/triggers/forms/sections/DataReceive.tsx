@@ -13,7 +13,6 @@ interface DataReceivedProps {
     handleTriggerDropDownChange: (value: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => void;
 }
 const DataReceived: React.FC<DataReceivedProps> = (props: DataReceivedProps): React.ReactElement<void> => {
-    console.log("The coming values are ", props.trigger)
     return (
         <React.Fragment>
             <div className="row">

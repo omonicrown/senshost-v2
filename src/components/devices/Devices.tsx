@@ -26,6 +26,7 @@ import { useHistory } from "react-router";
 import { History } from "history";
 import { AppRoutes, ViewDeviceRoutes } from "../../enums/routes";
 import PageTitle from "../shared/PageTitle";
+import { receiveDevices } from "../../actions/deviceActions";
 
 export interface DevicesProps extends SharedProps {
   onToggle: (value: boolean) => void;
@@ -33,7 +34,8 @@ export interface DevicesProps extends SharedProps {
 
 const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): React.ReactElement<void> => {
   const [paginationValue, setPaginationValue] = React.useState<number>(1);
-  const [devices, setDevices] = React.useState<Array<DeviceModel>>(null);
+
+
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const [paginationSize, setPaginationSize] = React.useState<number>(0);
@@ -52,6 +54,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
   }), [history]);
 
   // actions
+  const { devices } = useSelector((states: States) => states?.devices);
   const authState: AuthState = useSelector((states: States) => states?.auth);
   const dispatch: Dispatch = useDispatch();
 
@@ -121,7 +124,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
         dispatch(toggleNotification(notification));
 
-        setDevices([...devices, response.data]);
+        dispatch(receiveDevices([...devices, response.data]));
 
         setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
       }
@@ -131,7 +134,7 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
       setLoading(false);
     });
 
-  }, [toggleAddDeviceModal, setDevices, devices, dispatch, setToggleAddDeviceModal, toggleNotification]);
+  }, [toggleAddDeviceModal, devices, dispatch, setToggleAddDeviceModal, toggleNotification]);
 
   const onDismissModal = React.useCallback(() => {
     setToggleAddDeviceModal({ ...toggleAddDeviceModal, toggle: false });
@@ -161,16 +164,8 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
 
 
   React.useEffect(() => {
-    DeviceApis.getDevicesByAccount(authState?.auth?.account?.id)
-      .then((response: AxiosResponse<Array<DeviceModel>>) => {
-        if (response?.data) {
-          setDevices(response?.data || []);
-          setPaginationSize(response?.data?.length);
-        }
-      }).catch((error: AxiosError) => {
-        setDevices([]);
-      });
-  }, []);
+    setPaginationSize(devices?.length);
+  }, [devices]);
 
   return (
     <div className="device-container">

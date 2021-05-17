@@ -21,6 +21,7 @@ interface EventPropertiesProps {
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerStartDateChange: (value: Date) => void;
     handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleRuleTitleValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 
     handleActionsDropdownChange: (value: DropdownItem | ActionModel, field: "action" | "actionType") => void;
     handleActionsPropertyDropdownChange: (value: DropdownItem, type: "httpMethod") => void;
@@ -86,6 +87,7 @@ const EventProperties: React.FC<EventPropertiesProps> = (props: EventPropertiesP
             {isRuleEdge && <LineForm loading={props.loading} elements={props.elements} handleEdgeChange={props.handleEdgeChange} selectedElement={props.element} />}
             {isRuleNode && <RuleForm
                 handleRuleOperatorValueChange={props.handleRuleOperatorValueChange}
+                handleRuleTitleValueChange={props.handleRuleTitleValueChange}
                 loading={props.loading}
                 handleRulesDropDownChange={props.handleRulesDropDownChange}
                 elements={props.elements}

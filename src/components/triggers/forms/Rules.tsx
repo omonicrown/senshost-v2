@@ -21,6 +21,7 @@ interface RulesFormProps {
     elements: Elements;
     handleDataSourceChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleRuleOperatorValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleRuleTitleValueChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface DataSourceProps {
@@ -130,7 +131,7 @@ const RulesForm: React.FC<RulesFormProps> = (props: RulesFormProps): React.React
                     label="Title"
                     placeholder="Title"
                     value={dataSource?.title || ""}
-                    onChange={props.handleRuleOperatorValueChange}
+                    onChange={props.handleRuleTitleValueChange}
                     disabled={props.loading}
                 />
             </div>
