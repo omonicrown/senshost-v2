@@ -794,6 +794,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         if (recursiveRule?.and) {
                             const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.and.properties || "");
                             const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.and?.ruleType)}-${recursiveRule?.and.id}`;
+                            const value: { value: string, cadence: number} = convertStringToJson(recursiveRule?.and.value || "");
+
                             edgeNodes.push({
                                 id: `edge-${getId()}`,
                                 source: edgeNodes[rulesCounter - 1].target,
@@ -819,7 +821,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                             sensor: recursiveRule?.and.fieldId,
                                             deviceSource: recursiveRule?.and.fieldId ? "sensor" : "attribute",
                                             operator: recursiveRule?.and.operator,
-                                            operatorValue: recursiveRule?.and.value,
+                                            operatorValue: value?.value,
+                                            candence: value?.cadence,
                                             title: recursiveRule?.and.title,
                                             ruleType: RuleTypeEnums[recursiveRule?.and.ruleType]
                                         },
@@ -833,6 +836,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         if (recursiveRule?.or) {
                             const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.or?.ruleType)}-${recursiveRule?.or.id}`;
                             const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.or.properties || "");
+                            const value: { value: string, cadence: number} = convertStringToJson(recursiveRule?.or.value || "");
+
                             edgeNodes.push({
                                 id: `edge-${getId()}`,
                                 source: edgeNodes[rulesCounter - 1]?.target,
@@ -857,7 +862,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                             sensor: recursiveRule?.or?.fieldId,
                                             deviceSource: recursiveRule?.or?.fieldId ? "sensor" : "attribute",
                                             operator: recursiveRule?.or?.operator,
-                                            operatorValue: recursiveRule?.or?.value,
+                                            operatorValue: value?.value,
+                                            cadence: value?.cadence,
                                             title: recursiveRule?.or?.title,
                                             ruleType: RuleTypeEnums[recursiveRule?.or?.ruleType]
                                         },
@@ -871,6 +877,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 } else {
                     const properties: { position: { x: number, y: number } } = convertStringToJson(currenTrigger?.rule?.properties || "");
                     const ruleId: string = `${getRuleNodeLabelNameById(currenTrigger?.rule?.ruleType)}-${currenTrigger?.rule?.id}`;
+                    const value: { value: string, cadence: number} = convertStringToJson(currenTrigger?.rule?.value || "");
 
                     edgeNodes.push({
                         id: `edge-${getId()}`,
@@ -897,7 +904,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                     sensor: currenTrigger?.rule?.fieldId,
                                     deviceSource: currenTrigger?.rule?.fieldId ? "sensor" : "attribute",
                                     operator: currenTrigger?.rule?.operator,
-                                    operatorValue: currenTrigger?.rule?.value,
+                                    operatorValue: value?.value,
+                                    cadence: value?.cadence,
                                     title: currenTrigger?.rule?.title,
                                     ruleType: RuleTypeEnums[currenTrigger?.rule?.ruleType]
                                 },
