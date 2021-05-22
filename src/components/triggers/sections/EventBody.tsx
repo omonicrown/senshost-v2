@@ -563,7 +563,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     id: null,
                     name: action?.data?.nodeControls?.actions?.newAction?.name,
                     type: action?.data?.nodeControls?.actions?.newAction?.actionType,
-                    properties: JSON.stringify(action?.data?.nodeControls?.actions?.newAction?.property || ""),
+                    properties: JSON.stringify({ ...action?.data?.nodeControls?.actions?.newAction?.property, position: (action as Node)?.position } || ""),
                     accountId: authState?.auth?.account?.id,
                     creationDate: null
                 } as ActionModel;
@@ -573,7 +573,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
 
         const ruleType: string = selectedTrigger?.id?.split("-")[0];
         let trigger: TriggerModel = {
-            id: null,
+            id: currenTrigger?.id || null,
             name: selectedTrigger?.data?.nodeControls?.trigger?.eventName,
             eventName: selectedTrigger?.data?.nodeControls?.trigger?.triggerName,
             type: RuleTriggerTypes[ruleType],
@@ -581,6 +581,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             sourceId: selectedTrigger?.data?.nodeControls?.trigger?.sourceId,
             accountId: authState?.auth?.account?.id,
             deviceId: selectedTrigger?.data?.nodeControls?.trigger?.deviceId,
+            properties: JSON.stringify({ position: (selectedTrigger as Node)?.position }),
             rule: null,
             actions
         };
@@ -728,7 +729,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         };
 
                         dispatch(toggleNotification(notification));
-
+                        setElements([]);
                         setCurrentTrigger(response.data);
                     }
 
@@ -754,7 +755,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                     setLoading(false);
                 });
         }
-    }, [elements]);
+    }, [elements, setElements]);
 
     React.useEffect(() => {
 
@@ -786,9 +787,8 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
             let edgeNodes: Array<Edge> = [];
             let ruleNodes: Array<FlowElement> = [];
 
-            let rulesCounter = -1;
             const generateRulesrecursively = (recursiveRule?: RuleModel) => {
-                rulesCounter += 1;
+
                 if (ruleNodes?.length) {
                     if (recursiveRule?.and || recursiveRule?.or) {
                         const parentRuleId: string = `${getRuleNodeLabelNameById(recursiveRule?.ruleType)}-${recursiveRule?.id}`;
@@ -848,6 +848,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 data: { lineType: "OR" },
                                 label: "OR"
                             });
+
                             ruleNodes.push({
                                 id: ruleId,
                                 position: properties?.position || defaultPosition,
@@ -921,7 +922,6 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 }
             };
             generateRulesrecursively();
-            rulesCounter = -1;
             // actions
             const actionNodes: Array<FlowElement> = currenTrigger?.actions?.map((action: ActionModel) => {
                 const actionNodeId: string = `${getActionNodeIdByTypeEnum(action?.type)}-${getId()}`;

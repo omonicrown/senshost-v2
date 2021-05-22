@@ -9,10 +9,10 @@ export class TriggerLiveApis extends AxiosGlobal {
         return this.axios.get(`${configs.context}/${configs.apiList.Trigger}/${id}`);
     }
 
-     getTriggersByAccountId(accountId: string): AxiosPromise<Array<TriggerModel>> {        
+    getTriggersByAccountId(accountId: string): AxiosPromise<Array<TriggerModel>> {
         return this.axios.get(`${configs.context}/${configs.apiList.Trigger}/account/${accountId}`);
 
-     }
+    }
 
     createTrigger(trigger: TriggerModel): AxiosPromise<TriggerModel> {
         return this.axios.post(`${configs.context}/${configs.apiList.Trigger}`, trigger);
@@ -21,4 +21,8 @@ export class TriggerLiveApis extends AxiosGlobal {
     updateTriggerById(trigger: TriggerModel): AxiosPromise<TriggerModel> {
         return this.axios.put(`${configs.context}/${configs.apiList.Trigger}/${trigger?.id}`, trigger);
     }
-} 
+
+    deleteTriggerById(triggerId: string): AxiosPromise<PositiveResponse> {
+        return this.axios.delete(`${configs.context}/${configs.apiList.Trigger}/${triggerId}`);
+    }
+}

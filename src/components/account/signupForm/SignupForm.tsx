@@ -84,7 +84,7 @@ class SignupForm extends React.Component<SignupFormProps, SignupFormStates> {
             if (this.state.auth.password !== this.state.auth.cpassword) {
                 errors = { ...errors, cpassword: "passwords do not match" }
             }
-            console.log("The state is ", this.state.auth)
+        
             if (!errors) {
                 AuthApis.signup({
                     id: null,

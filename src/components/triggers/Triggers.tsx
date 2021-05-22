@@ -10,13 +10,18 @@ import { ActionLinkItem, Column, DataItem, TableHeader, TableRow } from "@sebgro
 import { Pagination } from "@sebgroup/react-components/dist/Pagination";
 import { TriggerApis } from "../../apis/triggerApis";
 import { AuthState, States } from "../../interfaces/states";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AxiosResponse } from "axios";
 import { TriggerModel } from "../../interfaces/models";
 import configs from "../../configs";
-import { ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
+import { Modal, ModalProps } from "@sebgroup/react-components/dist/Modal/Modal";
 import { initialState } from "../../constants";
 import { RuleTriggerTypes } from "../../enums";
+import PortalComponent from "../shared/Portal";
+import { Loader } from "@sebgroup/react-components/dist/Loader";
+import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
+import { Dispatch } from "redux";
+import { toggleNotification } from "../../actions";
 
 export interface TriggersProps extends SharedProps {
 
@@ -29,12 +34,49 @@ const Triggers: React.FunctionComponent<TriggersProps> = (props: TriggersProps):
     const [trigger, setTrigger] = React.useState<TriggerModel>();
     const [modalDeleteTriggerProps, setModalDeleteTriggerProps] = React.useState<ModalProps>({ ...initialState });
     const [paginationValue, setPagination] = React.useState<number>(1);
-    const [paginationSize, setPaginationSize] = React.useState<number>(1);
+
+    const dispatch: Dispatch = useDispatch();
+
 
     const history: History = useHistory();
     const handleAddTrigger = React.useCallback((e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         history.push(TriggerRoutes.CreateTrigger.toString());
     }, []);
+
+    const onDismissDelete = React.useCallback(() => {
+        setModalDeleteTriggerProps({ ...modalDeleteTriggerProps, toggle: false });
+    }, [setModalDeleteTriggerProps, setModalDeleteTriggerProps]);
+
+    const handleDeleteTrigger = React.useCallback(() => {
+        setLoading(true);
+        TriggerApis.deleteTriggerById(trigger?.id)
+            .then((response: AxiosResponse) => {
+                const notification: NotificationProps = {
+                    theme: "success",
+                    title: "User deleted",
+                    message: `Trigger delete successfully`,
+                    toggle: true,
+                    onDismiss: () => { }
+                };
+
+                const indexOfTriggerToBeDeleted: number = data?.findIndex((newTrigger: TriggerModel) => newTrigger?.id === newTrigger?.id);
+                const updatedTriggers: Array<TriggerModel> = [
+                    ...data?.slice(0, indexOfTriggerToBeDeleted),
+                    ...data?.slice(indexOfTriggerToBeDeleted + 1)
+                ];
+
+                dispatch(toggleNotification(notification));
+                setData(updatedTriggers || []);
+
+                setTrigger({} as TriggerModel);
+            })
+            .finally(() => {
+                setModalDeleteTriggerProps({ ...modalDeleteTriggerProps, toggle: false });
+                setLoading(false);
+            });
+
+    }, [setLoading, setModalDeleteTriggerProps, trigger, setData, setTrigger]);
+
 
     const columns: Array<Column> = React.useMemo((): Array<Column> => [
         {
@@ -129,6 +171,30 @@ const Triggers: React.FunctionComponent<TriggersProps> = (props: TriggersProps):
                     </div>
                 </div>
             </div>
+
+            <PortalComponent>
+                <Modal
+                    {...modalDeleteTriggerProps}
+                    onDismiss={onDismissDelete}
+                    header={<h4>Delete {trigger?.name} ?</h4>}
+                    body={
+                        modalDeleteTriggerProps?.toggle ?
+                            <p>Are you sure you want to delete this ?</p>
+                            : null
+                    }
+                    footer={
+                        modalDeleteTriggerProps?.toggle ?
+                            <div className="controls-holder d-flex flex-sm-row flex-column">
+                                <Button label="Cancel" theme="outline-primary" onClick={onDismissDelete} />
+                                <Button label="Delete" theme="danger" onClick={handleDeleteTrigger}>
+                                    {<Loader toggle={loading} size='sm' />}
+                                </Button>
+                            </div>
+                            : null
+                    }
+                />
+
+            </PortalComponent>
         </div>
     );
 };

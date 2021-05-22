@@ -7,7 +7,7 @@ import { TriggerLiveApis } from "./live/triggerLiveApis";
 export class TriggerApis {
     private static triggerApis: TriggerLiveApis = new TriggerLiveApis();
 
-    static getTriggerById(id: string): AxiosPromise<TriggerModel> {        
+    static getTriggerById(id: string): AxiosPromise<TriggerModel> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
@@ -15,7 +15,7 @@ export class TriggerApis {
         }
     }
 
-    static getTriggersByAccountId(accountId: string): AxiosPromise<Array<TriggerModel>> {        
+    static getTriggersByAccountId(accountId: string): AxiosPromise<Array<TriggerModel>> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
@@ -23,7 +23,7 @@ export class TriggerApis {
         }
     }
 
-    static createTrigger(trigger: TriggerModel): AxiosPromise<TriggerModel> {        
+    static createTrigger(trigger: TriggerModel): AxiosPromise<TriggerModel> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
@@ -31,11 +31,19 @@ export class TriggerApis {
         }
     }
 
-    static updateTriggerById(trigger: TriggerModel): AxiosPromise<TriggerModel> {        
+    static updateTriggerById(trigger: TriggerModel): AxiosPromise<TriggerModel> {
         if (configs.type === "LOCAL") {
             return {} as AxiosPromise;
         } else {
             return this.triggerApis.updateTriggerById(trigger);
+        }
+    }
+
+    static deleteTriggerById(triggerId: string): AxiosPromise<PositiveResponse> {
+        if (configs.type === "LOCAL") {
+            return {} as AxiosPromise;
+        } else {
+            return this.triggerApis.deleteTriggerById(triggerId);
         }
     }
 }

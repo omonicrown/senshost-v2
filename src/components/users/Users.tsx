@@ -200,7 +200,7 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
                 setLoading(false);
             });
 
-    }, [setLoading, setModalDeleteUserProps, user, setUsers])
+    }, [setLoading, setModalDeleteUserProps, user, setUsers]);
 
     const onCancel = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setModalProps({ ...modalProps, toggle: false });
