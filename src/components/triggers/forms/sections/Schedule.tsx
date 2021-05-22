@@ -8,7 +8,7 @@ interface ScheduledProps {
     loading: boolean;
     trigger: TriggerFormModel;
     sourceTypes: Array<DropdownItem>;
-    candenceValues: Array<DropdownItem>;
+    cadenceValues: Array<DropdownItem>;
     handleTriggerDropDownChange: (value: DropdownItem, type: "deviceId" | "sourceId" | "sourceType") => void;
     handleTriggerTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleTriggerStartDateChange: (value: Date) => void;
@@ -35,7 +35,7 @@ const Schedule: React.FC<ScheduledProps> = (props: ScheduledProps): React.ReactE
                     <Dropdown
                         label="Cadence"
                         name="cadence"
-                        list={props?.candenceValues}
+                        list={props?.cadenceValues}
                         className="col"
                         disabled={props?.loading}
                         selectedValue={props.trigger?.sourceId as DropdownItem}

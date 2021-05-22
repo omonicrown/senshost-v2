@@ -81,7 +81,7 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
     }, [elementType]);
 
 
-    const candenceValues: Array<DropdownItem> = React.useMemo(() => {
+    const cadenceValues: Array<DropdownItem> = React.useMemo(() => {
         return [{
             label: "Select",
             value: null
@@ -131,7 +131,7 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
         } else if (sourceType?.value === TriggerDataSourceTypeEnums.actuator) {
             sourceId = actuators.find((source: DropdownItem) => source?.value === element?.data?.nodeControls?.trigger?.sourceId);
         } else if (sourceType?.value === TriggerDataSourceTypeEnums.recurring) {
-            sourceId = candenceValues?.find((cadence: DropdownItem) => cadence?.value === element?.data?.nodeControls?.trigger?.sourceId);
+            sourceId = cadenceValues?.find((cadence: DropdownItem) => cadence?.value === element?.data?.nodeControls?.trigger?.sourceId);
         }
         
         setFields({
@@ -177,7 +177,7 @@ const TriggerForm: React.FC<TriggerFormProps> = (props: TriggerFormProps): React
                     trigger={fields}
                     handleTriggerDropDownChange={props.handleTriggerDropDownChange}
                     loading={props.loading}
-                    candenceValues={candenceValues}
+                    cadenceValues={cadenceValues}
                     handleTriggerStartDateChange={props.handleTriggerStartDateChange}
                     sourceTypes={triggerSouceTypes}
                     handleTriggerTextChange={props.handleTriggerTextChange}

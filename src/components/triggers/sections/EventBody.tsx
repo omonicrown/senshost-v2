@@ -614,7 +614,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         ruleType: RuleTypeEnums[firstWord],
                         dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                         value: JSON.stringify({
-                            candence: firstRuleNode?.data.nodeControls.rules?.cadence,
+                            cadence: firstRuleNode?.data.nodeControls.rules?.cadence,
                             value: firstRuleNode?.data.nodeControls.rules?.operatorValue
                         }),
                         properties: JSON.stringify({ position: (firstRuleNode as Node)?.position }),
@@ -636,7 +636,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 ruleType: RuleTypeEnums[firstWordDefault],
                                 dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                                 value: JSON.stringify({
-                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    cadence: outgoingRule?.data.nodeControls.rules?.cadence,
                                     value: outgoingRule?.data.nodeControls.rules?.operatorValue
                                 }),
                                 properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
@@ -653,7 +653,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 ruleType: RuleTypeEnums[firstWordDefault],
                                 dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                                 value: JSON.stringify({
-                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    cadence: outgoingRule?.data.nodeControls.rules?.cadence,
                                     value: outgoingRule?.data.nodeControls.rules?.operatorValue
                                 }),
                                 properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
@@ -679,7 +679,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 ruleType: RuleTypeEnums[firstWordDefault],
                                 dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                                 value: JSON.stringify({
-                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    cadence: outgoingRule?.data.nodeControls.rules?.cadence,
                                     value: outgoingRule?.data.nodeControls.rules?.operatorValue
                                 }),
                                 properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
@@ -696,7 +696,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                 ruleType: RuleTypeEnums[firstWordDefault],
                                 dataFieldSourceType: RuleDataSouceTypeEnums[nodeDatasourceType],
                                 value: JSON.stringify({
-                                    candence: outgoingRule?.data.nodeControls.rules?.cadence,
+                                    cadence: outgoingRule?.data.nodeControls.rules?.cadence,
                                     value: outgoingRule?.data.nodeControls.rules?.operatorValue
                                 }),
                                 properties: JSON.stringify({ position: (outgoingRule as Node)?.position }),
@@ -791,14 +791,15 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 rulesCounter += 1;
                 if (ruleNodes?.length) {
                     if (recursiveRule?.and || recursiveRule?.or) {
+                        const parentRuleId: string = `${getRuleNodeLabelNameById(recursiveRule?.ruleType)}-${recursiveRule?.id}`;
                         if (recursiveRule?.and) {
                             const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.and.properties || "");
                             const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.and?.ruleType)}-${recursiveRule?.and.id}`;
-                            const value: { value: string, cadence: number} = convertStringToJson(recursiveRule?.and.value || "");
+                            const value: { value: string, cadence: number } = convertStringToJson(recursiveRule?.and.value || "");
 
                             edgeNodes.push({
                                 id: `edge-${getId()}`,
-                                source: edgeNodes[rulesCounter - 1].target,
+                                source: parentRuleId,
                                 sourceHandle: null,
                                 target: ruleId,
                                 targetHandle: null,
@@ -822,7 +823,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                                             deviceSource: recursiveRule?.and.fieldId ? "sensor" : "attribute",
                                             operator: recursiveRule?.and.operator,
                                             operatorValue: value?.value,
-                                            candence: value?.cadence,
+                                            cadence: value?.cadence,
                                             title: recursiveRule?.and.title,
                                             ruleType: RuleTypeEnums[recursiveRule?.and.ruleType]
                                         },
@@ -836,11 +837,11 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                         if (recursiveRule?.or) {
                             const ruleId: string = `${getRuleNodeLabelNameById(recursiveRule?.or?.ruleType)}-${recursiveRule?.or.id}`;
                             const properties: { position: { x: number, y: number } } = convertStringToJson(recursiveRule?.or.properties || "");
-                            const value: { value: string, cadence: number} = convertStringToJson(recursiveRule?.or.value || "");
+                            const value: { value: string, cadence: number } = convertStringToJson(recursiveRule?.or.value || "");
 
                             edgeNodes.push({
                                 id: `edge-${getId()}`,
-                                source: edgeNodes[rulesCounter - 1]?.target,
+                                source: parentRuleId,
                                 sourceHandle: null,
                                 target: ruleId,
                                 targetHandle: null,
@@ -877,7 +878,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 } else {
                     const properties: { position: { x: number, y: number } } = convertStringToJson(currenTrigger?.rule?.properties || "");
                     const ruleId: string = `${getRuleNodeLabelNameById(currenTrigger?.rule?.ruleType)}-${currenTrigger?.rule?.id}`;
-                    const value: { value: string, cadence: number} = convertStringToJson(currenTrigger?.rule?.value || "");
+                    const value: { value: string, cadence: number } = convertStringToJson(currenTrigger?.rule?.value || "");
 
                     edgeNodes.push({
                         id: `edge-${getId()}`,
@@ -959,7 +960,7 @@ const EventBody: React.FC = (): React.ReactElement<void> => {
                 position: triggerProperties?.position || defaultPosition,
                 style: { backgroundColor: "#eee" },
                 data: {
-                    label: currenTrigger?.type === RuleTriggerTypes.dataReceived ? "dataReceived" : "schedule",
+                    label: currenTrigger?.type === RuleTriggerTypes.dataReceived ? "onDataReceived" : "schedule",
                     nodeType: "trigger",
                     nodeControls: {
                         trigger: {
