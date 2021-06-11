@@ -20,8 +20,8 @@
     "jsx": "react"
   },
   "include": [
-    "src",
-    "node_modules/jqwidgets-scripts/jqwidgets-ts/**/*.ts"
+    "src"
+    // "node_modules/jqwidgets-scripts/jqwidgets-ts/**/*.ts"
   ]
 }
 
