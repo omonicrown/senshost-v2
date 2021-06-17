@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="./images/icon3.png" />
+    <link rel="icon" type="image/png" href="./images/icon4.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
@@ -11,13 +11,17 @@
     />
     <link rel="apple-touch-icon" href="./images/icon3.png" />
     
-    <link rel="manifest" href="./manifest.json" />
+    <link rel="manifest" href="../manifest.json" />
+   
+    
+    
     <title>Senshost app</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="portal"></div>
+    
     <div id="root"></div>
+     <div id="portal"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -28,8 +32,9 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+<script>
 
-    <script>
+  
       if('serviceWorker' in navigator) {
           window.addEventListener('load', () => {
               navigator.serviceWorker.register('./serviceworker.js')
@@ -37,6 +42,9 @@
                   .catch((err) => console.log('Failure: ', err));
           })
       }
+ 
   </script>
+    
+ 
   </body>
 </html>

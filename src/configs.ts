@@ -3,9 +3,11 @@ import { createBrowserHistory } from 'history';
 //API CALL TYPE
 const TYPE_LOCAL = "LOCAL";
 const TYPE_REST = "REST";
+//console.log(77, process.env.NODE_ENV);
 
 //resources
-const API_URL = process.env.NODE_ENV === "production" ? "" : "http://senshost.com:8015/api";
+ const API_URL = process.env.NODE_ENV === "production" ? "" : "https://senshost.com:8015/api";
+//const API_URL = "http://senshost.com:8015/api";
 const SOCKET_URL = 'mqtt://senshost.com';
 //API contexts
 //We will pass this to swagger class constractor if we need different base urls
@@ -36,7 +38,7 @@ const configs = {
     tokenStorage: "TOKEN_PERSIST",
     socket: SOCKET_URL,
     type: TYPE_REST,
-    context: API_URL,
+    context: "https://senshost.com:8015/api",
     history: createBrowserHistory(),
     requestTimeOut: 30000,
     apiList: APILIST,

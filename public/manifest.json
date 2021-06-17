@@ -1,6 +1,6 @@
 {
     "short_name":"Senshost-V2",
-    "name":"Senshost",
+    "name":"Senshost App",
     "icons":[
         {
             "src":"/images/icon3.png",
@@ -9,7 +9,7 @@
 
         }
     ],
-    "start_url":".",
+    "start_url":"/",
     "display":"standalone",
     "theme_color":"#000000",
     "background_color":"#ffffff"

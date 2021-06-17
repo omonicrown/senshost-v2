@@ -94,9 +94,13 @@ class SigninForm extends React.Component<SigninProps, SigninStates> {
 
     render() {
         return (
+            <div>
+            
             <form onSubmit={this.onSignIn} className="account-forms-container">
+           
                 <div className="row title-holder">
                     <div className="col text-left">
+                    
                         or
                         <Link className="ml-2" to="#" onClick={this.props.setAccountMode} id="signup">create an account</Link>
                     </div>
@@ -144,6 +148,7 @@ class SigninForm extends React.Component<SigninProps, SigninStates> {
                     </div>
                 </div>
             </form>
+            </div>
         );
     }
 }
