@@ -70,14 +70,14 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
 
   return (
     <div className="home-container">
-      <div className="row no-gutters">
-        <HeaderComponent onToggle={onToggle} toggle={toggleMenu} />
+      <div className="row no-gutters" >
+        <HeaderComponent onToggle={onToggle} toggle={toggleMenu}  />
       </div>
       <div className="row no-gutters main-body">
-        <SidebarComponent toggle={toggleMenu} />
+        <SidebarComponent toggle={toggleMenu}/>
         <main className={"main-container col" + (toggleMenu ? " sidemenu-opened" : " sidemenu-closed")} role="main">
-          <div className="main-holder">
-            <div className="container-fluid">
+          <div className="main-holder" >
+            <div className="container-fluid" >
               <Switch>
                 <Redirect
                   exact
@@ -86,6 +86,7 @@ const Home: React.FunctionComponent<SharedProps> = React.memo((props: HomeProps)
                 />
                 <AppRoute
                   path={HomeRoutes.Dashboard.toString()}
+                
                   exact
                   component={Dashbaord}
                 />

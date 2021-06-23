@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="./images/icon4.png" />
+    <link rel="icon" type="image/png" href="AMS.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0040ff" />
     <meta
       name="description"
       content="pwa sample test"
     />
-    <link rel="apple-touch-icon" href="./images/icon3.png" />
+    <link rel="apple-touch-icon" href="AMS.png" />
     
     <link rel="manifest" href="../manifest.json" />
    
@@ -33,8 +34,6 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
 <script>
-
-  
       if('serviceWorker' in navigator) {
           window.addEventListener('load', () => {
               navigator.serviceWorker.register('./serviceworker.js')

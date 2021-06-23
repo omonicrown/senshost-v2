@@ -3,7 +3,7 @@
     "name":"Senshost App",
     "icons":[
         {
-            "src":"/images/icon3.png",
+            "src":"AMS.png",
             "type":"image/png",
             "sizes":"2024x2024"
 
@@ -11,7 +11,7 @@
     ],
     "start_url":"/",
     "display":"standalone",
-    "theme_color":"#000000",
+    "theme_color":"#0040ff",
     "background_color":"#ffffff"
 
 

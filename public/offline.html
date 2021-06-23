@@ -20,7 +20,19 @@
                 text-align: center;
                 justify-content: center;
             }
-        
+            .button {
+                    background-color: #0040ff;
+                    border: none;
+                    color: white;
+                    padding: 15px 32px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 10%;
+            }
             .city {
                 align-items: center;
                 width: 80%;
@@ -39,10 +51,10 @@
     </head>
     <body>
         <div class="city">
-            <Img src="../public/images/senshost.png" > </Img>
+            
             <h2 class="city-name">
                 <span>Senshost is currently offline</span> <br> 
-                <button onclick="window.location.reload();" class="btn btn-primary" align="middle"> REFRESH</button>
+                <button onclick="window.location.reload();" class="button" align="middle"> REFRESH</button>
 
             </h2>
         </div>

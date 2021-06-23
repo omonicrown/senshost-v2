@@ -94,7 +94,7 @@ class SigninForm extends React.Component<SigninProps, SigninStates> {
 
     render() {
         return (
-            <div>
+            <div className="">
             
             <form onSubmit={this.onSignIn} className="account-forms-container">
            

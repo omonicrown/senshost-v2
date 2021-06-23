@@ -1,5 +1,5 @@
 const CACHE_NAME = "Senshost-V7";
-const urlsToCache = [ 'index.html', 'offline.html' ];
+const urlsToCache = [ 'index.html', 'offline.html','AMS.png' ];
 
 const self = this;
 
@@ -21,7 +21,7 @@ self.addEventListener('fetch', (event) => {
         caches.match(event.request)
             .then(() => {
                 return fetch(event.request) 
-                    .catch(() => caches.match('offline2.html'))
+                    .catch(() => caches.match('offline.html'))
             })
     )
 });

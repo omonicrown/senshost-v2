@@ -20,10 +20,12 @@ import { navigate } from "../../utils/navigateUtil";
 import { AppRoutes } from "../../enums/routes";
 import { NotificationProps } from "@sebgroup/react-components/dist/notification/Notification";
 
+
 export type AccountMode = "signup" | "signin";
 interface UserAccountStates {
   modal: ModalProps;
   accountMode: AccountMode;
+ 
 }
 
 class UserAccount extends React.PureComponent<SharedProps, UserAccountStates> {
@@ -116,8 +118,9 @@ class UserAccount extends React.PureComponent<SharedProps, UserAccountStates> {
               disableBackdropDismiss={this.state.modal.disableBackdropDismiss}
               position={this.state.modal.position}
               onDismiss={this.toggleModal}
-              header={<AccountHeader accountMode={this.state.accountMode} />}
+              header={<Button className="sdv-button sdv-button-ghost-dark float-right"  label="X" onClick={this.setAccountMode} size="sm" />}
               body={<>
+              {<AccountHeader accountMode={this.state.accountMode} />}
                 {this.state.accountMode === "signin" && <SigninForm history={this.props.history} setAccountMode={this.setAccountModeOnly} />}
                 {this.state.accountMode === "signup" && <SignupForm history={this.props.history} setAccountMode={this.setAccountModeOnly} onSuccessfullRegister={this.onSwictchToSignin} />} </>}
               ariaLabel="My Label"

@@ -256,14 +256,15 @@ const ActionHolder: React.FunctionComponent<ActionHolderProps> = (props: ActionH
         <div className="actions-container">
             <PageTitle title="Actions" />
             <div className="actions-holder">
-                <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
+                <div className="table-filter-and-control-holder d-flex flex-row bd-highlight mb-3">
                     <Dropdown
+                    className="p-2 bd-highlight"
                         placeholder="Filter By Type"
                         list={actionTypes}
                         selectedValue={selectedType}
                         onChange={(value: DropdownItem) => setSelectedType(value)}
                     />
-                    <Button label="Add" id="addBtn" size="sm" theme="outline-primary" title="Add" onClick={onAddAction} />
+                    <Button className="p-2 bd-highlight" label="Add" id="addBtn" size="sm" theme="outline-primary" title="Add" onClick={onAddAction} />
                 </div>
                 <div className="row">
                     <div className="col">

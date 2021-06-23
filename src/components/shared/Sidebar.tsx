@@ -2,6 +2,7 @@ import React from "react";
 import { Icon } from "@sebgroup/react-components/dist/Icon";
 import { SvgElement, icontypesEnum } from "../../utils/svgElement";
 import { useHistory } from "react-router";
+import HeaderComponent from "../shared/Header";
 import { History } from 'history';
 import { Link } from "react-router-dom";
 
@@ -14,6 +15,8 @@ interface MenuItem {
     iconType: icontypesEnum;
     title: string;
 }
+
+
 
 const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): React.ReactElement<void> => {
     const history: History = useHistory();
@@ -58,16 +61,18 @@ const Sidebar: React.FunctionComponent<SidebarProps> = (props: SidebarProps): Re
     ];
 
     return (
-        <aside className={"left-side-container " + (props.toggle ? "sidemenu-opened" : "sidemenu-closed")}>
-            <div className="sidebar-content">
-                <div className="row">
-                    <div className="sidebar-sticky col">
-                        <ul className="nav d-flex flex-column">
+        <aside className={"left-side-container " + (props.toggle ? "sidemenu-opened" : "sidemenu-closed")} >
+            <div className="sidebar-content" >
+                <div className="row " > 
+                    <div className="sidebar-sticky ">
+                   
+                        <ul className="nav d-flex flex-column " >
                             {menuItems?.map((menu: MenuItem) =>
                                 <li className={"nav-item"} key={menu.name}>
-                                    <Link className={"title-holder d-flex " + (isActiveTab(menu.name) ? " active" : "")} to={`/home/${menu.name}`}>
+                                   
+                                    <Link   className={"title-holder d-flex " + (isActiveTab(menu.name) ? " active" : "")} to={`/home/${menu.name}`} >
                                         <Icon src={<SvgElement type={menu.iconType} />} />
-                                        <span className="title">{menu.title}</span>
+                                        <span className="title" >{menu.title}</span>
                                     </Link>
                                 </li>
                             )}

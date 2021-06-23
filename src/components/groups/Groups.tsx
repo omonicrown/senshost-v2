@@ -283,14 +283,15 @@ const GroupHolder: React.FunctionComponent<GroupsProps> = (props: GroupsProps): 
     <div className="groups-container">
       <PageTitle title="Groups" />
       <div className="group-holder">
-        <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
+        <div className="table-filter-and-control-holder d-flex flex-row bd-highlight mb-3">
           <Dropdown
+          className="p-2 bd-highlight"
             placeholder="Filter By Status"
             list={statuses}
             selectedValue={selectedStatus}
             onChange={(value: DropdownItem) => setSelectedStatus(value)}
           />
-          <Button label="Add" id="addBtn" size="sm" theme="outline-primary" title="Add" onClick={onAddGroup} />
+          <Button className="p-2 bd-highlight" label="Add" id="addBtn" size="sm" theme="outline-primary" title="Add" onClick={onAddGroup} />
         </div>
         <div className="row">
           <div className="col">

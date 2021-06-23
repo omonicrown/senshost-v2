@@ -20,8 +20,16 @@
                 }
             }
         }
+        // .col-6{
+        //     @media screen and (max-width: 600px) {
+        //        flex: 50% 20% 0;
+        //        max-width: 80%;
+        //       }
+           
+      //  }
 
         .account-forms {
+          
             @import "./forms/forms.scss";
         }
 

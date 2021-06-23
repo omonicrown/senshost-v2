@@ -171,15 +171,17 @@ const Devices: React.FunctionComponent<DevicesProps> = (props: DevicesProps): Re
     <div className="device-container">
       <PageTitle title="Devices" />
       <div className="device-holder">
-        <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
+        <div className="table-filter-and-control-holder d-flex flex-row bd-highlight mb-3">
           <Dropdown
+          className="p-2 bd-highlight"
             placeholder="Filter By type"
             list={deviceTypes}
             searchable
             selectedValue={selectedDeviceType}
             onChange={(value: DropdownItem) => setSelectedDeviceType(value)}
           />
-          <Button
+          <Button 
+          className="p-2 bd-highlight"
             label="Add"
             theme="outline-primary"
             id="btnAdd"

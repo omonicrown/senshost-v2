@@ -252,15 +252,16 @@ const Users: React.FunctionComponent<UsersProps> = (props: UsersProps): React.Re
             <PageTitle title="Users" />
 
             <div className="users-holder">
-                <div className="table-filter-and-control-holder d-flex flex-sm-row flex-column">
+                <div className="table-filter-and-control-holder d-flex flex-row bd-highlight mb-3">
                     <Dropdown
+                    className="p-2 bd-highlight"
                         placeholder="Filter By Group"
                         list={groupOptions}
                         selectedValue={selectedGroup}
                         onChange={(value: DropdownItem) => setSelectedGroup(value)}
                     />
 
-                    <Button label="Add" size="sm" id="addBtn" theme="outline-primary" title="Add" onClick={onAdduser} />
+                    <Button className="p-2 bd-highlight" label="Add" size="sm" id="addBtn" theme="outline-primary" title="Add" onClick={onAdduser} />
 
                 </div>
                 <div className="row">
